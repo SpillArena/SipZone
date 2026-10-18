@@ -1,0 +1,2 @@
+/sipzone/favicon.svg /favicon.svg 200
+/sipzone/assets/* /assets/:splat 200

@@ -1,0 +1,522 @@
+/* Live entry points and the shared account pill in its usual corner. */
+.app-shell {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+}
+.live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.hero-actions > .button {
+  gap: 12px;
+}
+.live-spotlight {
+  max-width: 1480px;
+  margin-bottom: 48px;
+}
+.live-spotlight-card {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  gap: 28px;
+  padding: 44px 48px;
+  border-radius: 20px;
+  background: var(--accent);
+  color: var(--pine);
+  overflow: hidden;
+}
+.live-spotlight h2 {
+  font-size: clamp(36px, 4.1vw, 58px);
+  letter-spacing: -2px;
+  margin-block: 18px;
+}
+.live-spotlight-copy > p:not(.eyebrow) {
+  max-width: 500px;
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+.live-perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-bottom: 25px;
+}
+.live-perks > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.live-perks svg {
+  flex-shrink: 0;
+}
+.live-start {
+  background: var(--pine);
+  color: var(--paper);
+}
+.live-start:hover {
+  background: #214d3d;
+}
+.live-join-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.live-spotlight :focus-visible {
+  outline-color: var(--pine);
+}
+.live-phone-scene {
+  position: relative;
+  height: 320px;
+  min-width: 0;
+}
+.live-phone {
+  position: absolute;
+  border: 6px solid var(--pine);
+  border-radius: 25px;
+  padding: 20px 15px 16px;
+  box-shadow: 6px 10px 0 #153a3025;
+}
+.phone-host {
+  width: 176px;
+  height: 286px;
+  background: var(--paper);
+  left: 7%;
+  top: 8px;
+  transform: rotate(-10deg);
+}
+.phone-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 8px;
+  font-weight: 750;
+  letter-spacing: 1px;
+}
+.phone-top > i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.phone-game {
+  display: block;
+  margin-top: 24px;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.phone-host > strong {
+  display: block;
+  font-size: 23px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.9px;
+  margin: 10px 0 16px;
+}
+.phone-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block: 6px;
+  min-height: 25px;
+  padding: 5px 10px;
+  border: 1px solid #153a3035;
+  border-radius: 5px;
+  font-size: 10px;
+}
+.phone-option.selected {
+  background: var(--pine);
+  color: var(--paper);
+}
+.phone-voter {
+  width: 160px;
+  height: 256px;
+  background: var(--pine);
+  color: var(--paper);
+  right: 4%;
+  bottom: 0;
+  transform: rotate(11deg);
+}
+.phone-vote-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 28px auto 18px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--pine);
+  font-size: 31px;
+}
+.phone-voter > strong {
+  display: block;
+  font-size: 22px;
+  line-height: 1.1;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+.phone-bottom {
+  display: block;
+  text-align: center;
+  font-size: 6px;
+  letter-spacing: 1px;
+  margin-top: 24px;
+}
+.phone-connection {
+  position: absolute;
+  top: 4px;
+  right: 13%;
+  font-size: 48px;
+  transform: rotate(14deg);
+}
+.live-onboarding {
+  max-width: 1100px;
+}
+.live-intro {
+  margin-block: 25px 34px;
+  max-width: 620px;
+}
+.live-intro h1 {
+  font-size: clamp(40px, 5vw, 62px);
+  margin: 18px 0;
+  letter-spacing: -2.7px;
+  line-height: 1.06;
+}
+.live-intro h1 > span {
+  color: var(--accent);
+}
+[data-theme="light"] .live-intro h1 > span {
+  color: #b43820;
+}
+.live-intro > p:last-child {
+  color: var(--muted);
+  max-width: 490px;
+  font-size: 15px;
+}
+.live-entry-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 60px;
+}
+.live-entry {
+  padding: 28px;
+}
+.live-entry-modes {
+  margin-bottom: 26px;
+}
+.live-entry-modes > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+}
+.live-entry-modes svg {
+  flex-shrink: 0;
+}
+.live-entry-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+[data-theme="light"] .live-entry-icon {
+  color: var(--pine);
+}
+.live-entry-copy h2 {
+  margin: 0 0 12px;
+  font-size: 29px;
+  letter-spacing: -1px;
+}
+.live-entry-copy p {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 0 25px;
+}
+.live-entry .code-input {
+  max-width: 100%;
+  width: 100%;
+  text-align: center;
+  font-size: 34px;
+  min-height: 66px;
+  letter-spacing: 10px;
+}
+.live-entry > .button {
+  margin-top: 0;
+  gap: 10px;
+}
+.live-entry .live-account-note {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+  text-align: center;
+}
+.live-how > .eyebrow {
+  color: var(--muted);
+  margin-bottom: 25px;
+}
+.live-how > ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.live-how li {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+.live-how li > span {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--accent);
+}
+[data-theme="light"] .live-how li > span {
+  color: var(--pine);
+}
+.live-how h3 {
+  font-size: 17px;
+  letter-spacing: -0.3px;
+  margin: 0 0 6px;
+}
+.live-how p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+  margin: 0;
+}
+.live-included {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+}
+.live-included > span {
+  font-size: 10px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+@media (max-width: 1050px) {
+  .live-spotlight-card {
+    padding: 32px;
+    grid-template-columns: 1.2fr 1fr;
+  }
+  .phone-host {
+    left: 0;
+  }
+  .phone-voter {
+    right: 0;
+  }
+  .live-entry-grid {
+    gap: 32px;
+  }
+}
+@media (max-width: 760px), (max-width: 960px) and (max-height: 500px) {
+  .hero-actions {
+    align-items: stretch;
+    flex-direction: column;
+    max-width: 360px;
+  }
+  .hero-actions > .button {
+    width: 100%;
+  }
+  .live-spotlight {
+    margin-bottom: 30px;
+  }
+  .live-spotlight-card {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 28px;
+    border-radius: 15px;
+  }
+  .live-spotlight h2 {
+    font-size: 40px;
+    letter-spacing: -1.7px;
+  }
+  .live-spotlight-copy > p:not(.eyebrow) {
+    font-size: 14px;
+  }
+  .live-spotlight .actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .live-spotlight .button {
+    width: 100%;
+  }
+  .live-join-link {
+    justify-content: center;
+  }
+  .live-perks {
+    gap: 12px;
+  }
+  .live-perks > span {
+    font-size: 11px;
+  }
+  .live-phone-scene {
+    width: min(100%, 350px);
+    height: 280px;
+    margin: 0 auto;
+  }
+  .phone-host {
+    width: 158px;
+    height: 260px;
+    left: 5%;
+    padding-inline: 12px;
+  }
+  .phone-voter {
+    width: 146px;
+    height: 238px;
+    right: 3%;
+  }
+  .phone-connection {
+    right: 6%;
+    top: -10px;
+  }
+  .live-entry-grid {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .live-intro {
+    margin-block: 16px 25px;
+  }
+  .live-intro h1 {
+    font-size: clamp(38px, 10vw, 54px);
+    letter-spacing: -2px;
+  }
+  .live-intro > p:last-child {
+    font-size: 14px;
+  }
+  .live-entry {
+    padding: 22px;
+  }
+  .live-entry-copy h2 {
+    font-size: 27px;
+  }
+  .live-entry-modes > button {
+    font-size: 13px;
+    gap: 7px;
+  }
+  .live-entry .button {
+    min-height: 56px;
+  }
+  .live-how li {
+    margin-bottom: 22px;
+  }
+  .live-onboarding {
+    padding-top: 16px;
+  }
+  /* Leave the native account pill its own space below touch controls. */
+  .game-actions {
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+  .round-board {
+    min-height: calc(
+      100svh - 216px - env(safe-area-inset-top, 0px) -
+        env(safe-area-inset-bottom, 0px)
+    );
+  }
+  .play-page,
+  .live-playing {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+  .app-shell .sac-reminder {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (max-width: 380px) {
+  .live-spotlight-card {
+    padding: 24px 20px;
+  }
+  .live-spotlight h2 {
+    font-size: 35px;
+  }
+  .live-phone-scene {
+    height: 246px;
+  }
+  .phone-host {
+    width: 137px;
+    height: 232px;
+    left: 2%;
+    padding: 17px 10px 12px;
+    border-width: 5px;
+  }
+  .phone-host > strong {
+    font-size: 21px;
+    margin-bottom: 10px;
+  }
+  .phone-game {
+    margin-top: 17px;
+  }
+  .phone-option {
+    min-height: 22px;
+    margin-block: 5px;
+    padding: 4px 7px;
+  }
+  .phone-voter {
+    width: 125px;
+    height: 207px;
+    right: 0;
+    padding: 16px 10px;
+    border-width: 5px;
+  }
+  .phone-vote-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 26px;
+    margin-block: 23px 13px;
+  }
+  .phone-voter > strong {
+    font-size: 18px;
+  }
+  .phone-bottom {
+    font-size: 5px;
+    margin-top: 18px;
+  }
+  .live-entry {
+    padding: 19px;
+  }
+  .live-entry-modes > button {
+    font-size: 12px;
+    gap: 5px;
+  }
+  .live-entry-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+  .live-entry-copy h2 {
+    font-size: 25px;
+  }
+}

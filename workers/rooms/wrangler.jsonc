@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "sipzone-rooms",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "secrets": { "required": ["AUTH_SECRET"] },
+  "durable_objects": {
+    "bindings": [{ "name": "ROOMS", "class_name": "SipZoneRoom" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SipZoneRoom"] }],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+}

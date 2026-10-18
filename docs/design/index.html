@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="nb" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Visuell skisse for SipZone fra SpillArena. Et norsk vorsbord med plass til lekene som kommer." />
+    <title>SipZone – visuell skisse</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#innhold">Hopp til innhold</a>
+    <header class="site-header">
+      <div class="container header-row">
+        <a class="brand" href="#" aria-label="SipZone, til toppen">
+          <span class="brand-mark" aria-hidden="true">S<span>♦</span></span>
+          <span>SipZone<span class="brand-dot">.</span></span>
+        </a>
+        <nav class="header-actions" aria-label="Navigasjon">
+          <a class="lobby-link" href="https://spillarena.no/">← <span>Til SpillArena</span></a>
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Lys visning" aria-pressed="false" title="Bytt lys og mørk visning">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4.2 4.2l2.1 2.1m11.4 11.4 2.1 2.1M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="innhold">
+      <section class="hero container" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Fra SpillArena. Til vorset.</p>
+          <h1 id="hero-title">Gode venner.<br />Dårlige<br /><span>unnskyldninger.</span></h1>
+          <p class="hero-description">Kort på bordet. Gjengen samlet. Drikkelekene til vorset, hytteturen og den ene runden til.</p>
+          <a class="button primary" href="#lekene">Ta plass rundt bordet <span aria-hidden="true">↗</span></a>
+          <p class="hero-note">En visuell skisse. Lekene velger vi sammen.</p>
+        </div>
+
+        <div class="table-scene">
+          <span class="scene-label">BORDET ER DEKKET</span>
+          <svg class="table-art" viewBox="0 0 620 550" role="img" aria-labelledby="table-title table-description">
+            <title id="table-title">Et vorsbord med kort, ølglass og snusboks</title>
+            <desc id="table-description">En kremhvit kortstokk med hjerter, en rutete kortbakside, et glass på en glassbrikke og en generisk rund snusboks.</desc>
+            <defs>
+              <pattern id="card-pattern" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M8 0 16 8 8 16 0 8Z" fill="none" stroke="#f6f0dc" stroke-width="1.5" opacity=".6" /></pattern>
+              <filter id="card-shadow" x="-50%" y="-50%" width="200%" height="210%"><feDropShadow dx="3" dy="14" stdDeviation="10" flood-color="#041c13" flood-opacity=".3" /></filter>
+            </defs>
+            <circle cx="310" cy="273" r="222" fill="none" stroke="currentColor" opacity=".12" stroke-dasharray="3 9" />
+            <circle cx="310" cy="273" r="188" fill="none" stroke="currentColor" opacity=".07" />
+            <g fill="#eadc90">
+              <path d="m106 98 4 13 13 4-13 4-4 13-4-13-13-4 13-4Z" />
+              <path d="m523 309 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z" />
+              <circle cx="183" cy="458" r="4" />
+            </g>
+            <g transform="translate(104 113) rotate(-17 106 155)" filter="url(#card-shadow)">
+              <rect x="0" y="0" width="206" height="300" rx="17" fill="#f6f0dc" />
+              <rect x="12" y="12" width="182" height="276" rx="10" fill="#da6045" />
+              <rect x="19" y="19" width="168" height="262" rx="6" fill="url(#card-pattern)" />
+              <circle cx="103" cy="150" r="49" fill="#f6f0dc" stroke="#da6045" stroke-width="5" />
+              <text x="103" y="167" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="50" fill="#153a30">S.</text>
+            </g>
+            <g transform="translate(235 119) rotate(12 106 155)" filter="url(#card-shadow)">
+              <rect x="0" y="0" width="206" height="300" rx="17" fill="#f6f0dc" />
+              <rect x="9" y="9" width="188" height="282" rx="10" fill="none" stroke="#153a30" stroke-opacity=".18" />
+              <g fill="#d94c3c" font-family="Georgia, serif" text-anchor="middle">
+                <text x="28" y="39" font-size="28">A</text><text x="28" y="66" font-size="25">♥</text>
+                <g transform="rotate(180 103 150)"><text x="28" y="39" font-size="28">A</text><text x="28" y="66" font-size="25">♥</text></g>
+              </g>
+              <path d="M103 185C91 173 55 149 55 125c0-29 33-38 48-14 15-24 48-15 48 14 0 24-36 48-48 60Z" fill="#d94c3c" />
+              <text x="103" y="225" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="11" letter-spacing="3" fill="#153a30">BARE ÉN TIL</text>
+            </g>
+            <g transform="translate(422 44) rotate(13 60 80)">
+              <ellipse cx="60" cy="160" rx="74" ry="24" fill="#041c13" opacity=".2" />
+              <ellipse cx="60" cy="153" rx="69" ry="26" fill="#eadc90" />
+              <ellipse cx="60" cy="153" rx="58" ry="19" fill="none" stroke="#153a30" opacity=".3" stroke-dasharray="2 3" />
+              <path d="M26 32h68l-6 116q-28 17-56 0Z" fill="#e9a743" stroke="#f6f0dc" stroke-width="3" />
+              <path d="M94 49h13q25 0 21 27l-3 22q-2 16-32 16" fill="none" stroke="#f6f0dc" stroke-width="9" />
+              <path d="m44 61 3 68m14-68v72m17-72-3 68" fill="none" stroke="#f6f0dc" stroke-opacity=".35" stroke-width="4" />
+              <path d="M24 41q-11-14 1-23 3-20 23-13 11-15 26-3 20-5 23 14 13 8 4 23-17-8-24 1-20-12-29 0-12-7-24 1Z" fill="#f6f0dc" />
+            </g>
+            <g transform="translate(391 358) rotate(-13 66 50)">
+              <ellipse cx="72" cy="70" rx="77" ry="49" fill="#041c13" opacity=".2" />
+              <ellipse cx="66" cy="58" rx="70" ry="46" fill="#1c2420" stroke="#f6f0dc" stroke-width="2" />
+              <path d="M-4 48v12c0 26 140 26 140 0V48" fill="#e3dfcb" />
+              <ellipse cx="66" cy="46" rx="70" ry="44" fill="#f6f0dc" />
+              <ellipse cx="66" cy="46" rx="61" ry="36" fill="#153a30" />
+              <ellipse cx="66" cy="46" rx="54" ry="29" fill="none" stroke="#f6f0dc" stroke-opacity=".6" />
+              <text x="66" y="43" fill="#f6f0dc" font-family="Arial, sans-serif" font-weight="900" font-size="18" text-anchor="middle" letter-spacing="2">SNUS</text>
+              <text x="66" y="60" fill="#eadc90" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" letter-spacing="2">VORSETS INVENTAR</text>
+            </g>
+            <g transform="translate(85 383) rotate(-10 35 35)">
+              <circle cx="35" cy="35" r="31" fill="#ff825b" />
+              <circle cx="35" cy="35" r="23" fill="none" stroke="#153a30" stroke-width="1.5" stroke-dasharray="3 3" />
+              <path d="m23 36 8 8 17-19" fill="none" stroke="#153a30" stroke-width="4" />
+            </g>
+          </svg>
+          <p class="scene-caption"><span aria-hidden="true">↳</span> Ta med gjengen. Vi tar med kortene.</p>
+        </div>
+      </section>
+
+      <div class="ticker" aria-hidden="true"><div class="container ticker-row"><span>VORSET</span><i>✳</i><span>HYTTETUREN</span><i>✳</i><span>SPILLKVELDEN</span><i>✳</i><span>BARE ÉN RUNDE TIL</span></div></div>
+
+      <section class="games-section container" id="lekene" aria-labelledby="games-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">01 / Lekeplassen</p><h2 id="games-title">Hva legger vi på bordet?</h2></div>
+          <p class="section-description">Her kommer lekene dine.<br />Dette er mulige uttrykk for spillkortene.</p>
+        </div>
+        <div class="game-grid">
+          <article class="game-card">
+            <div class="card-art art-cards" aria-hidden="true"><div class="mini-card back"></div><div class="mini-card front">♥</div><span class="art-number">01</span></div>
+            <div class="card-copy"><span class="placeholder-label">Innholdsforslag</span><h3>Kort på bordet</h3><p>Plass til leker med kortstokker, trekning og neste kort.</p><div class="card-meta">Spill og regler kommer senere <span aria-hidden="true">↗</span></div></div>
+          </article>
+          <article class="game-card">
+            <div class="card-art art-party" aria-hidden="true"><span class="party-dot dot-one">☺</span><span class="party-dot dot-two">☺</span><span class="party-dot dot-three">☺</span><span class="art-number">02</span></div>
+            <div class="card-copy"><span class="placeholder-label">Innholdsforslag</span><h3>Gjengen i sentrum</h3><p>Plass til spørsmål, pekeleker og ting dere kanskje angrer på å si.</p><div class="card-meta">Spill og regler kommer senere <span aria-hidden="true">↗</span></div></div>
+          </article>
+          <article class="game-card">
+            <div class="card-art art-chaos" aria-hidden="true"><span class="chaos-star">✳</span><span class="chaos-label">OI DA.</span><span class="art-number">03</span></div>
+            <div class="card-copy"><span class="placeholder-label">Innholdsforslag</span><h3>Litt ekstra kaos</h3><p>Plass til lekene som trenger sitt helt eget oppsett.</p><div class="card-meta">Spill og regler kommer senere <span aria-hidden="true">↗</span></div></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="how-section container" aria-labelledby="how-title">
+        <div class="how-intro"><p class="eyebrow">02 / Tanken er enkel</p><h2 id="how-title">Mindre oppsett.<br />Mer «din tur».</h2></div>
+        <ol class="steps"><li><span class="step-number">1</span><div><h3>Finn en lek</h3><p>En kort forklaring, så skjønner alle greia.</p></div></li><li><span class="step-number">2</span><div><h3>Samle gjengen</h3><p>Legg til navn hvis leken trenger det.</p></div></li><li><span class="step-number">3</span><div><h3>La det gå på rundgang</h3><p>En tydelig oppgave. En enkel vei videre.</p></div></li></ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-row"><a href="https://spillarena.no/">↗ En del av SpillArena</a><p>Visuell skisse · Norsk vors, digitalt bord.</p><a href="../OPPSETT.md">Les oppsettsplanen →</a></div>
+    </footer>
+    <script>
+      const themeButton = document.getElementById('theme-toggle');
+      themeButton.addEventListener('click', () => {
+        const light = document.documentElement.dataset.theme !== 'light';
+        document.documentElement.dataset.theme = light ? 'light' : 'dark';
+        themeButton.setAttribute('aria-pressed', String(light));
+      });
+    </script>
+  </body>
+</html>

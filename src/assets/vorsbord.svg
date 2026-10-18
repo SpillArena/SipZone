@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 550" role="img" aria-labelledby="table-title table-description">
+            <title id="table-title">Et vorsbord med kort, ølglass og snusboks</title>
+            <desc id="table-description">En kremhvit kortstokk med hjerter, en rutete kortbakside, et glass på en glassbrikke og en generisk rund snusboks.</desc>
+            <defs>
+              <pattern id="card-pattern" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M8 0 16 8 8 16 0 8Z" fill="none" stroke="#f6f0dc" stroke-width="1.5" opacity=".6" /></pattern>
+              <filter id="card-shadow" x="-50%" y="-50%" width="200%" height="210%"><feDropShadow dx="3" dy="14" stdDeviation="10" flood-color="#041c13" flood-opacity=".3" /></filter>
+            </defs>
+            <circle cx="310" cy="273" r="222" fill="none" stroke="#f6f0dc" opacity=".12" stroke-dasharray="3 9" />
+            <circle cx="310" cy="273" r="188" fill="none" stroke="#f6f0dc" opacity=".07" />
+            <g fill="#eadc90">
+              <path d="m106 98 4 13 13 4-13 4-4 13-4-13-13-4 13-4Z" />
+              <path d="m523 309 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z" />
+              <circle cx="183" cy="458" r="4" />
+            </g>
+            <g transform="translate(104 113) rotate(-17 106 155)" filter="url(#card-shadow)">
+              <rect x="0" y="0" width="206" height="300" rx="17" fill="#f6f0dc" />
+              <rect x="12" y="12" width="182" height="276" rx="10" fill="#da6045" />
+              <rect x="19" y="19" width="168" height="262" rx="6" fill="url(#card-pattern)" />
+              <circle cx="103" cy="150" r="49" fill="#f6f0dc" stroke="#da6045" stroke-width="5" />
+              <text x="103" y="167" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="50" fill="#153a30">S.</text>
+            </g>
+            <g transform="translate(235 119) rotate(12 106 155)" filter="url(#card-shadow)">
+              <rect x="0" y="0" width="206" height="300" rx="17" fill="#f6f0dc" />
+              <rect x="9" y="9" width="188" height="282" rx="10" fill="none" stroke="#153a30" stroke-opacity=".18" />
+              <g fill="#d94c3c" font-family="Georgia, serif" text-anchor="middle">
+                <text x="28" y="39" font-size="28">A</text><text x="28" y="66" font-size="25">♥</text>
+                <g transform="rotate(180 103 150)"><text x="28" y="39" font-size="28">A</text><text x="28" y="66" font-size="25">♥</text></g>
+              </g>
+              <path d="M103 185C91 173 55 149 55 125c0-29 33-38 48-14 15-24 48-15 48 14 0 24-36 48-48 60Z" fill="#d94c3c" />
+              <text x="103" y="225" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="11" letter-spacing="3" fill="#153a30">BARE ÉN TIL</text>
+            </g>
+            <g transform="translate(422 44) rotate(13 60 80)">
+              <ellipse cx="60" cy="160" rx="74" ry="24" fill="#041c13" opacity=".2" />
+              <ellipse cx="60" cy="153" rx="69" ry="26" fill="#eadc90" />
+              <ellipse cx="60" cy="153" rx="58" ry="19" fill="none" stroke="#153a30" opacity=".3" stroke-dasharray="2 3" />
+              <path d="M26 32h68l-6 116q-28 17-56 0Z" fill="#e9a743" stroke="#f6f0dc" stroke-width="3" />
+              <path d="M94 49h13q25 0 21 27l-3 22q-2 16-32 16" fill="none" stroke="#f6f0dc" stroke-width="9" />
+              <path d="m44 61 3 68m14-68v72m17-72-3 68" fill="none" stroke="#f6f0dc" stroke-opacity=".35" stroke-width="4" />
+              <path d="M24 41q-11-14 1-23 3-20 23-13 11-15 26-3 20-5 23 14 13 8 4 23-17-8-24 1-20-12-29 0-12-7-24 1Z" fill="#f6f0dc" />
+            </g>
+            <g transform="translate(391 358) rotate(-13 66 50)">
+              <ellipse cx="72" cy="70" rx="77" ry="49" fill="#041c13" opacity=".2" />
+              <ellipse cx="66" cy="58" rx="70" ry="46" fill="#1c2420" stroke="#f6f0dc" stroke-width="2" />
+              <path d="M-4 48v12c0 26 140 26 140 0V48" fill="#e3dfcb" />
+              <ellipse cx="66" cy="46" rx="70" ry="44" fill="#f6f0dc" />
+              <ellipse cx="66" cy="46" rx="61" ry="36" fill="#153a30" />
+              <ellipse cx="66" cy="46" rx="54" ry="29" fill="none" stroke="#f6f0dc" stroke-opacity=".6" />
+              <text x="66" y="43" fill="#f6f0dc" font-family="Arial, sans-serif" font-weight="900" font-size="18" text-anchor="middle" letter-spacing="2">SNUS</text>
+              <text x="66" y="60" fill="#eadc90" font-family="Arial, sans-serif" font-size="8" text-anchor="middle" letter-spacing="2">VORSETS INVENTAR</text>
+            </g>
+            <g transform="translate(85 383) rotate(-10 35 35)">
+              <circle cx="35" cy="35" r="31" fill="#ff825b" />
+              <circle cx="35" cy="35" r="23" fill="none" stroke="#153a30" stroke-width="1.5" stroke-dasharray="3 3" />
+              <path d="m23 36 8 8 17-19" fill="none" stroke="#153a30" stroke-width="4" />
+            </g>
+          </svg>

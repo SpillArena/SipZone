@@ -1,0 +1,532 @@
+/* Shared turn indicator and touch layouts for every game. */
+.turn-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  margin-bottom: 24px;
+  padding: 18px 22px;
+  border: 1px solid #153a3020;
+  border-radius: 12px;
+  background: var(--yellow);
+  color: var(--pine);
+  text-align: left;
+}
+.turn-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--pine);
+  color: var(--paper);
+  font-size: 18px;
+  font-weight: 750;
+}
+.turn-copy {
+  min-width: 0;
+  flex: 1;
+}
+.turn-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.turn-name {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+.turn-player-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.turn-suffix {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.turn-symbol {
+  flex-shrink: 0;
+  font-size: 28px;
+}
+.is-your-turn {
+  background: var(--accent);
+}
+.roulette-wrap {
+  --wheel-size: 300px;
+  width: var(--wheel-size);
+  height: calc(var(--wheel-size) + 20px);
+}
+.roulette-wheel {
+  width: var(--wheel-size);
+  height: var(--wheel-size);
+}
+.room-roster {
+  margin: 0 0 24px;
+}
+.room-roster > summary {
+  min-height: 48px;
+  padding-block: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--muted);
+}
+.room-roster > summary > span {
+  margin-left: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.room-roster > summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+.room-roster .room-members {
+  margin: 8px 0 0;
+}
+
+@media (max-width: 760px), (max-width: 960px) and (max-height: 500px) {
+  .arena-container {
+    padding-left: max(var(--arena-gutter), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--arena-gutter), env(safe-area-inset-right, 0px));
+  }
+  .arena-header {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  input,
+  select {
+    font-size: 16px;
+  }
+  .button {
+    min-height: 52px;
+    font-size: 15px;
+  }
+  .button svg {
+    flex-shrink: 0;
+  }
+  .play-page {
+    padding-top: 10px;
+    padding-bottom: 24px;
+  }
+  .play-top {
+    min-height: 44px;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+  .play-top > .eyebrow {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .round-board {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100svh - 148px - env(safe-area-inset-top, 0px));
+  }
+  .round-board > * {
+    flex-shrink: 0;
+    min-width: 0;
+  }
+  .round-meta {
+    margin-bottom: 8px;
+    font-size: 12px;
+    gap: 12px;
+  }
+  .progress-track {
+    margin-bottom: 14px;
+  }
+  .turn-banner {
+    position: sticky;
+    top: max(8px, env(safe-area-inset-top, 0px));
+    z-index: 8;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 0 #061e1620;
+  }
+  .turn-avatar {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    font-size: 16px;
+  }
+  .turn-name {
+    font-size: clamp(26px, 7vw, 34px);
+  }
+  .turn-label {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+  }
+  .turn-suffix {
+    font-size: 15px;
+  }
+  .turn-symbol {
+    font-size: 24px;
+  }
+  .prompt-card,
+  .live-prompt {
+    min-height: clamp(200px, 29svh, 270px);
+    padding: 36px 24px 38px;
+    border-radius: 13px;
+  }
+  .prompt-card h2 {
+    font-size: clamp(23px, 6.2vw, 29px);
+    line-height: 1.3;
+    margin: 17px 0;
+  }
+  .card-corner {
+    top: 14px;
+    left: 16px;
+    font-size: 21px;
+  }
+  .card-brand {
+    bottom: 17px;
+  }
+  .play-hint {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 18px auto;
+  }
+  .game-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+    padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--line);
+    background: var(--bg);
+    margin-top: auto;
+  }
+  .game-actions > .button {
+    min-width: 0;
+    width: 100%;
+    padding: 13px 10px;
+    gap: 8px;
+    overflow-wrap: anywhere;
+  }
+  .game-actions > :only-child,
+  .game-actions > .text-button {
+    grid-column: 1 / -1;
+  }
+  .live-actions > .button:nth-last-child(2):first-child {
+    grid-column: 1 / -1;
+  }
+  .game-actions > .text-button {
+    min-height: 44px;
+    padding-block: 10px;
+  }
+  .skip-button {
+    min-height: 44px;
+    margin: 0 auto;
+  }
+  .result-message {
+    font-size: 15px;
+    margin-block: 18px;
+  }
+  .roulette-wrap {
+    --wheel-size: clamp(180px, min(68vw, 30svh), 270px);
+    max-width: 100%;
+    margin: 12px auto 8px;
+    transform: none;
+  }
+  .wheel-symbol {
+    font-size: clamp(19px, 6vw, 25px);
+  }
+  .wheel-hub {
+    width: 56px;
+    height: 56px;
+    inset: calc(50% - 28px);
+    font-size: 25px;
+  }
+  .roulette-result {
+    min-height: 0;
+    margin: 12px auto 20px;
+  }
+  .roulette-result h2 {
+    font-size: clamp(24px, 6vw, 29px);
+    margin: 8px 0 12px;
+  }
+  .roulette-result p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .higher-cards {
+    gap: 12px;
+    padding: 4px 0 12px;
+  }
+  .higher-cards .playing-card {
+    width: clamp(96px, 29vw, 150px);
+    height: auto;
+    aspect-ratio: 12 / 17;
+  }
+  .higher-cards .big-suit {
+    font-size: 52px;
+  }
+  .higher-cards .card-back > span {
+    width: 54px;
+    height: 54px;
+    font-size: 30px;
+  }
+  .score-strip {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: 12px 0 0;
+    padding: 4px 0 10px;
+  }
+  .score-strip li {
+    flex-shrink: 0;
+    min-height: 40px;
+    align-items: center;
+    gap: 10px;
+  }
+  .potato-stage {
+    width: 128px;
+    height: 146px;
+    margin: 12px auto 20px;
+  }
+  .potato-stage span {
+    font-size: 80px;
+  }
+  .pass-button {
+    min-height: 66px;
+    font-size: 17px;
+  }
+  .fate-layout {
+    display: grid;
+    grid-template-columns: clamp(88px, 27vw, 130px) minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+    margin: 8px 0 22px;
+    text-align: left;
+  }
+  .fate-layout .playing-card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 12 / 17;
+  }
+  .fate-layout .big-suit {
+    font-size: 45px;
+  }
+  .fate-layout .card-back > span {
+    width: 48px;
+    height: 48px;
+    font-size: 27px;
+  }
+  .fate-copy > .eyebrow {
+    justify-content: flex-start;
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+  .fate-copy h2 {
+    font-size: clamp(23px, 5.8vw, 29px);
+    line-height: 1.15;
+    margin: 12px 0;
+  }
+  .fate-copy p:last-child {
+    font-size: 14px;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .fate-layout .rank {
+    font-size: 20px;
+  }
+  .fate-layout .rank small {
+    font-size: 16px;
+  }
+  .fate-layout .top-rank {
+    top: 9px;
+    left: 9px;
+  }
+  .fate-layout .bottom-rank {
+    bottom: 9px;
+    right: 9px;
+  }
+  .house-rule-form {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .house-rule-form input {
+    font-size: 16px;
+  }
+  .active-rules {
+    padding: 16px 18px;
+    margin-top: 18px;
+  }
+  .active-rules ul {
+    font-size: 14px;
+  }
+  .vote-area {
+    width: 100%;
+    padding: 16px 0 0;
+  }
+  .play-most-likely .vote-area {
+    display: contents;
+  }
+  .play-most-likely .vote-area > p,
+  .play-most-likely .vote-area > h3 {
+    text-align: center;
+  }
+  .vote-area .turn-banner {
+    margin-top: 12px;
+  }
+  .vote-area h3 {
+    font-size: 23px;
+  }
+  .vote-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 18px 0;
+  }
+  .vote-options > .button {
+    min-width: 0;
+    min-height: 54px;
+    padding: 12px;
+    font-size: 16px;
+  }
+  .vote-results > div {
+    min-height: 48px;
+    align-items: center;
+    font-size: 15px;
+  }
+  .vote-results > div > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .setup-page .panel,
+  .live-page .panel {
+    padding: 21px;
+  }
+  .setup-page .rules-list {
+    font-size: 15px;
+  }
+  .setup-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .setup-bottom .button {
+    min-height: 56px;
+    font-size: 16px;
+  }
+  .player-list li > .icon-button {
+    width: 44px;
+  }
+  .segmented {
+    flex-wrap: wrap;
+  }
+  .segmented button {
+    min-width: 0;
+    min-height: 44px;
+  }
+  .room-heading {
+    margin-block: 16px 20px;
+    align-items: center;
+  }
+  .room-heading > .button {
+    margin-top: 0;
+    min-height: 48px;
+  }
+  .live-playing {
+    padding-top: 10px;
+    padding-bottom: 24px;
+  }
+  .live-playing .room-heading {
+    margin: 0 0 12px;
+  }
+  .live-playing .room-code {
+    font-size: 34px;
+    margin: 6px 0 0;
+    letter-spacing: 3px;
+  }
+  .live-playing .room-heading .eyebrow {
+    font-size: 9px;
+  }
+  .live-playing .room-heading > .button {
+    padding: 10px;
+    font-size: 12px;
+  }
+  .live-playing .room-roster {
+    margin-bottom: 12px;
+  }
+  .live-playing > .round-meta {
+    margin-top: 12px;
+  }
+  .live-page .panel > .button {
+    width: 100%;
+  }
+  .live-page .code-input {
+    max-width: 100%;
+    width: 100%;
+  }
+  .finish-page {
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+  }
+  .finish-page .button {
+    width: 100%;
+    min-height: 56px;
+  }
+  /* Keep the shared storage reminder from covering game buttons. */
+  .app-shell:has(.play-page, .live-playing) .sac-reminder {
+    position: static;
+    margin: 0 0 16px;
+    padding-inline: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .turn-banner {
+    gap: 10px;
+    padding-inline: 12px;
+  }
+  .turn-avatar {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    font-size: 14px;
+  }
+  .turn-symbol {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) and (max-height: 500px) {
+  .turn-banner {
+    position: static;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+  }
+  .turn-name {
+    font-size: 26px;
+  }
+  .round-board {
+    min-height: 0;
+  }
+  .roulette-wrap {
+    --wheel-size: 180px;
+  }
+  .prompt-card,
+  .live-prompt {
+    min-height: 170px;
+  }
+  .potato-stage {
+    width: 95px;
+    height: 110px;
+  }
+  .potato-stage span {
+    font-size: 60px;
+  }
+  .game-actions {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+}

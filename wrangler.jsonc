@@ -1,0 +1,7 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sipzone",
+  "compatibility_date": "2026-10-18",
+  "pages_build_output_dir": "dist",
+  "services": [{ "binding": "ROOMS_API", "service": "sipzone-rooms" }],
+}

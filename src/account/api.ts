@@ -1,4 +1,4 @@
-import { getToken, setSession, signOut } from './session'
+import { getToken, setSession, signOut } from './session.ts'
 import type {
     AccountOverview,
     ApiResult,
@@ -9,7 +9,7 @@ import type {
     ProfileResponse,
     RecoverResult,
     Session,
-} from './types'
+} from './types.ts'
 
 /**
  * Calls to the account service on the front page.
@@ -24,7 +24,7 @@ import type {
  * VITE_ACCOUNT_API overrides the base when you'd rather point at a deployed
  * preview.
  */
-const API_BASE = (import.meta.env.VITE_ACCOUNT_API as string | undefined) ?? '/api'
+const API_BASE = (import.meta.env?.VITE_ACCOUNT_API as string | undefined) ?? '/api'
 
 /** A player waits a few seconds for a login; past that, tell them it's unreachable. */
 const TIMEOUT_MS = 8000
@@ -70,7 +70,8 @@ async function call<T>(
             if ((body as { error?: unknown } | null)?.error === 'bad_credentials') {
                 return { ok: false, error: 'bad_credentials' }
             }
-            signOut()
+            // A delayed request from an earlier login cannot sign out its replacement.
+            if (!auth || token === getToken()) signOut()
             return { ok: false, error: 'unauthorized' }
         }
 

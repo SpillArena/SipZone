@@ -42,9 +42,12 @@ fanebytte, og svar etter fristen teller som tidsslutt. Category Rush og
 Showdown dømmes av gjengen. Alle nye leker bruker den felles turmarkeringen
 og mobilkontrollene, med plass til kontopillen nederst.
 
-SipZone Live bruker SpillArena-kontoer og støtter **Truth or Sip**,
-**Never Have I Ever** og **Who’s Most Likely?** som første moduler. Rommet har
-opptil 16 deltakere. Verten velger lek, starter runder og viser avstemningen.
+SipZone Live bruker SpillArena-kontoer og har ni leker: **Who’s Most Likely?**,
+**Higher or Lower**, **Emoji Decoder**, **Quickfire**, **Hot Potato**,
+**Sip Roulette**, **Sip or Dare**, **Truth or Sip** og **Never Have I Ever**.
+Svar og gjetting er private til runden avsluttes, quizene gir poeng, og
+Hot Potato-fusen ligger bare på serveren. Spillerne vises med kontobilde og navn.
+Rommet har opptil 16 deltakere. Verten velger lek, starter runder og viser avstemningen.
 Ved likt resultat deler spillerne førsteplassen. Verten kan gå tilbake til
 lobbyen for å slippe inn flere eller bytte lek. Rommet utløper etter 24 timer.
 

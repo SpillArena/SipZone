@@ -70,8 +70,10 @@ repoet og lokalt verifisert, ikke publisert i Cloudflare. Se README for oppstart
 - [x] **SipZone Live** – felles ramme i MVP-en over.
 - [ ] **Vote & Sip:** egen Live-modul med avstemmingskategorier, rundetid og
       en komplett resultatflyt. Hemmelig stemmegivning finnes allerede i Live MVP.
-- [ ] **Sip or Dare Live:** private valg og oppgaver, utfordring av andre
-      spillere og kontroll over hvem som får se hvert valg.
+- [x] **Live-leker:** Higher or Lower, Emoji Decoder, Quickfire, Hot Potato,
+      Sip Roulette og Sip or Dare i rommene, med private svar, poeng og servertimer.
+- [ ] **Sip or Dare Live, videre:** utfordring av andre spillere og kontroll
+      over hvem som får se hvert valg.
 - [ ] **Drawing Duel:** lerret, tegnerrolle, synkroniserte strøk og duellregler.
 - [ ] **Guess the Drawing:** gjetting, tidsfrister og poeng for raskt riktig svar.
 - [ ] **Fake Answer:** privat innsending av falske svar, blanding med fasit,

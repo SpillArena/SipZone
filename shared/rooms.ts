@@ -1,7 +1,20 @@
-import { promptDeck, voteResults } from "./engine.ts";
-import type { Player } from "./engine.ts";
-import type { Category, PromptGame } from "./catalog.ts";
+import { voteResults } from "./engine.ts";
+import type { Card, Player } from "./engine.ts";
+import type { Category } from "./catalog.ts";
 import type { Prompt } from "./content.ts";
+import {
+  advanceRound,
+  dropPlayer,
+  isLiveGame,
+  liveGame,
+  liveView,
+  passPotato,
+  revealRound,
+  spinWheel,
+  startGame,
+  submitAnswer,
+} from "./live-games.ts";
+import type { LiveGame, LiveView, Potato } from "./live-games.ts";
 export const ROOM_CODE = /^\d{3}[A-Z]$/;
 export const ROOM_TTL = 24 * 60 * 60 * 1000;
 export interface Member extends Player {
@@ -17,14 +30,24 @@ export interface Room {
   members: Member[];
   version: number;
   expires: number;
-  game: PromptGame;
+  game: LiveGame;
   category: Category;
   phase: "lobby" | "playing";
   round: number;
+  /** Shuffled prompts for the card games. */
   deck: Prompt[];
   cursor: number;
+  /** Private answers this round, keyed by member id, in arrival order. */
   votes: Record<string, string>;
   revealed: boolean;
+  /** Points for the quiz games, explosions for Hot Potato. */
+  scores: Record<string, number>;
+  /** Shuffled indexes into the puzzle or question list. */
+  queue: number[];
+  cards: Card[];
+  /** The wheel's landing field this round. */
+  pick: number | null;
+  potato: Potato | null;
 }
 export interface RoomView {
   code: string;
@@ -33,7 +56,7 @@ export interface RoomView {
   version: number;
   expires: number;
   you: string;
-  game: PromptGame;
+  game: LiveGame;
   category: Category;
   phase: "lobby" | "playing";
   round: number;
@@ -43,6 +66,8 @@ export interface RoomView {
   hasVoted: boolean;
   revealed: boolean;
   results: ReturnType<typeof voteResults> | null;
+  scores: Record<string, number>;
+  live: LiveView | null;
 }
 export class RoomError extends Error {
   status: number;
@@ -76,6 +101,11 @@ export function createRoom(
     cursor: 0,
     votes: {},
     revealed: false,
+    scores: {},
+    queue: [],
+    cards: [],
+    pick: null,
+    potato: null,
   };
 }
 export function joinRoom(room: Room, account: string, token: string): Member {
@@ -107,9 +137,14 @@ export function applyRoomAction(
   room: Room,
   member: Member,
   input: Record<string, unknown>,
+  now = Date.now(),
+  random = Math.random,
 ): void {
   const action = input.action;
-  if (action === "vote") {
+  if (action === "answer") submitAnswer(room, member.id, input);
+  else if (action === "spin") spinWheel(room, member.id, random);
+  else if (action === "pass") passPotato(room, member.id, input.target);
+  else if (action === "vote") {
     if (
       room.phase !== "playing" ||
       room.game !== "most-likely" ||
@@ -133,10 +168,12 @@ export function applyRoomAction(
       ),
     );
     if (room.host === member.id) room.host = room.members[0]?.id ?? "";
+    dropPlayer(room, member.id);
     if (room.members.length < 2) {
       room.phase = "lobby";
       room.votes = {};
       room.revealed = false;
+      room.potato = null;
     }
   } else {
     if (member.id !== room.host)
@@ -147,52 +184,55 @@ export function applyRoomAction(
       if (room.phase !== "lobby")
         throw new RoomError("Åpne lobbyen før du endrer oppsettet.", 409);
       if (
-        !["truth", "never", "most-likely"].includes(String(input.game)) ||
+        !isLiveGame(input.game) ||
         !["all", "vors", "hytta", "venner"].includes(String(input.category))
       )
         throw new RoomError("Ugyldig spilloppsett.");
-      room.game = input.game as PromptGame;
+      room.game = input.game;
       room.category = input.category as Category;
     } else if (action === "start") {
       if (room.phase !== "lobby")
         throw new RoomError("Spillet har allerede startet.", 409);
       if (room.members.length < 2)
         throw new RoomError("Inviter minst én venn først.");
-      room.phase = "playing";
-      room.deck = promptDeck(room.game, room.category);
-      room.cursor = 0;
-      room.round = 1;
-      room.votes = {};
-      room.revealed = false;
+      startGame(room, now, random);
     } else if (action === "next") {
       if (room.phase !== "playing")
         throw new RoomError("Spillet har ikke startet.", 409);
-      room.cursor++;
-      if (room.cursor >= room.deck.length) {
-        const previous = room.deck.at(-1)?.id;
-        room.deck = promptDeck(room.game, room.category);
-        if (room.deck[0]?.id === previous && room.deck.length > 1)
-          [room.deck[0], room.deck[1]] = [room.deck[1], room.deck[0]];
-        room.cursor = 0;
-      }
-      room.round++;
-      room.votes = {};
-      room.revealed = false;
+      advanceRound(room, now, random);
     } else if (action === "reveal") {
-      if (room.phase !== "playing" || room.game !== "most-likely")
-        throw new RoomError("Ingen avstemming å vise.", 409);
+      if (
+        room.phase !== "playing" ||
+        !liveGame(room.game)?.answers ||
+        room.revealed
+      )
+        throw new RoomError("Ingen runde å vise.", 409);
       if (Object.keys(room.votes).length === 0)
-        throw new RoomError("Vent på minst én stemme først.");
-      room.revealed = true;
+        throw new RoomError("Vent på minst ett svar først.");
+      revealRound(room);
     } else if (action === "lobby") {
       room.phase = "lobby";
       room.deck = [];
       room.cursor = 0;
       room.votes = {};
       room.revealed = false;
+      room.scores = {};
+      room.queue = [];
+      room.cards = [];
+      room.pick = null;
+      room.potato = null;
     } else throw new RoomError("Ukjent handling.");
   }
   room.version++;
+}
+/** Fills fields that rooms saved before a game was added do not have. */
+export function normalizeRoom(room: Room): Room {
+  room.scores ??= {};
+  room.queue ??= [];
+  room.cards ??= [];
+  room.pick ??= null;
+  room.potato ??= null;
+  return room;
 }
 export function publicRoom(room: Room, memberId: string): RoomView {
   const members = room.members.map(({ id, name }) => ({ id, name }));
@@ -207,14 +247,19 @@ export function publicRoom(room: Room, memberId: string): RoomView {
     category: room.category,
     phase: room.phase,
     round: room.round,
-    prompt: room.phase === "playing" ? room.deck[room.cursor] : null,
+    prompt: room.phase === "playing" ? (room.deck[room.cursor] ?? null) : null,
     activePlayer:
-      room.phase === "playing"
+      room.phase === "playing" && liveGame(room.game)?.turns
         ? (members[(room.round - 1) % members.length]?.id ?? null)
         : null,
     voted: Object.keys(room.votes).length,
     hasVoted: Boolean(room.votes[memberId]),
     revealed: room.revealed,
-    results: room.revealed ? voteResults(members, room.votes) : null,
+    results:
+      room.revealed && room.game === "most-likely"
+        ? voteResults(members, room.votes)
+        : null,
+    scores: room.scores,
+    live: liveView(room),
   };
 }

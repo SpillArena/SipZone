@@ -150,7 +150,8 @@ export const games: GameDefinition[] = [
     id: "live",
     name: "SipZone Live",
     subtitle: "Hver deres skjerm",
-    description: "Hver sin enhet, samme spill. Del en kode og stem i skjul.",
+    description:
+      "Hver sin enhet, samme spill. Ni leker: quiz, kort, potet, hjul og mer.",
     min: 2,
     time: "Så lenge dere vil",
     kind: "live",
@@ -158,8 +159,8 @@ export const games: GameDefinition[] = [
     rules: [
       "Logg inn med SpillArena-kontoen din og opprett eller bli med i et rom.",
       "Del koden eller invitasjonslenken. Rommet har plass til 16 spillere.",
-      "Verten velger Truth or Sip, Jeg har aldri eller Who’s Most Likely?.",
-      "Spørsmålene vises samtidig. I Who’s Most Likely? stemmer alle privat.",
+      "Verten velger blant ni leker: Who’s Most Likely?, Higher or Lower, Emoji Decoder, Quickfire, Hot Potato, Sip Roulette, Sip or Dare, Truth or Sip og Jeg har aldri.",
+      "Alle ser samme runde samtidig. Stemmer og svar er private frem til resultatet vises, og quizene gir poeng.",
       "Verten viser resultatet og starter neste runde. Rommet utløper etter 24 timer.",
     ],
   },

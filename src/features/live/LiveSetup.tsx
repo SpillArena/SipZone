@@ -4,6 +4,7 @@ import { useAccount } from "../../account/useAccount";
 import { onSessionChange } from "../../account/session";
 import { useI18n } from "../../i18n";
 import { ROOM_CODE } from "../../../shared/rooms";
+import { LIVE_GAMES } from "../../../shared/live-games";
 import { LiveError, randomCode, roomRequest } from "./api";
 import type { Access } from "./api";
 import { ConnectedRoom } from "./ConnectedRoom";
@@ -309,8 +310,8 @@ export function LiveSetup({ initialCode }: { initialCode: string }) {
                 <h3>{t("Hver deres skjerm", "Your own screens")}</h3>
                 <p>
                   {t(
-                    "Alle får samme spørsmål. Stemmene er private frem til resultatet vises.",
-                    "Everyone gets the same question. Votes stay private until results are revealed.",
+                    "Alle ser samme runde. Svar og stemmer er private frem til resultatet vises.",
+                    "Everyone sees the same round. Answers and votes stay private until the result is revealed.",
                   )}
                 </p>
               </div>
@@ -318,9 +319,9 @@ export function LiveSetup({ initialCode }: { initialCode: string }) {
           </ol>
           <div className="live-included">
             <span>2–16 {t("spillere", "players")}</span>
-            <span>Truth or Sip</span>
-            <span>Jeg har aldri</span>
-            <span>Who’s Most Likely?</span>
+            {LIVE_GAMES.map((game) => (
+              <span key={game.id}>{game.name}</span>
+            ))}
           </div>
         </aside>
       </div>

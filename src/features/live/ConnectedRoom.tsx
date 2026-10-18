@@ -2,9 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, Copy, Wifi, WifiOff } from "lucide-react";
 import { useI18n } from "../../i18n";
 import type { RoomView } from "../../../shared/rooms";
+import { LIVE_GAMES, liveGame } from "../../../shared/live-games";
 import { LiveError, roomRequest } from "./api";
 import type { Access } from "./api";
 import { TurnBanner } from "../../games/GameControls";
+import { LiveBoard } from "./LiveBoard";
+import { Avatar, PlayerChip } from "./PlayerChip";
 
 export function ConnectedRoom({
   access,
@@ -157,6 +160,8 @@ export function ConnectedRoom({
     }
   };
   const host = room?.you === room?.host;
+  const info = room ? liveGame(room.game) : undefined;
+  const cards = Boolean(room?.prompt);
   return (
     <section
       className={`live-page arena-container page-narrow live-${room?.phase ?? "connecting"}`}
@@ -206,11 +211,17 @@ export function ConnectedRoom({
                   key={member.id}
                   className={member.id === room.you ? "is-you" : ""}
                 >
-                  {member.name}
-                  {member.id === room.host && (
-                    <span>♛ {t("Vert", "Host")}</span>
-                  )}
-                  {member.id === room.you && <span>{t("Deg", "You")}</span>}
+                  <PlayerChip name={member.name}>
+                    {(member.id === room.host || member.id === room.you) && (
+                      <small>
+                        {member.id === room.host && `♛ ${t("Vert", "Host")}`}
+                        {member.id === room.host &&
+                          member.id === room.you &&
+                          " · "}
+                        {member.id === room.you && t("Deg", "You")}
+                      </small>
+                    )}
+                  </PlayerChip>
                 </li>
               ))}
             </ul>
@@ -226,45 +237,56 @@ export function ConnectedRoom({
                   ? t("Hva spiller vi?", "What are we playing?")
                   : t("Gjengen samles.", "Friends are gathering.")}
               </h2>
-              <label className="field">
-                {t("Lek", "Game")}
-                <select
-                  value={room.game}
-                  disabled={!host || busy || !connected}
-                  onChange={(event) =>
-                    void action({
-                      action: "settings",
-                      game: event.target.value,
-                      category: room.category,
-                    })
-                  }
-                >
-                  <option value="most-likely">Who’s Most Likely?</option>
-                  <option value="truth">Truth or Sip</option>
-                  <option value="never">Never Have I Ever</option>
-                </select>
-              </label>
-              <label className="field">
-                {t("Kategori", "Category")}
-                <select
-                  value={room.category}
-                  disabled={!host || busy || !connected}
-                  onChange={(event) =>
-                    void action({
-                      action: "settings",
-                      game: room.game,
-                      category: event.target.value,
-                    })
-                  }
-                >
-                  <option value="all">
-                    {t("Litt av alt", "A bit of everything")}
-                  </option>
-                  <option value="vors">Vors</option>
-                  <option value="hytta">Hytta</option>
-                  <option value="venner">Venner</option>
-                </select>
-              </label>
+              <div
+                className="live-picker"
+                role="group"
+                aria-label={t("Lek", "Game")}
+              >
+                {LIVE_GAMES.map((game) => (
+                  <button
+                    type="button"
+                    key={game.id}
+                    className="live-pick"
+                    aria-pressed={room.game === game.id}
+                    disabled={!host || busy || !connected}
+                    onClick={() =>
+                      room.game !== game.id &&
+                      void action({
+                        action: "settings",
+                        game: game.id,
+                        category: room.category,
+                      })
+                    }
+                  >
+                    <span aria-hidden="true">{game.symbol}</span>
+                    <strong>{game.name}</strong>
+                    <small>{t(game.no, game.en)}</small>
+                  </button>
+                ))}
+              </div>
+              {info?.categories && (
+                <label className="field">
+                  {t("Kategori", "Category")}
+                  <select
+                    value={room.category}
+                    disabled={!host || busy || !connected}
+                    onChange={(event) =>
+                      void action({
+                        action: "settings",
+                        game: room.game,
+                        category: event.target.value,
+                      })
+                    }
+                  >
+                    <option value="all">
+                      {t("Litt av alt", "A bit of everything")}
+                    </option>
+                    <option value="vors">Vors</option>
+                    <option value="hytta">Hytta</option>
+                    <option value="venner">Venner</option>
+                  </select>
+                </label>
+              )}
               {host ? (
                 <>
                   <button
@@ -298,11 +320,9 @@ export function ConnectedRoom({
                 <span>
                   {t("Runde", "Round")} {room.round}
                 </span>
-                {room.game !== "truth" && (
-                  <span>{t("Hele gjengen", "Everyone")}</span>
-                )}
+                {!info?.turns && <span>{t("Hele gjengen", "Everyone")}</span>}
               </div>
-              {room.game === "truth" && (
+              {info?.turns && (
                 <TurnBanner
                   player={
                     room.members.find(
@@ -312,19 +332,15 @@ export function ConnectedRoom({
                   isYou={room.you === room.activePlayer}
                 />
               )}
-              <div className="prompt-card live-prompt">
-                <p className="eyebrow">
-                  {room.game === "truth"
-                    ? "Truth or Sip"
-                    : room.game === "never"
-                      ? "Never Have I Ever"
-                      : "Who’s Most Likely?"}
-                </p>
-                <h2>{room.prompt?.text}</h2>
-                <span className="card-brand" aria-hidden="true">
-                  SIPZONE ♦
-                </span>
-              </div>
+              {cards && (
+                <div className="prompt-card live-prompt">
+                  <p className="eyebrow">{info?.name}</p>
+                  <h2>{room.prompt?.text}</h2>
+                  <span className="card-brand" aria-hidden="true">
+                    SIPZONE ♦
+                  </span>
+                </div>
+              )}
               {room.game === "most-likely" && (
                 <div className="vote-area">
                   {room.revealed && room.results ? (
@@ -338,7 +354,10 @@ export function ConnectedRoom({
                       <div className="vote-results">
                         {room.members.map((member) => (
                           <div key={member.id}>
-                            <span>{member.name}</span>
+                            <span className="live-inline">
+                              <Avatar name={member.name} size={28} />
+                              {member.name}
+                            </span>
                             <strong>
                               {room.results?.counts[member.id] ?? 0}
                             </strong>
@@ -361,7 +380,7 @@ export function ConnectedRoom({
                         <div className="vote-options">
                           {room.members.map((member) => (
                             <button
-                              className="button secondary"
+                              className="player-pick"
                               key={member.id}
                               disabled={busy || !connected}
                               onClick={() =>
@@ -371,7 +390,7 @@ export function ConnectedRoom({
                                 })
                               }
                             >
-                              {member.name}
+                              <PlayerChip name={member.name} />
                             </button>
                           ))}
                         </div>
@@ -380,22 +399,36 @@ export function ConnectedRoom({
                   )}
                 </div>
               )}
-              {room.game !== "most-likely" && (
+              {(room.game === "truth" ||
+                room.game === "never" ||
+                room.game === "sip-dare") && (
                 <p className="play-hint">
                   {room.game === "truth"
                     ? t(
                         "Svar høyt til gjengen, eller ta en slurk.",
                         "Answer out loud, or take a sip.",
                       )
-                    : t(
-                        "Alle som har gjort det, tar en slurk.",
-                        "Anyone who has done it takes a sip.",
-                      )}
+                    : room.game === "sip-dare"
+                      ? t(
+                          "Utfør utfordringen, eller ta en slurk.",
+                          "Do the dare, or take a sip.",
+                        )
+                      : t(
+                          "Alle som har gjort det, tar en slurk.",
+                          "Anyone who has done it takes a sip.",
+                        )}
                 </p>
+              )}
+              {!cards && (
+                <LiveBoard
+                  room={room}
+                  disabled={busy || !connected}
+                  send={(input) => void action(input)}
+                />
               )}
               {host ? (
                 <div className="actions centered game-actions live-actions">
-                  {room.game === "most-likely" && !room.revealed && (
+                  {info?.answers && !room.revealed && (
                     <button
                       className="button primary"
                       disabled={busy || !connected || !room.voted}
@@ -406,16 +439,18 @@ export function ConnectedRoom({
                   )}
                   <button
                     className={
-                      room.game === "most-likely" && !room.revealed
+                      info?.answers && !room.revealed
                         ? "button secondary"
                         : "button primary"
                     }
                     disabled={busy || !connected}
                     onClick={() => void action({ action: "next" })}
                   >
-                    {room.game === "most-likely" && !room.revealed
+                    {info?.answers && !room.revealed
                       ? t("Hopp over", "Skip")
-                      : t("Neste runde", "Next round")}{" "}
+                      : room.game === "hot-potato"
+                        ? t("Ny potet", "New potato")
+                        : t("Neste runde", "Next round")}{" "}
                     →
                   </button>
                   <button

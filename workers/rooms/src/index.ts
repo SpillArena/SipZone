@@ -3,11 +3,13 @@ import {
   applyRoomAction,
   createRoom,
   joinRoom,
+  normalizeRoom,
   publicRoom,
   ROOM_CODE,
   RoomError,
 } from "../../../shared/rooms.ts";
 import type { Room } from "../../../shared/rooms.ts";
+import { nextWake, tick } from "../../../shared/live-games.ts";
 import { verifyAccount } from "../../../shared/auth.ts";
 type Result = { status: number; data: object };
 type SocketIdentity = { id: string; expires: number; token: string };
@@ -30,7 +32,7 @@ export class SipZoneRoom extends DurableObject<Env> {
     const row = this.ctx.storage.sql
       .exec<{ data: string }>("SELECT data FROM room WHERE id = 1")
       .toArray()[0];
-    return row ? JSON.parse(row.data) : null;
+    return row ? normalizeRoom(JSON.parse(row.data)) : null;
   }
   private save(room: Room) {
     this.ctx.storage.sql.exec(
@@ -54,6 +56,10 @@ export class SipZoneRoom extends DurableObject<Env> {
       }
     }
   }
+  /** Wakes the room for its next timed event, such as a potato going off. */
+  private schedule(room: Room) {
+    this.ctx.waitUntil(this.ctx.storage.setAlarm(nextWake(room)));
+  }
   handle(
     code: string,
     method: string,
@@ -68,6 +74,11 @@ export class SipZoneRoom extends DurableObject<Env> {
         if (input.action === "create") room = null;
         else return fail("Rommet har utløpt. Opprett et nytt rom.", 410);
       }
+      if (room && tick(room)) {
+        room.version++;
+        this.save(room);
+        this.broadcast(room);
+      }
       let issuedToken: string | undefined;
       let member;
       if (method === "POST" && input.action === "create") {
@@ -75,7 +86,7 @@ export class SipZoneRoom extends DurableObject<Env> {
         room = createRoom(code, account);
         member = room.members[0];
         issuedToken = member.token;
-        this.ctx.waitUntil(this.ctx.storage.setAlarm(room.expires));
+        this.schedule(room);
       } else {
         if (!room) return fail("Fant ikke rommet. Sjekk koden.", 404);
         if (method === "POST" && input.action === "join") {
@@ -103,6 +114,7 @@ export class SipZoneRoom extends DurableObject<Env> {
       this.broadcast(room);
       if (room.members.length === 0)
         this.ctx.waitUntil(this.ctx.storage.setAlarm(Date.now() + 1000));
+      else this.schedule(room);
       return {
         status: 200,
         data: {
@@ -159,7 +171,12 @@ export class SipZoneRoom extends DurableObject<Env> {
   async alarm() {
     const room = this.read();
     if (room && room.members.length && room.expires > Date.now()) {
-      await this.ctx.storage.setAlarm(room.expires);
+      if (tick(room)) {
+        room.version++;
+        this.save(room);
+        this.broadcast(room);
+      }
+      await this.ctx.storage.setAlarm(nextWake(room));
       return;
     }
     for (const socket of this.ctx.getWebSockets())

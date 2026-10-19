@@ -28,7 +28,7 @@ publisert fra dette repoet ennå.
 | Emoji Decoder       | 24 oppgaver, svarvarianter, to forsøk, poeng og manuell godkjenning.                              |
 | Category Rush       | 30 forslag og egne kategorier, taperen velger neste, tidsfrist og manuell dømming.                |
 | Truth Train         | 24 personlige spørsmål med oppfølgere og gruppens godkjenning.                                    |
-| Bussruta            | 2–8 spillere, fire gjetninger, skjulte hender, pyramide, sjåførtrekning og inntil tre bussforsøk. |
+| H-en + Bussruta      | 2–8 spillere. Tøm hånden i H-en; taperne gjetter på rundgang og klatrer en pyramide uten bildekort. |
 
 De 16 lokale lekene trenger ingen konto. Spillere, lokale runder og poeng
 lever i minnet i fanen. Gjengen følger med når dere bytter lek.
@@ -132,6 +132,16 @@ for å gi vertskapet videre; det å lukke fanen fjerner ikke medlemskapet.
 Romtesten starter og stopper sin egen runtime med separat lagring og en
 tilfeldig testnøkkel. Den trenger hverken hub, innlogging eller eksisterende rom.
 
+
+For mobilgjennomgang: start `npm run dev` og åpne
+`/sipzone/tests/mobile-layout/index.html`. Siden sjekker reelle spillkomponenter
+ved 320, 375 og 430 px, liggende 812 × 375 og skrivebord 1280 × 800, med lange
+spillernavn. Velg en enkeltscene for å prøve knapper og spilltilstander manuelt.
+Den måler horisontal overflyt og om handlingsfelter dekker spillinnhold; visuell
+kontroll og test på en fysisk mobil kommer i tillegg. Live-brettene bruker lokale
+romdata og tester ikke tilkoblingen til romserveren. Gjennomgangssiden følger
+ikke med i produksjonsbygget.
+
 ## Struktur
 
 ```text
@@ -148,7 +158,7 @@ src/
   styles.css           SipZones bord-, kort- og mobilutforming
   mobile-games.css      Tydelig turmarkering og mobiltilpassede spillkontroller
   party-games.css       Illustrasjoner og oppsett for de åtte nye lekene
-  bus.css               Bussruta, private hender, pyramide og busstur
+  bus.css               H-en + Bussruta, private hender og pyramide
   live.css              Live-fremheving, enkelt romoppsett og plass til kontopillen
 shared/
   catalog.ts           De 17 spilloppføringene og deres regler

@@ -155,6 +155,44 @@ export function GameArt({
           <span className="art-stamp">ALLE OM BORD!</span>
         </>
       )}
+      {id === "spy" && (
+        <>
+          <span className="table-art-glyph">?</span>
+          <span className="art-stamp">HVEM ER SPIONEN?</span>
+        </>
+      )}
+      {id === "werewolf" && (
+        <>
+          <span className="table-art-moon" />
+          <span className="art-stamp">NATTA FALLER</span>
+        </>
+      )}
+      {id === "bluff" && (
+        <>
+          <span className="mini-card back">S.</span>
+          <span className="mini-card front">♣</span>
+          <span className="art-stamp">SNYD!</span>
+        </>
+      )}
+      {id === "liars-dice" && (
+        <>
+          <span className="table-art-dice">
+            <i>⚀</i>
+            <i>⚅</i>
+          </span>
+          <span className="art-stamp">LØGNER!</span>
+        </>
+      )}
+      {id === "two-truths" && (
+        <>
+          <span className="table-art-chips">
+            <i>✓</i>
+            <i>✓</i>
+            <i>✗</i>
+          </span>
+          <span className="art-stamp">EN AV TRE LYVER</span>
+        </>
+      )}
       {id === "live" && (
         <>
           <span className="phone-art">S.</span>

@@ -115,9 +115,13 @@ test("the latest jack/queen replaces the previous master", () => {
   );
 });
 test("catalog preserves the MVP and all implemented local games", () => {
-  assert.equal(games.length, 17);
-  assert.equal(new Set(games.map((game) => game.id)).size, 17);
-  assert.equal(games.filter((game) => game.kind === "live").length, 1);
+  assert.equal(games.length, 22);
+  assert.equal(new Set(games.map((game) => game.id)).size, 22);
+  // SipZone Live itself and the games that only run with a phone each
+  assert.deepEqual(
+    games.filter((game) => game.kind === "live").map((game) => game.id),
+    ["live", "bus", "spy", "werewolf", "bluff", "liars-dice", "two-truths"],
+  );
   for (const id of [
     "roulette",
     "truth",
@@ -136,6 +140,11 @@ test("catalog preserves the MVP and all implemented local games", () => {
     "category-rush",
     "truth-train",
     "bus",
+    "spy",
+    "werewolf",
+    "bluff",
+    "liars-dice",
+    "two-truths",
   ])
     assert.ok(games.some((game) => game.id === id));
   assert.ok(

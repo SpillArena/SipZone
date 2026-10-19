@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Plus, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Smartphone, X } from "lucide-react";
 import type { Category, GameDefinition } from "../../shared/catalog";
 import { MAX_PLAYERS, validateNames } from "../../shared/engine";
 import type { Player } from "../../shared/engine";
@@ -63,6 +63,13 @@ export function Setup({
           <p className="eyebrow">{game.subtitle}</p>
           <h1>{game.name}</h1>
           <p className="muted">{game.description}</p>
+          <p className="device-note">
+            <Smartphone size={15} aria-hidden="true" />
+            {t(
+              "Én mobil holder. Legg den på bordet eller send den rundt.",
+              "One phone is enough. Put it on the table or pass it around.",
+            )}
+          </p>
         </div>
       </div>
       <div className="setup-grid">

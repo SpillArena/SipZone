@@ -7,8 +7,8 @@ import {
   type Suit,
 } from "./engine.ts";
 export const BUS_MAX_PLAYERS = 8;
-export const BUS_ATTEMPTS = 3;
-export const BUS_ROUTE_LENGTH = 5;
+export const H_CARD_COUNT = 12;
+export const PYRAMID_CARD_COUNT = 15;
 export type BusGuess =
   "red" | "black" | "higher" | "lower" | "inside" | "outside" | Suit;
 export function busValue(card: Card) {
@@ -47,10 +47,24 @@ export function busGuessCorrect(
     card.suit === guess
   );
 }
+/** Pyramid indices run from the five-card bottom row to the single top card. */
 export function pyramidRow(index: number) {
-  if (!Number.isInteger(index) || index < 0 || index >= 15)
+  if (!Number.isInteger(index) || index < 0 || index >= PYRAMID_CARD_COUNT)
     throw new Error("Ugyldig pyramidekort.");
   return index < 5 ? 1 : index < 9 ? 2 : index < 12 ? 3 : index < 14 ? 4 : 5;
+}
+export function hEffect(index: number): "give" | "take" | "shot" {
+  if (!Number.isInteger(index) || index < 0 || index >= H_CARD_COUNT)
+    throw new Error("Ugyldig H-kort.");
+  return index >= 10 ? "shot" : index % 2 === 0 ? "take" : "give";
+}
+export function isPictureCard(card: Card) {
+  return card.rank >= 11 && card.rank <= 13;
+}
+export function pyramidPenalty(row: number): { sips: number; shot: boolean } {
+  if (!Number.isInteger(row) || row < 1 || row > 5)
+    throw new Error("Ugyldig pyramiderad.");
+  return { sips: row === 5 ? 0 : row * 2, shot: row === 5 };
 }
 export function busCandidates(hands: readonly (readonly Card[])[]) {
   const max = Math.max(0, ...hands.map((hand) => hand.length));
@@ -61,14 +75,16 @@ export function busCandidates(hands: readonly (readonly Card[])[]) {
 export interface BusState {
   players: Player[];
   hands: Card[][];
+  h: Card[];
+  guessHands: Card[][];
   pyramid: Card[];
-  routes: Card[][];
-  phase: "deal" | "pyramid" | "driver" | "bus" | "done";
+  phase: "deal" | "h" | "driver" | "bus" | "done";
   deal: {
     player: number;
     question: number;
-    stage: "handoff" | "guess" | "feedback" | "memory";
+    stage: "handoff" | "guess" | "feedback";
     correct: boolean | null;
+    recipient: number | null;
   };
   table: {
     index: number;
@@ -76,19 +92,19 @@ export interface BusState {
     viewer: number | null;
     played: Card | null;
     recipient: number | null;
+    actor: number | null;
   };
-  scores: number[];
   driverCandidates: number[];
-  driver: number | null;
-  driverLot: number;
+  drivers: number[];
   bus: {
     attempt: number;
-    cursor: number;
-    stage: "ready" | "guess" | "feedback";
-    correct: boolean | null;
+    row: number;
+    stage: "ready" | "pick" | "feedback";
+    picks: number[];
+    failed: boolean;
     failures: number;
   };
-  endReason: "no-driver" | "cleared" | "attempt-limit" | "skipped" | null;
+  endReason: "no-driver" | "cleared" | "skipped" | null;
 }
 export function createBusGame(
   players: Player[],
@@ -105,68 +121,88 @@ export function createBusGame(
   )
     throw new Error(invalid ?? "Spillerne må ha unike ID-er.");
   const deck = cardDeck(random);
+  const guesses = cardDeck(random);
   return {
     players: players.map((player) => ({ ...player })),
     hands: players.map((_, index) => deck.slice(index * 4, index * 4 + 4)),
-    pyramid: deck.slice(players.length * 4, players.length * 4 + 15),
-    routes: Array.from({ length: BUS_ATTEMPTS }, () =>
-      cardDeck(random).slice(0, BUS_ROUTE_LENGTH),
+    guessHands: players.map((_, index) =>
+      guesses.slice(index * 4, index * 4 + 4),
     ),
-    phase: "deal",
-    deal: { player: 0, question: 0, stage: "handoff", correct: null },
+    h: deck.slice(players.length * 4, players.length * 4 + H_CARD_COUNT),
+    pyramid: cardDeck(random).slice(0, PYRAMID_CARD_COUNT),
+    phase: "h",
+    deal: {
+      player: 0,
+      question: 0,
+      stage: "handoff",
+      correct: null,
+      recipient: null,
+    },
     table: {
-      index: 0,
+      index: -1,
       stage: "intro",
       viewer: null,
       played: null,
       recipient: null,
+      actor: null,
     },
-    scores: players.map(() => 0),
     driverCandidates: [],
-    driver: null,
-    driverLot: random(),
-    bus: { attempt: 0, cursor: 1, stage: "ready", correct: null, failures: 0 },
+    drivers: [],
+    bus: {
+      attempt: 1,
+      row: 1,
+      stage: "ready",
+      picks: [],
+      failed: false,
+      failures: 0,
+    },
     endReason: null,
   };
 }
 export type BusAction =
   | { type: "confirm-deal" }
   | { type: "deal-guess"; guess: BusGuess }
-  | { type: "next-question" }
-  | { type: "hide-hand" }
-  | { type: "start-pyramid" }
-  | { type: "reveal-pyramid" }
+  | { type: "deal-award"; recipient: number }
+  | { type: "next-player" }
+  | { type: "start-h" }
+  | { type: "reveal-h" }
   | { type: "view-hand"; player: number }
   | { type: "confirm-hand" }
   | { type: "close-hand" }
   | { type: "play-card"; slot: number }
-  | { type: "award"; recipient: number | null }
-  | { type: "next-pyramid" }
-  | { type: "draw-driver" }
+  | { type: "award"; recipient: number }
+  | { type: "next-h" }
+  | { type: "choose-driver"; player: number }
+  | { type: "ride-together" }
   | { type: "start-bus" }
-  | { type: "bus-guess"; guess: "higher" | "lower" }
-  | { type: "next-stop" }
+  | { type: "pick-pyramid"; index: number }
+  | { type: "next-row" }
   | { type: "retry-bus" }
   | { type: "skip-bus" };
-function finishPyramid(state: BusState): BusState {
+function finishH(state: BusState): BusState {
   const candidates = busCandidates(state.hands);
-  if (!candidates.length)
-    return {
-      ...state,
-      phase: "done",
-      endReason: "no-driver",
-      driverCandidates: [],
-    };
   return {
     ...state,
-    phase: candidates.length === 1 ? "bus" : "driver",
+    phase: !candidates.length
+      ? "done"
+      : candidates.length === 1
+        ? "deal"
+        : "driver",
+    endReason: !candidates.length ? "no-driver" : null,
     driverCandidates: candidates,
-    driver: candidates.length === 1 ? candidates[0] : null,
+    drivers: candidates.length === 1 ? candidates : [],
+    deal: { ...state.deal, player: candidates[0] ?? 0 },
   };
 }
-/** Every action is gated by phase and reveal state, so a repeated tap cannot consume another card. */
-export function playBus(state: BusState, action: BusAction): BusState {
+/** Gate every action by phase and reveal state; repeated taps cannot consume cards. */
+export function playBus(
+  state: BusState,
+  action: BusAction,
+  random = Math.random,
+): BusState {
   const { deal, table, bus } = state;
+  const validRecipient = (index: number, actor: number) =>
+    Number.isInteger(index) && !!state.players[index] && index !== actor;
   if (state.phase === "done") return state;
   if (state.phase === "deal") {
     if (action.type === "confirm-deal" && deal.stage === "handoff")
@@ -179,64 +215,64 @@ export function playBus(state: BusState, action: BusAction): BusState {
         ["♠", "♥", "♣", "♦"],
       ];
       if (!allowed[deal.question].includes(action.guess)) return state;
-      const correct = busGuessCorrect(
-        state.hands[deal.player],
-        deal.question,
-        action.guess,
-      );
-      return {
-        ...state,
-        deal: { ...deal, stage: "feedback", correct },
-        scores: state.scores.map(
-          (score, index) => score + (index === deal.player && correct ? 1 : 0),
-        ),
-      };
-    }
-    if (action.type === "next-question" && deal.stage === "feedback")
       return {
         ...state,
         deal: {
           ...deal,
-          stage: deal.question === 3 ? "memory" : "guess",
-          question: Math.min(3, deal.question + 1),
-          correct: null,
+          stage: "feedback",
+          correct: busGuessCorrect(
+            state.guessHands[deal.player],
+            deal.question,
+            action.guess,
+          ),
         },
       };
-    if (action.type === "hide-hand" && deal.stage === "memory") {
-      if (deal.player + 1 === state.players.length)
-        return { ...state, phase: "pyramid" };
+    }
+    if (
+      action.type === "deal-award" &&
+      deal.stage === "feedback" &&
+      deal.correct &&
+      deal.recipient === null &&
+      validRecipient(action.recipient, deal.player)
+    )
+      return { ...state, deal: { ...deal, recipient: action.recipient } };
+    if (
+      action.type === "next-player" &&
+      deal.stage === "feedback" &&
+      (!deal.correct || deal.recipient !== null)
+    ) {
+      const next =
+        (state.drivers.indexOf(deal.player) + 1) % state.drivers.length;
+      const player = state.drivers[next];
+      const question = deal.question + (next === 0 ? 1 : 0);
+      if (question === 4) return { ...state, phase: "bus" };
       return {
         ...state,
         deal: {
-          player: deal.player + 1,
-          question: 0,
+          player,
+          question,
           stage: "handoff",
           correct: null,
+          recipient: null,
         },
       };
     }
     return state;
   }
-  if (state.phase === "pyramid") {
-    if (action.type === "start-pyramid" && table.stage === "intro")
-      return { ...state, table: { ...table, stage: "covered" } };
-    if (action.type === "reveal-pyramid" && table.stage === "covered")
+  if (state.phase === "h") {
+    if (action.type === "start-h" && table.stage === "intro")
+      return { ...state, table: { ...table, index: 0, stage: "covered" } };
+    if (action.type === "reveal-h" && table.stage === "covered")
       return { ...state, table: { ...table, stage: "open" } };
     if (
       action.type === "view-hand" &&
-      table.stage === "open" &&
+      (table.stage === "intro" || table.stage === "open") &&
       Number.isInteger(action.player) &&
       state.hands[action.player]?.length
     )
       return {
         ...state,
-        table: {
-          ...table,
-          stage: "handoff",
-          viewer: action.player,
-          played: null,
-          recipient: null,
-        },
+        table: { ...table, stage: "handoff", viewer: action.player },
       };
     if (action.type === "confirm-hand" && table.stage === "handoff")
       return { ...state, table: { ...table, stage: "hand" } };
@@ -244,15 +280,24 @@ export function playBus(state: BusState, action: BusAction): BusState {
       action.type === "close-hand" &&
       (table.stage === "hand" || table.stage === "handoff")
     )
-      return { ...state, table: { ...table, stage: "open", viewer: null } };
+      return {
+        ...state,
+        table: {
+          ...table,
+          stage: table.index < 0 ? "intro" : "open",
+          viewer: null,
+        },
+      };
     if (
       action.type === "play-card" &&
       table.stage === "hand" &&
       table.viewer !== null &&
+      table.index >= 0 &&
       Number.isInteger(action.slot)
     ) {
       const card = state.hands[table.viewer][action.slot];
-      if (!card || card.rank !== state.pyramid[table.index].rank) return state;
+      if (!card || card.rank !== state.h[table.index].rank) return state;
+      const give = hEffect(table.index) === "give";
       return {
         ...state,
         hands: state.hands.map((hand, index) =>
@@ -260,20 +305,22 @@ export function playBus(state: BusState, action: BusAction): BusState {
             ? hand.filter((_, slot) => slot !== action.slot)
             : hand,
         ),
-        scores: state.scores.map((score, index) =>
-          index === table.viewer ? score + pyramidRow(table.index) : score,
-        ),
-        table: { ...table, stage: "award", played: card, recipient: null },
+        table: {
+          ...table,
+          stage: give ? "award" : "open",
+          played: card,
+          actor: table.viewer,
+          recipient: give ? null : table.viewer,
+          viewer: give ? table.viewer : null,
+        },
       };
     }
-    if (action.type === "award" && table.stage === "award") {
-      if (
-        action.recipient !== null &&
-        (!Number.isInteger(action.recipient) ||
-          !state.players[action.recipient] ||
-          action.recipient === table.viewer)
-      )
-        return state;
+    if (
+      action.type === "award" &&
+      table.stage === "award" &&
+      table.viewer !== null &&
+      validRecipient(action.recipient, table.viewer)
+    )
       return {
         ...state,
         table: {
@@ -283,10 +330,9 @@ export function playBus(state: BusState, action: BusAction): BusState {
           viewer: null,
         },
       };
-    }
-    if (action.type === "next-pyramid" && table.stage === "open") {
-      if (table.index === 14 || state.hands.every((hand) => hand.length === 0))
-        return finishPyramid(state);
+    if (action.type === "next-h" && table.stage === "open") {
+      // Reveal the entire H even if everyone has already emptied their hands.
+      if (table.index === H_CARD_COUNT - 1) return finishH(state);
       return {
         ...state,
         table: {
@@ -294,6 +340,7 @@ export function playBus(state: BusState, action: BusAction): BusState {
           stage: "covered",
           viewer: null,
           played: null,
+          actor: null,
           recipient: null,
         },
       };
@@ -301,62 +348,70 @@ export function playBus(state: BusState, action: BusAction): BusState {
     return state;
   }
   if (state.phase === "driver") {
-    if (action.type !== "draw-driver") return state;
-    const chosen =
-      state.driverCandidates[
-        Math.min(
-          state.driverCandidates.length - 1,
-          Math.floor(state.driverLot * state.driverCandidates.length),
-        )
-      ];
-    return { ...state, phase: "bus", driver: chosen };
+    if (action.type === "ride-together")
+      return {
+        ...state,
+        phase: "deal",
+        drivers: [...state.driverCandidates],
+        deal: { ...deal, player: state.driverCandidates[0] },
+      };
+    if (
+      action.type === "choose-driver" &&
+      state.driverCandidates.includes(action.player)
+    )
+      return {
+        ...state,
+        phase: "deal",
+        drivers: [action.player],
+        deal: { ...deal, player: action.player },
+      };
+    return state;
   }
   if (action.type === "skip-bus")
     return { ...state, phase: "done", endReason: "skipped" };
   if (action.type === "start-bus" && bus.stage === "ready")
-    return { ...state, bus: { ...bus, stage: "guess" } };
-  if (action.type === "bus-guess" && bus.stage === "guess") {
-    if (action.guess !== "higher" && action.guess !== "lower") return state;
-    const route = state.routes[bus.attempt];
-    const correct =
-      compareCards(route[bus.cursor - 1], route[bus.cursor], action.guess, {
-        ace: "high",
-        ties: "lose",
-      }) === "correct";
+    return { ...state, bus: { ...bus, stage: "pick" } };
+  if (
+    action.type === "pick-pyramid" &&
+    bus.stage === "pick" &&
+    Number.isInteger(action.index) &&
+    action.index >= 0 &&
+    action.index < PYRAMID_CARD_COUNT &&
+    pyramidRow(action.index) === bus.row
+  ) {
+    const failed = isPictureCard(state.pyramid[action.index]);
     const next = {
       ...bus,
       stage: "feedback" as const,
-      correct,
-      failures: bus.failures + (correct ? 0 : 1),
+      picks: [...bus.picks, action.index],
+      failed,
+      failures: bus.failures + (failed ? 1 : 0),
     };
-    if (correct && bus.cursor === BUS_ROUTE_LENGTH - 1)
-      return { ...state, phase: "done", bus: next, endReason: "cleared" };
-    if (!correct && bus.attempt === BUS_ATTEMPTS - 1)
-      return { ...state, phase: "done", bus: next, endReason: "attempt-limit" };
-    return { ...state, bus: next };
+    return {
+      ...state,
+      bus: next,
+      phase: !failed && bus.row === 5 ? "done" : "bus",
+      endReason: !failed && bus.row === 5 ? "cleared" : null,
+    };
   }
   if (
-    action.type === "next-stop" &&
+    action.type === "next-row" &&
     bus.stage === "feedback" &&
-    bus.correct === true
+    !bus.failed &&
+    bus.row < 5
   )
+    return { ...state, bus: { ...bus, row: bus.row + 1, stage: "pick" } };
+  if (action.type === "retry-bus" && bus.stage === "feedback" && bus.failed)
     return {
       ...state,
-      bus: { ...bus, cursor: bus.cursor + 1, stage: "guess", correct: null },
-    };
-  if (
-    action.type === "retry-bus" &&
-    bus.stage === "feedback" &&
-    bus.correct === false
-  )
-    return {
-      ...state,
+      pyramid: cardDeck(random).slice(0, PYRAMID_CARD_COUNT),
       bus: {
         ...bus,
         attempt: bus.attempt + 1,
-        cursor: 1,
-        stage: "guess",
-        correct: null,
+        row: 1,
+        stage: "pick",
+        picks: [],
+        failed: false,
       },
     };
   return state;

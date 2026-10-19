@@ -15,7 +15,12 @@ export type GameId =
   | "emoji"
   | "category-rush"
   | "truth-train"
-  | "bus";
+  | "bus"
+  | "spy"
+  | "werewolf"
+  | "bluff"
+  | "liars-dice"
+  | "two-truths";
 export type PromptGame = "truth" | "never" | "most-likely";
 export type Category = "all" | "vors" | "hytta" | "venner";
 export interface GameDefinition {
@@ -151,7 +156,7 @@ export const games: GameDefinition[] = [
     name: "SipZone Live",
     subtitle: "Hver deres skjerm",
     description:
-      "Hver sin enhet, samme spill. Ni leker: quiz, kort, potet, hjul og mer.",
+      "Hver sin mobil, samme spill. Femten leker: kort, quiz, roller, potet, hjul og mer.",
     min: 2,
     time: "Så lenge dere vil",
     kind: "live",
@@ -299,23 +304,121 @@ export const games: GameDefinition[] = [
   },
   {
     id: "bus",
-    name: "Bussruta",
-    subtitle: "Alle om bord!",
+    name: "H-en + Bussruta",
+    subtitle: "Hvem må ta bussen?",
     description:
-      "Fire gjetninger, en pyramide og én sjåfør. Hvem sitter igjen med kortene?",
+      "Tøm hånden i H-en. De med flest kort igjen tar fire gjetninger og en pyramide uten bildekort.",
     min: 2,
     max: 8,
     time: "15–25 min",
-    kind: "cards",
+    kind: "live",
     symbol: "↗",
     rules: [
-      "Én enhet, 2–8 spillere. Fire kort per spiller og 15 i pyramiden fra samme stokk. Ess er alltid høyest, og like kort teller som feil.",
-      "Del 1: bekreft hvem som holder mobilen. Gjett rød/svart, høyere/lavere, innenfor/utenfor og sort. Innenfor er strengt mellom de to første kortene; likt med en av grensene er feil i begge valg. Riktig gir ett poeng, feil én valgfri slurk.",
-      "Husk de fire kortene dine og skjul hånden før du gir mobilen videre. De andre skal se bort mens du spiller.",
-      "Del 2: snu pyramiden fra bunnen. Velg spiller, bekreft overlevering og vis bare deres hånd. Et kort med samme verdi kan legges én gang og gir radens poeng (1–5), pluss muligheten til å gi én valgfri slurk til en annen. Skjul hånden før mobilen går tilbake.",
-      "Etter pyramiden kjører den med flest restkort bussen, uavhengig av poeng. Ved likt antall trekkes én av disse tilfeldig. Har alle tømt hånden, slipper alle bussturen.",
-      "Del 3: sjåføren gjetter høyere/lavere fire ganger gjennom fem kort. Feil starter et nytt forsøk med en ny stokket bunke. Maks tre forsøk, én valgfri slurk per feil. Du kan alltid avslutte bussturen.",
+      "Hver sin mobil: alle blir med i samme rom og får fire kort. Kortene ligger nederst på din egen skjerm. Trykk på dem for å se dem. Målet er å ha null kort igjen. H-en har fem kort på hver side og to som binder sidene sammen.",
+      "Verten snur ett H-kort om gangen, annenhver side: ta én slurk, gi bort én slurk, og gjenta. Alle kan legge ett eller flere håndkort med samme verdi på det åpne kortet, rett fra sin egen mobil. Venstre side: gi én slurk til en valgfri spiller per kort. Høyre side: ta én slurk selv per kort. De to kortene i midten: ta en shot per match. Hele H-en skal snus.",
+      "Den med flest håndkort igjen tar Bussruta. Ved likt antall spiller dere stein, saks, papir og velger taperen, eller tar hele Bussruta sammen. Har alle null kort, slipper alle bussen.",
+      "Bussruta del 1: bussdeltakerne får fire nye kort. Gjett rød/svart, høyere/lavere enn kort 1, innenfor/utenfor kort 1 og 2, og sort. Alle tar ett kort hver før neste gjetterunde. Riktig: gi bort 1, 2, 3 eller 4 slurker. Feil: ta samme antall selv. Ess er høyest; like verdier og treff på en grense teller som feil.",
+      "Bussruta del 2: trykk på ett kort i hver pyramiderad, fra bunnen til toppen. Unngå knekt, dame og konge. Ess er trygt. Bildekort på rad 1–4 gir 2, 4, 6 eller 8 slurker. Bildekort på toppen gir en shot.",
+      "Et bildekort stokker og nullstiller hele pyramiden. Begynn på nederste rad igjen. Fortsett til dere når toppen uten bildekort. Dere kan alltid avslutte bussturen.",
+    ],
+  },
+  {
+    id: "spy",
+    name: "Hvem er spionen?",
+    subtitle: "Alle vet hvor dere er. Nesten.",
+    description:
+      "Alle ser stedet unntatt spionen. Still spørsmål, bløff og avslør hvem som ikke hører til.",
+    min: 3,
+    max: 12,
+    time: "10–15 min",
+    kind: "live",
+    symbol: "?",
+    rules: [
+      "Hver sin mobil: alle blir med i samme rom. Trykk på kortet nederst på skjermen for å se rollen din. Bare du ser den.",
+      "Alle unntatt én ser stedet. Spionen ser bare listen over mulige steder.",
+      "Dere stiller hverandre spørsmål om stedet, på skift og høyt. Svar så riktig at spionen ikke gjetter, men så vagt at spionen ikke blir med på stedet.",
+      "Spionen kan når som helst gjette stedet. Riktig: spionen vinner. Feil: spionen taper og tar to slurker.",
+      "Når verten åpner avstemmingen, stemmer alle i skjul på hvem de tror er spionen. Flest stemmer avslører spionen og spionen tar to slurker. Slipper spionen unna, tar alle de andre en slurk.",
+    ],
+  },
+  {
+    id: "werewolf",
+    name: "Varulv",
+    subtitle: "Natta faller. Ulvene våkner.",
+    description:
+      "Hemmelige roller. Ulvene tar én hver natt, landsbyen stemmer ut én hver dag. Hvem er ulven?",
+    min: 4,
+    max: 12,
+    time: "15–30 min",
+    kind: "live",
+    symbol: "☾",
+    rules: [
+      "Hver sin mobil: alle får en hemmelig rolle. Trykk på kortet nederst på skjermen for å se din. Fra fem spillere er én av landsbyboerne en seer.",
+      "Natt: ulvene velger i hemmelighet et offer. Seeren velger en spiller og får vite om hen er ulv. Alle andre venter.",
+      "Dag: alle ser hvem som er borte, snakker sammen og stemmer ut den de tror er ulven. Flest stemmer går ut. Likt antall stemmer betyr at ingen går ut.",
+      "Landsbyen vinner når alle ulvene er borte. Ulvene vinner når de er like mange som resten. Den som er ute, ser på videre uten å si noe.",
+      "Den som blir tatt ut, av ulvene eller av stemmen, tar en slurk. Når runden er over, tar hele taperlaget en slurk til.",
+    ],
+  },
+  {
+    id: "bluff",
+    name: "Snyd",
+    subtitle: "Tror du på ham?",
+    description:
+      "Legg kort med bunnen opp og påstå hva de er. Tviler noen, må den som tok feil ta hele bunken.",
+    min: 2,
+    max: 6,
+    time: "10–20 min",
+    kind: "live",
+    symbol: "♣",
+    rules: [
+      "Hver sin mobil: kortstokken deles likt, og du ser bare din egen hånd nederst på skjermen.",
+      "På din tur legger du ett til fire kort med bunnen opp og sier hvilken verdi de har. Verdien går oppover: ess, to, tre og så videre, rundt og rundt.",
+      "Den neste spilleren kan tro på det og legge sine kort, eller kalle det løgn.",
+      "Kalles det løgn, snus kortene. Var det snyd, tar den som la kortene hele bunken. Var det sant, tar den som kalte det hele bunken. Den som tar bunken, tar også en slurk.",
+      "Først tom for kort vinner. Alle andre tar like mange slurker som de har kort igjen.",
+    ],
+  },
+  {
+    id: "liars-dice",
+    name: "Løgnerdyst",
+    subtitle: "Fem terninger. Én løgn.",
+    description:
+      "Fem terninger under koppen. Byd opp hvor mange som finnes på bordet, eller kall budet løgn.",
+    min: 2,
+    max: 8,
+    time: "10–20 min",
+    kind: "live",
+    symbol: "⚅",
+    rules: [
+      "Hver sin mobil: alle har fem terninger og ser bare sine egne. Trykk på koppen nederst på skjermen for å se dem.",
+      "På din tur byr du: hvor mange terninger av én verdi dere tror det finnes til sammen på hele bordet. Enere teller som alle verdier.",
+      "Neste spiller må øke budet, med flere terninger eller samme antall på en høyere verdi, eller kalle det løgn.",
+      "Kalles det løgn, vises alle terningene. Finnes det minst så mange som budet, mister den som kalte en terning. Ellers mister den som bød. Den som mister en terning, tar også en slurk.",
+      "Den som mister alle terningene er ute. Siste spiller med terninger igjen vinner.",
+    ],
+  },
+  {
+    id: "two-truths",
+    name: "To sannheter og en løgn",
+    subtitle: "Hvilken av de tre lyver?",
+    description:
+      "Skriv tre påstander om deg selv, hvorav én er løgn. Gjengen stemmer i skjul på hvilken.",
+    min: 3,
+    max: 12,
+    time: "15–30 min",
+    kind: "live",
+    symbol: "≟",
+    rules: [
+      "Hver sin mobil: spillerne skriver på tur, og de andre stemmer på sin egen mobil.",
+      "Du som er på tur skriver tre påstander om deg selv. To er sanne og én er løgn, og du markerer hvilken.",
+      "Alle andre stemmer i skjul på hvilken de tror er løgnen. Alle ser påstandene på sin egen mobil.",
+      "Så vises svaret. De som gjettet feil, tar en slurk. Lot ingen seg lure, tar den som skrev to slurker.",
+      "Turen går videre til neste spiller.",
     ],
   },
 ];
 export const gameById = (id: string) => games.find((game) => game.id === id);
+/** Live games run with a phone per player; every other game needs one phone. */
+export const needsOwnPhones = (game: { kind: GameDefinition["kind"] }) =>
+  game.kind === "live";

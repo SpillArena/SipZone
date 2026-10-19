@@ -4,12 +4,19 @@ import { useAccount } from "../../account/useAccount";
 import { onSessionChange } from "../../account/session";
 import { useI18n } from "../../i18n";
 import { ROOM_CODE } from "../../../shared/rooms";
-import { LIVE_GAMES } from "../../../shared/live-games";
+import { LIVE_GAMES, type LiveGame } from "../../../shared/live-games";
 import { LiveError, randomCode, roomRequest } from "./api";
 import type { Access } from "./api";
 import { ConnectedRoom } from "./ConnectedRoom";
 
-export function LiveSetup({ initialCode }: { initialCode: string }) {
+export function LiveSetup({
+  initialCode,
+  game,
+}: {
+  initialCode: string;
+  /** A Live game picked from its own tile; a new room starts on it. */
+  game?: LiveGame;
+}) {
   const { username } = useAccount();
   const { t } = useI18n();
   const [mode, setMode] = useState<"create" | "join">(
@@ -113,6 +120,7 @@ export function LiveSetup({ initialCode }: { initialCode: string }) {
       <ConnectedRoom
         key={`${access.code}-${access.token}`}
         access={access}
+        game={game}
         onLeave={() => {
           setAccess(null);
           history.replaceState(null, "", "#/live");

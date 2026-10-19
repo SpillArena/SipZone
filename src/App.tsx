@@ -93,6 +93,7 @@ export default function App() {
         }}
       >
         <LobbyLink language={language} />
+        <AccountBadge corner="header" language={language} />
         <SettingsMenu />
       </SiteHeader>
       <main id="main" tabIndex={-1}>
@@ -146,19 +147,7 @@ export default function App() {
           />
         )}
       </main>
-      <SiteFooter
-        game="SipZone"
-        language={language}
-        note={
-          <p className="footer-note">
-            {t(
-              "Deres tempo. Deres glass. Hopp over når dere vil.",
-              "Your pace. Your drink. Skip whenever you want.",
-            )}
-          </p>
-        }
-      />
-      <AccountBadge language={language} />
+      <SiteFooter game="SipZone" language={language} />
       <ConsentDialog
         language={language}
         game="SipZone"

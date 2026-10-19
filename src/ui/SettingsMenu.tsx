@@ -46,7 +46,7 @@ export function SettingsMenu() {
         title={t("Innstillinger", "Settings")}
         onClick={() => setOpen((value) => !value)}
       >
-        <Settings size={16} />
+        <Settings size={18} />
       </button>
       {open && (
         <div

@@ -307,18 +307,18 @@ export const games: GameDefinition[] = [
     name: "H-en + Bussruta",
     subtitle: "Hvem må ta bussen?",
     description:
-      "Tøm hånden i H-en. De med flest kort igjen tar fire gjetninger og en pyramide uten bildekort.",
+      "Gjett fire kort og bruk dem i H-en. De med flest kort igjen tar pyramiden uten bildekort.",
     min: 2,
     max: 8,
     time: "15–25 min",
     kind: "live",
     symbol: "↗",
     rules: [
-      "Hver sin mobil: alle blir med i samme rom og får fire kort. Kortene ligger nederst på din egen skjerm. Trykk på dem for å se dem. Målet er å ha null kort igjen. H-en har fem kort på hver side og to som binder sidene sammen.",
-      "Verten snur ett H-kort om gangen, annenhver side: ta én slurk, gi bort én slurk, og gjenta. Alle kan legge ett eller flere håndkort med samme verdi på det åpne kortet, rett fra sin egen mobil. Venstre side: gi én slurk til en valgfri spiller per kort. Høyre side: ta én slurk selv per kort. De to kortene i midten: ta en shot per match. Hele H-en skal snus.",
-      "Den med flest håndkort igjen tar Bussruta. Ved likt antall spiller dere stein, saks, papir og velger taperen, eller tar hele Bussruta sammen. Har alle null kort, slipper alle bussen.",
-      "Bussruta del 1: bussdeltakerne får fire nye kort. Gjett rød/svart, høyere/lavere enn kort 1, innenfor/utenfor kort 1 og 2, og sort. Alle tar ett kort hver før neste gjetterunde. Riktig: gi bort 1, 2, 3 eller 4 slurker. Feil: ta samme antall selv. Ess er høyest; like verdier og treff på en grense teller som feil.",
-      "Bussruta del 2: trykk på ett kort i hver pyramiderad, fra bunnen til toppen. Unngå knekt, dame og konge. Ess er trygt. Bildekort på rad 1–4 gir 2, 4, 6 eller 8 slurker. Bildekort på toppen gir en shot.",
+      "Fire gjetninger først: alle blir med på hver sin mobil. Gjett rød/svart, høyere/lavere enn kort 1, innenfor/utenfor kort 1 og 2, og sort. Alle tar én gjetning hver før neste gjetterunde. Riktig: gi bort 1, 2, 3 eller 4 slurker. Feil: ta samme antall selv. Ess er høyest; like verdier og treff på en grense teller som feil.",
+      "Behold de fire kortene du gjettet på. Disse er hånden din i H-en, fra samme kortstokk som bordet. Kortene hviler nederst med toppen synlig. Trykk på et hvilende kort for å vise hele hånden, og trykk på et kort uten match igjen for å minimere. Kort som matcher et snudd H-kort løftes automatisk til full høyde.",
+      "H-en har fem kort på hver side og to i midten. Verten snur ett kort om gangen, annenhver side. Trykk på et spillbart håndkort for å legge det på det sist snudde H-kortet med samme verdi. Venstre side: gi én slurk til en valgfri spiller per kort. Høyre side: ta én slurk selv per kort. De to kortene i midten: ta en shot per match. Hele H-en skal snus.",
+      "Den med flest håndkort igjen tar Bussruta, rett til pyramiden. Ved likt antall spiller dere stein, saks, papir og velger taperen, eller tar bussen sammen. Har alle null kort, slipper alle bussen. Det deles ikke ut nye gjetningskort etter H-en.",
+      "Pyramiden: trykk på ett kort i hver rad, fra bunnen til toppen. Unngå knekt, dame og konge. Ess er trygt. Bildekort på rad 1–4 gir 2, 4, 6 eller 8 slurker. Bildekort på toppen gir en shot.",
       "Et bildekort stokker og nullstiller hele pyramiden. Begynn på nederste rad igjen. Fortsett til dere når toppen uten bildekort. Dere kan alltid avslutte bussturen.",
     ],
   },
@@ -419,6 +419,8 @@ export const games: GameDefinition[] = [
   },
 ];
 export const gameById = (id: string) => games.find((game) => game.id === id);
+/** Only Bussruta is available while the other games await quality review (TODO.md). */
+export const availableGames = games.filter((game) => game.id === "bus");
 /** Live games run with a phone per player; every other game needs one phone. */
 export const needsOwnPhones = (game: { kind: GameDefinition["kind"] }) =>
   game.kind === "live";

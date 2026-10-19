@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { Check, Copy, Wifi, WifiOff } from "lucide-react";
 import { useI18n } from "../../i18n";
 import type { RoomView } from "../../../shared/rooms";
 import {
-  LIVE_GAMES,
+  availableLiveGames,
   liveGame,
   type LiveGame,
 } from "../../../shared/live-games";
@@ -12,6 +13,11 @@ import type { Access } from "./api";
 import { TurnBanner } from "../../games/GameControls";
 import { LiveBoard } from "./LiveBoard";
 import { Avatar, PlayerChip } from "./PlayerChip";
+
+const scene = (room: RoomView) => {
+  const bus = room.live?.kind === "bus" ? room.live : null;
+  return `${room.code}:${room.phase}:${bus?.phase ?? room.game}:${bus?.phaseIntro?.id ?? "play"}`;
+};
 
 export function ConnectedRoom({
   access,
@@ -31,13 +37,36 @@ export function ConnectedRoom({
   const [copied, setCopied] = useState(false);
   const alive = useRef(true);
   const lock = useRef(false);
-  const updateRoom = useCallback(
-    (incoming: RoomView) =>
-      setRoom((current) =>
-        !current || incoming.version >= current.version ? incoming : current,
-      ),
-    [],
-  );
+  const latestRoom = useRef<RoomView | null>(null);
+  const transition = useRef<ViewTransition | null>(null);
+  const updateRoom = useCallback((incoming: RoomView) => {
+    const current = latestRoom.current;
+    if (current?.code === incoming.code && incoming.version < current.version)
+      return;
+    latestRoom.current = incoming;
+    // Only scene changes use snapshots; turns and cards remain immediately interactive.
+    if (
+      !current ||
+      scene(current) === scene(incoming) ||
+      document.hidden ||
+      !document.startViewTransition ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setRoom(incoming);
+      return;
+    }
+    transition.current?.skipTransition();
+    const next = document.startViewTransition(() => {
+      if (alive.current) flushSync(() => setRoom(latestRoom.current));
+    });
+    transition.current = next;
+    void next.finished
+      .catch(() => {})
+      .then(() => {
+        if (transition.current === next) transition.current = null;
+      });
+  }, []);
+  useEffect(() => () => transition.current?.skipTransition(), []);
   useEffect(() => {
     alive.current = true;
     let disposed = false;
@@ -130,7 +159,7 @@ export function ConnectedRoom({
     };
   }, [access, updateRoom]);
   const action = async (input: Record<string, unknown>) => {
-    if (lock.current || !room) return;
+    if (lock.current || !room) return false;
     lock.current = true;
     setBusy(true);
     setError("");
@@ -140,17 +169,19 @@ export function ConnectedRoom({
         round: room.round,
         ...input,
       });
-      if (!alive.current) return;
+      if (!alive.current) return false;
       if (input.action === "leave") onLeave();
       else updateRoom(view);
+      return true;
     } catch (caught) {
-      if (!alive.current) return;
+      if (!alive.current) return false;
       setError(caught instanceof Error ? caught.message : "Prøv igjen.");
       try {
         updateRoom(await roomRequest(access.code, access.token));
       } catch {
         /* Keep the previous view while reconnecting. */
       }
+      return false;
     } finally {
       lock.current = false;
       if (alive.current) setBusy(false);
@@ -190,9 +221,13 @@ export function ConnectedRoom({
   const host = room?.you === room?.host;
   const info = room ? liveGame(room.game) : undefined;
   const cards = Boolean(room?.prompt);
+  const compactDeal =
+    room?.live?.kind === "bus" &&
+    room.live.phase === "deal" &&
+    !room.live.phaseIntro;
   return (
     <section
-      className={`live-page arena-container page-narrow live-${room?.phase ?? "connecting"}`}
+      className={`live-page arena-container page-narrow live-${room?.phase ?? "connecting"}${compactDeal ? " live-bus-deal" : ""}`}
     >
       <div className="play-top">
         <button
@@ -231,6 +266,9 @@ export function ConnectedRoom({
         <>
           <details className="room-roster" open={room.phase === "lobby"}>
             <summary>
+              {compactDeal && (
+                <span className="bus-room-code">Rom {access.code} · </span>
+              )}
               {t("Gjengen", "Players")} <span>{room.members.length} / 16</span>
             </summary>
             <ul className="room-members">
@@ -253,6 +291,17 @@ export function ConnectedRoom({
                 </li>
               ))}
             </ul>
+            {compactDeal && (
+              <button
+                className="button secondary bus-room-share"
+                onClick={() => void copy()}
+              >
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied
+                  ? t("Kopiert", "Copied")
+                  : t("Del rommet", "Share room")}
+              </button>
+            )}
           </details>
           {room.phase === "lobby" ? (
             <div className="panel live-lobby">
@@ -282,42 +331,48 @@ export function ConnectedRoom({
                     "One shared object. Also on the front page for one phone.",
                   ),
                 },
-              ].map((group) => (
-                <div key={String(group.own)} className="live-picker-group">
-                  <p className="live-picker-title">
-                    <strong>{group.title}</strong> <span>{group.note}</span>
-                  </p>
-                  <div
-                    className="live-picker"
-                    role="group"
-                    aria-label={group.title}
-                  >
-                    {LIVE_GAMES.filter(
-                      (game) => game.ownPhones === group.own,
-                    ).map((game) => (
-                      <button
-                        type="button"
-                        key={game.id}
-                        className="live-pick"
-                        aria-pressed={room.game === game.id}
-                        disabled={!host || busy || !connected}
-                        onClick={() =>
-                          room.game !== game.id &&
-                          void action({
-                            action: "settings",
-                            game: game.id,
-                            category: room.category,
-                          })
-                        }
-                      >
-                        <span aria-hidden="true">{game.symbol}</span>
-                        <strong>{game.name}</strong>
-                        <small>{t(game.no, game.en)}</small>
-                      </button>
-                    ))}
+              ]
+                .filter((group) =>
+                  availableLiveGames.some(
+                    (game) => game.ownPhones === group.own,
+                  ),
+                )
+                .map((group) => (
+                  <div key={String(group.own)} className="live-picker-group">
+                    <p className="live-picker-title">
+                      <strong>{group.title}</strong> <span>{group.note}</span>
+                    </p>
+                    <div
+                      className="live-picker"
+                      role="group"
+                      aria-label={group.title}
+                    >
+                      {availableLiveGames
+                        .filter((game) => game.ownPhones === group.own)
+                        .map((game) => (
+                          <button
+                            type="button"
+                            key={game.id}
+                            className="live-pick"
+                            aria-pressed={room.game === game.id}
+                            disabled={!host || busy || !connected}
+                            onClick={() =>
+                              room.game !== game.id &&
+                              void action({
+                                action: "settings",
+                                game: game.id,
+                                category: room.category,
+                              })
+                            }
+                          >
+                            <span aria-hidden="true">{game.symbol}</span>
+                            <strong>{game.name}</strong>
+                            <small>{t(game.no, game.en)}</small>
+                          </button>
+                        ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
               {info?.categories && (
                 <label className="field">
                   {t("Kategori", "Category")}
@@ -348,6 +403,9 @@ export function ConnectedRoom({
                     disabled={
                       room.members.length < (info?.min ?? 2) ||
                       room.members.length > (info?.max ?? 16) ||
+                      !availableLiveGames.some(
+                        (game) => game.id === room.game,
+                      ) ||
                       busy ||
                       !connected
                     }
@@ -497,11 +555,12 @@ export function ConnectedRoom({
                 <LiveBoard
                   room={room}
                   disabled={busy || !connected}
-                  send={(input) => void action(input)}
+                  send={action}
                 />
               )}
               {info?.board ? (
-                host && (
+                host &&
+                !(room.live?.kind === "bus" && room.live.phase === "done") && (
                   <div className="actions centered game-actions live-actions">
                     <button
                       className="text-button"

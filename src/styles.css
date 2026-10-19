@@ -460,6 +460,9 @@ main:focus {
   background: var(--ink);
   color: var(--bg);
 }
+.games-section .game-grid {
+  grid-template-columns: minmax(0, 420px);
+}
 .game-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -496,7 +499,7 @@ main:focus {
   margin: 0 !important;
   min-height: 0 !important;
 }
-.tile-copy h4 {
+.tile-copy h3 {
   font-size: 23px;
   margin-top: 9px;
 }
@@ -1625,7 +1628,7 @@ fieldset {
   .tile-copy {
     padding-inline: 17px;
   }
-  .tile-copy h4 {
+  .tile-copy h3 {
     font-size: 21px;
   }
   .setup-grid {
@@ -1694,7 +1697,7 @@ fieldset {
   .tile-copy {
     padding: 17px 15px 0;
   }
-  .tile-copy h4 {
+  .tile-copy h3 {
     font-size: 21px;
   }
   .tile-meta {
@@ -1798,7 +1801,7 @@ fieldset {
   .tile-copy {
     padding: 20px 16px 0;
   }
-  .tile-copy h4 {
+  .tile-copy h3 {
     font-size: 23px;
   }
   .tile-copy > p {
@@ -1960,7 +1963,7 @@ fieldset {
     width: 116px;
     height: 174px;
   }
-  .tile-copy h4 {
+  .tile-copy h3 {
     font-size: 21px;
   }
   .prompt-card {

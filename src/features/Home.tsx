@@ -1,68 +1,10 @@
-import { useEffect, useRef } from "react";
 import { ArrowUpRight, Clock3, Users, Smartphone } from "lucide-react";
-import { games, needsOwnPhones } from "../../shared/catalog";
+import { availableGames } from "../../shared/catalog";
 import { useI18n } from "../i18n";
 import { GameArt } from "../ui/GameArt";
 import tableArt from "../assets/vorsbord.svg";
-export type GameFilter = "all" | "local" | "live";
-export function Home({
-  filter,
-  onFilter,
-}: {
-  /** Set by the address, so the header's shortcuts and these filters agree. */
-  filter: GameFilter;
-  onFilter: (filter: GameFilter) => void;
-}) {
+export function Home() {
   const { t } = useI18n();
-  // a tap on the page's own filters is already in view; only arrivals scroll
-  const quiet = useRef(false);
-  const mounted = useRef(false);
-  useEffect(() => {
-    const first = !mounted.current;
-    mounted.current = true;
-    if (quiet.current) {
-      quiet.current = false;
-      return;
-    }
-    if (filter === "all") return;
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.getElementById("lekene")?.scrollIntoView({
-      block: "start",
-      behavior: first || reduce ? "instant" : "smooth",
-    });
-  }, [filter]);
-  const setFilter = (next: GameFilter) => {
-    quiet.current = true;
-    onFilter(next);
-  };
-  const groups: {
-    id: Exclude<GameFilter, "all">;
-    many: boolean;
-    title: string;
-    text: string;
-    games: typeof games;
-  }[] = [
-    {
-      id: "local",
-      many: false,
-      title: t("Én mobil på bordet", "One phone on the table"),
-      text: t(
-        "Ett felles objekt, som hjulet, flasken, poteten eller kortet som leses høyt. Legg mobilen midt på bordet eller send den rundt.",
-        "One shared object, like the wheel, the bottle, the potato or the card read out loud. Put the phone in the middle or pass it around.",
-      ),
-      games: games.filter((game) => !needsOwnPhones(game)),
-    },
-    {
-      id: "live",
-      many: true,
-      title: t("Hver sin mobil", "A phone each"),
-      text: t(
-        "Alle sitter med egne kort eller svarer i skjul. Hver spiller trenger sin egen mobil og en SpillArena-konto.",
-        "Everyone holds their own cards or answers in secret. Every player needs their own phone and a SpillArena account.",
-      ),
-      games: games.filter(needsOwnPhones),
-    },
-  ];
   return (
     <>
       <section className="hero-section arena-container">
@@ -84,31 +26,18 @@ export function Home({
             </h1>
             <p className="hero-description">
               {t(
-                "Kort på bordet. Gjengen samlet. Drikkelekene til vorset, hytteturen og den ene runden til.",
-                "Cards on the table. Friends around it. Party games for the pre-party, cabin trip and one more round.",
+                "Kort på bordet. Gjengen samlet. Spill H-en + Bussruta med venner på hver deres mobil.",
+                "Cards on the table. Friends around it. Play H-en + Bussruta together, each on your own phone.",
               )}
             </p>
             <div className="hero-actions">
-              <a className="button primary" href="#/live">
+              <a className="button primary" href="#/bus">
                 <Smartphone size={18} />
-                {t("Spill på hver sin mobil", "Play on your own phones")}
+                {t("Spill Bussruta", "Play Bussruta")}
                 <ArrowUpRight size={20} />
               </a>
-              <a
-                className="button secondary"
-                href="#lekene"
-                onClick={(event) => {
-                  event.preventDefault();
-                  setFilter("local");
-                  document.getElementById("lekene")?.scrollIntoView({
-                    behavior: matchMedia("(prefers-reduced-motion: reduce)")
-                      .matches
-                      ? "instant"
-                      : "smooth",
-                  });
-                }}
-              >
-                {t("Spill på én mobil", "Play on one phone")}
+              <a className="button secondary" href="#/live/join">
+                {t("Bli med i rom", "Join a room")}
                 <ArrowUpRight size={20} />
               </a>
             </div>
@@ -116,10 +45,7 @@ export function Home({
               {t(
                 "Én oppretter rommet. Resten blir med med kode eller lenke.",
                 "One creates a room. Everyone else joins with a code or link.",
-              )}{" "}
-              <a className="live-join-link" href="#/live/join">
-                {t("Har du en kode? Bli med →", "Got a code? Join →")}
-              </a>
+              )}
             </p>
           </div>
           <div className="table-scene">
@@ -168,81 +94,35 @@ export function Home({
           </div>
           <p className="muted small">
             {t(
-              "Velg en lek. Resten tar vi underveis.",
-              "Pick a game. We’ll take it from there.",
+              "H-en + Bussruta. 2–8 spillere, hver sin mobil.",
+              "H-en + Bussruta. 2–8 players, a phone each.",
             )}
           </p>
         </div>
-        <div
-          className="filters"
-          aria-label={t("Filtrer leker", "Filter games")}
-        >
-          {[
-            {
-              id: "all" as GameFilter,
-              label: t("Alle leker", "All games"),
-              count: games.length,
-            },
-            ...groups.map((group) => ({
-              id: group.id,
-              label: group.many
-                ? t("Hver sin mobil", "A phone each")
-                : t("Én mobil", "One phone"),
-              count: group.games.length,
-            })),
-          ].map((item) => (
-            <button
-              key={item.id}
-              className="filter"
-              aria-pressed={filter === item.id}
-              onClick={() => setFilter(item.id)}
-            >
-              {item.label}
-              <span>{item.count}</span>
-            </button>
-          ))}
-        </div>
-        {groups
-          .filter((group) => filter === "all" || filter === group.id)
-          .map((group) => (
-            <section
-              key={group.id}
-              className="game-group"
-              aria-labelledby={`group-${group.id}`}
-            >
-              <div className="game-group-heading">
-                <Devices many={group.many} />
-                <div>
-                  <h3 id={`group-${group.id}`}>{group.title}</h3>
-                  <p>{group.text}</p>
+        <div className="game-grid">
+          {availableGames.map((game) => (
+            <a key={game.id} className="game-tile" href={`#/${game.id}`}>
+              <GameArt id={game.id} />
+              <Devices many label />
+              <div className="tile-copy">
+                <p className="tile-kicker">{game.subtitle}</p>
+                <h3>{game.name}</h3>
+                <p>{game.description}</p>
+                <div className="tile-meta">
+                  <span>
+                    <Users size={13} />
+                    {game.min}–{game.max ?? 16}
+                  </span>
+                  <span>
+                    <Clock3 size={13} />
+                    {game.time}
+                  </span>
+                  <ArrowUpRight size={20} className="tile-arrow" />
                 </div>
               </div>
-              <div className="game-grid">
-                {group.games.map((game) => (
-                  <a key={game.id} className="game-tile" href={`#/${game.id}`}>
-                    <GameArt id={game.id} />
-                    <Devices many={group.many} label />
-                    <div className="tile-copy">
-                      <p className="tile-kicker">{game.subtitle}</p>
-                      <h4>{game.name}</h4>
-                      <p>{game.description}</p>
-                      <div className="tile-meta">
-                        <span>
-                          <Users size={13} />
-                          {game.min}–{game.max ?? 16}
-                        </span>
-                        <span>
-                          <Clock3 size={13} />
-                          {game.time}
-                        </span>
-                        <ArrowUpRight size={20} className="tile-arrow" />
-                      </div>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </section>
+            </a>
           ))}
+        </div>
       </section>
       <section className="how-section arena-container">
         <div>
@@ -258,24 +138,24 @@ export function Home({
         <ol className="steps">
           {[
             [
-              t("Finn en lek", "Pick a game"),
+              t("Opprett et rom", "Create a room"),
               t(
-                "En kort forklaring, så skjønner alle greia.",
-                "A quick explanation gets everyone ready.",
+                "Logg inn med SpillArena-kontoen din og åpne Bussruta.",
+                "Sign in with your SpillArena account and open Bussruta.",
               ),
             ],
             [
               t("Samle gjengen", "Gather your friends"),
               t(
-                "Legg til navnene deres. Konto trengs bare i Live.",
-                "Add your names. Only Live requires an account.",
+                "Del romkoden. Alle blir med fra sin egen mobil.",
+                "Share the room code. Everyone joins on their own phone.",
               ),
             ],
             [
-              t("La det gå på rundgang", "Pass it around"),
+              t("Tøm hånden i H-en", "Empty your hand in the H"),
               t(
-                "Spill i deres eget tempo. Hopp over når dere vil.",
-                "Play at your own pace. Skip whenever you want.",
+                "Fire gjetninger gir dere hånden til H-en. De med flest kort igjen tar bussen.",
+                "Four guesses give you your hand for the H. Most cards left means a ride on the bus.",
               ),
             ],
           ].map(([title, text], index) => (

@@ -16,7 +16,12 @@ import {
 } from "./live-games.ts";
 import type { LiveGame, LiveView, Potato } from "./live-games.ts";
 import type { BusState } from "./bus.ts";
-import { busMove, dropBusPlayer, type BusPlay } from "./live-bus.ts";
+import {
+  busMove,
+  dropBusPlayer,
+  normalizeLiveBus,
+  type BusPlay,
+} from "./live-bus.ts";
 import { dropTablePlayer, tableMove, type TableState } from "./live-table.ts";
 export const ROOM_CODE = /^\d{3}[A-Z]$/;
 export const ROOM_TTL = 24 * 60 * 60 * 1000;
@@ -53,7 +58,7 @@ export interface Room {
   potato: Potato | null;
   /** H-en + Bussruta: the whole table, hands included. Never sent as is. */
   bus: BusState | null;
-  /** Cards laid on the open H card, cleared when the next one turns. */
+  /** Cards laid on revealed H targets since the host last advanced. */
   busPlays: BusPlay[];
   /** Spy, Werewolf, Bluff, Liar's dice or Two truths: their state. Never sent as is. */
   table: TableState | null;
@@ -192,7 +197,9 @@ export function applyRoomAction(
       room.potato = null;
     }
   } else {
-    if (member.id !== room.host)
+    const finishedBusLobby =
+      action === "lobby" && room.game === "bus" && room.bus?.phase === "done";
+    if (member.id !== room.host && !finishedBusLobby)
       throw new RoomError("Bare verten kan gjøre dette.", 403);
     if (input.version !== room.version)
       throw new RoomError("Rommet har endret seg. Prøv igjen.", 409);
@@ -260,6 +267,7 @@ export function normalizeRoom(room: Room): Room {
   room.pick ??= null;
   room.potato ??= null;
   room.bus ??= null;
+  if (room.bus) room.bus = normalizeLiveBus(room.bus);
   room.busPlays ??= [];
   room.table ??= null;
   return room;

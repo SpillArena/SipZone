@@ -1,58 +1,72 @@
 # SipZone – alle leker og videre arbeid
 
-MVP-en prioriterer de åtte delene du valgte. Ni nye lokale leker er også implementert. Avkrysset betyr implementert i
-repoet og lokalt verifisert, ikke publisert i Cloudflare. Se README for oppstart.
+Bussruta er eneste synlige spill mens vi prioriterer kvalitet. Alle andre leker
+har status **TODO** og er skjult fra forside, direkte spillsider og rommets spillvalg.
+Eksisterende kode beholdes som utgangspunkt for en senere kvalitetsgjennomgang;
+uavkryssede punkter kan derfor allerede ha en implementasjon. De må gjennomgås
+og verifiseres før de gjøres tilgjengelige igjen. Rom, konto og invitasjoner
+brukes fortsatt av Bussruta.
+
+## Tilgjengelig nå
+
+- [x] **H-en + Bussruta:** 2–8 spillere på hver sin mobil. Fire gjetninger først;
+      bruk de samme fire kortene i H-en. De med flest kort igjen tar pyramiden.
+
+## TODO – skjulte leker
+
+Alle spill nedenfor er satt på vent, inkludert Live-variantene. Prioriter
+Bussruta før disse åpnes igjen.
 
 ## MVP
 
-- [x] **Sip Roulette:** animert hjul med åtte felt, slurker og utfordringer,
+- [ ] **Sip Roulette:** animert hjul med åtte felt, slurker og utfordringer,
       turbytte, valgbart antall runder og redusert bevegelse.
-- [x] **Truth or Sip:** 36 norske spørsmål, tre kategorier, svar/slurk/hopp over,
+- [ ] **Truth or Sip:** 36 norske spørsmål, tre kategorier, svar/slurk/hopp over,
       spillerrotasjon og en bunke uten gjentakelser i samme økt.
-- [x] **Never Have I Ever:** 36 norske påstander, kategorier og felles skjerm.
-- [x] **Higher or Lower:** 52 unike kort, rask runde eller rekkemodus,
+- [ ] **Never Have I Ever:** 36 norske påstander, kategorier og felles skjerm.
+- [ ] **Higher or Lower:** 52 unike kort, rask runde eller rekkemodus,
       valgbart ess/like kort, sikring av poeng og automatisk sikring ved tom stokk.
-- [x] **Who’s Most Likely?:** 36 spørsmål, samtidig peking eller anonym
+- [ ] **Who’s Most Likely?:** 36 spørsmål, samtidig peking eller anonym
       avstemming ved å sende enheten rundt. Delt førsteplass håndteres.
-- [x] **Hot Potato:** skjult tilfeldig tidtaker, navngitt mottaker, absolutte
+- [ ] **Hot Potato:** skjult tilfeldig tidtaker, navngitt mottaker, absolutte
       tidsfrister og valg mellom slurk og en oppgave ved tidsslutt.
-- [x] **Card of Fate:** 52 kort med 13 regler, tommel-/spørsmålsmester,
+- [ ] **Card of Fate:** 52 kort med 13 regler, tommel-/spørsmålsmester,
       noterbare husregler, synlige makkerpar som oppdateres ved nytt valg,
       og avslutning ved fjerde konge.
-- [x] **SipZone Live:** kontobaserte rom, kode og invitasjonslenke, lobby,
+- [ ] **SipZone Live:** kontobaserte rom, kode og invitasjonslenke, lobby,
       privat servicebinding, Durable Objects med SQLite, WebSocket-synkronisering,
       gjenoppkobling, vertsskifte og 24 timers utløp. Tre spørsmålsleker brukes
       som første moduler, med privat avstemming i Who’s Most Likely?.
 
 ## Én enhet – sendes rundt
 
-- [x] **Truth or Sip** – MVP over.
-- [x] **Sip or Dare:** 48 utfordringer i tre kategorier, rolig/modig nivå,
+- [ ] **Truth or Sip** – MVP over.
+- [ ] **Sip or Dare:** 48 utfordringer i tre kategorier, rolig/modig nivå,
       valg mellom slurk og utfordring og mulighet til å hoppe over.
-- [x] **Who’s Most Likely?** – MVP over.
-- [x] **Never Have I Ever** – MVP over.
-- [x] **Spin the Bottle:** spillerplasser rundt flaske, tilfeldig mottaker,
+- [ ] **Who’s Most Likely?** – MVP over.
+- [ ] **Never Have I Ever** – MVP over.
+- [ ] **Spin the Bottle:** spillerplasser rundt flaske, tilfeldig mottaker,
       animasjon og oppgave-/spørsmålsvalg.
-- [x] **Sip Roulette** – MVP over.
-- [x] **Card of Fate** – MVP over.
-- [x] **Hot Potato** – MVP over.
-- [x] **The Snus Box / Pass the Box:** virtuell boks, overlevering, åpning og
+- [ ] **Sip Roulette** – MVP over.
+- [ ] **Card of Fate** – MVP over.
+- [ ] **Hot Potato** – MVP over.
+- [ ] **The Snus Box / Pass the Box:** virtuell boks, overlevering, åpning og
       24 tilfeldige oppgaver og eget visuelt uttrykk med animert lokk.
-- [x] **Quickfire Questions:** korte spørsmål, tidsfrist, riktig/feil,
+- [ ] **Quickfire Questions:** korte spørsmål, tidsfrist, riktig/feil,
       30 spørsmål, valgbar tidsfrist, poeng og personlige serier av riktige svar.
 
 ## Én enhet – felles skjerm
 
-- [x] **Sip Showdown:** 15 duelloppgaver og tilfeldig utslagsturnering,
+- [ ] **Sip Showdown:** 15 duelloppgaver og tilfeldig utslagsturnering,
       vinner/taper, omkamp og fripass ved oddetall.
-- [x] **Higher or Lower** – MVP over.
+- [ ] **Higher or Lower** – MVP over.
 - [ ] **Odd One Out:** fire alternativer, fasit og forklaring. Start med ord;
       legg til bilder og musikk når innholdskildene er avklart.
-- [x] **Emoji Decoder:** 24 emojioppgaver, aksepterte svarvarianter, to forsøk,
+- [ ] **Emoji Decoder:** 24 emojioppgaver, aksepterte svarvarianter, to forsøk,
       fasit, poeng og manuell godkjenning.
 - [ ] **Finish the Lyric:** avklar egne/lisensierte/selvskrevne tekster før
       innhold legges inn; bygg spørsmål, svar og fasit rundt godkjent materiale.
-- [x] **Category Rush:** kategoribibliotek, turer, timer og manuell registrering
+- [ ] **Category Rush:** kategoribibliotek, turer, timer og manuell registrering
       av gjentakelser, svar utenfor kategorien og stopp. 30 forslag,
       egne kategorier, ingen gjenbruk og valgbar tidsfrist. Taperen velger neste
       kategori eller gir valget videre; velgeren starter.
@@ -60,17 +74,17 @@ repoet og lokalt verifisert, ikke publisert i Cloudflare. Se README for oppstart
       spiller-/lagoppsett og siste gjenstående deltaker.
 - [ ] **Reaction Rush:** tilfeldig startsignal, reaksjonsmåling og lokal
       sammenligning. Avklar rettferdig inndata på én skjerm.
-- [x] **Truth Train:** 24 personlige spørsmål etter tur, valgfrie oppfølgere
+- [ ] **Truth Train:** 24 personlige spørsmål etter tur, valgfrie oppfølgere
       og gruppens avgjørelse.
 - [ ] **Sip Bingo:** brett fra festhendelser, avkryssing, bingo og mulighet
       til å la spillet gå ved siden av andre leker.
 
 ## Flere enheter – én skjerm per spiller
 
-- [x] **SipZone Live** – felles ramme i MVP-en over.
+- [ ] **SipZone Live** – felles ramme i MVP-en over.
 - [ ] **Vote & Sip:** egen Live-modul med avstemmingskategorier, rundetid og
       en komplett resultatflyt. Hemmelig stemmegivning finnes allerede i Live MVP.
-- [x] **Live-leker:** Higher or Lower, Emoji Decoder, Quickfire, Hot Potato,
+- [ ] **Live-leker:** Higher or Lower, Emoji Decoder, Quickfire, Hot Potato,
       Sip Roulette og Sip or Dare i rommene, med private svar, poeng og servertimer.
 - [ ] **Sip or Dare Live, videre:** utfordring av andre spillere og kontroll
       over hvem som får se hvert valg.
@@ -89,7 +103,7 @@ repoet og lokalt verifisert, ikke publisert i Cloudflare. Se README for oppstart
 
 ## Nye norske klassikere – fra regelgjennomgangen
 
-Av disse 12 er **Bussruta implementert**, mens 11 fortsatt er planlagt. Inspirasjon er hentet
+Bussruta er tilgjengelig som H-en + Bussruta. De øvrige klassikerne er TODO. Inspirasjon er hentet
 fra [Drikkespill.no](https://drikkespill.no/) og
 [Annes Drikkeleker](https://www.annesdrikkeleker.no/index.html/beste-drikkespill.html).
 Regelvalg, kildehenvisninger og overlapp er dokumentert i
@@ -98,12 +112,8 @@ Reglene er SipZone-varianter, ikke en påstand om ett offisielt regelsett.
 
 ### Først – én enhet og tydelig rundelogikk
 
-- [x] **Bussjåfør / Bussruta:** 2–8 spillere, fire private gjetninger hver,
-      bekreftet overlevering og skjult hånd. 15-korts pyramide med matchende
-      kort som brukes én gang, radpoeng og valgfri utdeling til en annen spiller.
-      Flest restkort avgjør sjåføren; loddtrekning ved likt og ingen busstur hvis
-      alle er tomhendte. Ess høyt, likt feil, fire riktige gjennom fem kort,
-      ny stokk per bussforsøk og maksimalt tre forsøk. Bussturen kan avsluttes.
+Bussruta: se «Tilgjengelig nå» over for den gjeldende rombaserte varianten.
+
 - [ ] **Rød eller svart:** bruk den felles 52-kortstokken, ett fargevalg per tur,
       korrekt fargeklassifisering, poeng og tydelig avslutning ved tom stokk.
 - [ ] **Gjett kortet / Fuck the Dealer:** skjult kort, to gjetninger med
@@ -140,6 +150,14 @@ Reglene er SipZone-varianter, ikke en påstand om ett offisielt regelsett.
       bekreftet overlevering, gjetning og poeng etter avstand. Egne temaer,
       vekslende roller og ingen avsløring av tallet før gjetningen låses.
 
+## TODO – flere romspill med eksisterende kode
+
+- [ ] **Hvem er spionen?:** gjennomgå roller, spørsmål, gjetting og avstemming.
+- [ ] **Varulv:** gjennomgå natt/dag, private roller og vilkår for seier.
+- [ ] **Snyd:** gjennomgå private hender, bud, bløffrop og tom hånd.
+- [ ] **Løgnerdyst:** gjennomgå terningbud, avsløring og eliminering.
+- [ ] **To sannheter og en løgn (Live):** gjennomgå innskriving, privat fasit og avstemming.
+
 ## Felles videre arbeid
 
 - [ ] Publisering: opprett Pages-prosjektet, sett romserverens `AUTH_SECRET`
@@ -158,4 +176,4 @@ Reglene er SipZone-varianter, ikke en påstand om ett offisielt regelsett.
 - [ ] Vurder lagring av økter/profil ved konkret behov. Lokale runder og navn
       er foreløpig bare i minnet, og gir ingen personlig XP eller ledertavler.
 
-Totalt: **43 leker/rammeverk**, hvorav **17 implementert** (8 fra MVP og 9 nye) og **26 gjenstår**.
+Status: **ett tilgjengelig spill (H-en + Bussruta)**. Alle andre spill er **TODO**.

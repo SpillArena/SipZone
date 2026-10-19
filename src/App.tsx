@@ -1,28 +1,19 @@
 import { useEffect, useState } from "react";
 import { AccountBadge, ConsentDialog } from "./account";
 import { useI18n } from "./i18n";
-import { gameById } from "../shared/catalog";
+import { availableGames } from "../shared/catalog";
 import { isLiveGame } from "../shared/live-games";
 import type { Player } from "../shared/engine";
 import { SiteFooter, SiteHeader, LobbyLink } from "./ui/SiteShell";
 import { SettingsMenu } from "./ui/SettingsMenu";
 import { Dialog } from "./ui/Dialog";
 import logo from "./ui/sipzone-logo.svg";
-import { Home, type GameFilter } from "./features/Home";
+import { Home } from "./features/Home";
 import { Setup } from "./features/Setup";
 import type { GameSettings } from "./features/Setup";
 import { LocalGame } from "./features/LocalGame";
 import { Live } from "./features/live/Live";
 const routeFromHash = () => location.hash.replace(/^#\/?/, "").split("/");
-/** The front page, opened on one kind of game: one phone or a phone each. */
-const FILTER_ROUTES: Record<string, GameFilter> = {
-  "en-mobil": "local",
-  "hver-sin-mobil": "live",
-};
-const filterHash = (filter: GameFilter) =>
-  filter === "all"
-    ? "#/"
-    : `#/${Object.keys(FILTER_ROUTES).find((key) => FILTER_ROUTES[key] === filter)}`;
 interface Session {
   id: string;
   game: string;
@@ -35,10 +26,11 @@ export default function App() {
   const [party, setParty] = useState<Player[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const [exit, setExit] = useState(false);
-  const game = gameById(route[0]);
-  const filter: GameFilter | undefined = !route[0]
-    ? "all"
-    : FILTER_ROUTES[route[0]];
+  // Keep existing room invitations working, with Bussruta as the only game.
+  const game = availableGames.find(
+    (game) => game.id === (route[0] === "live" ? "bus" : route[0]),
+  );
+  const isHome = !route[0] || ["en-mobil", "hver-sin-mobil"].includes(route[0]);
   const active = session && !session.finished;
   const home = () => {
     setSession(null);
@@ -65,8 +57,7 @@ export default function App() {
       setSession(null);
       const next = routeFromHash();
       setRoute(next);
-      // the front page scrolls itself to the chosen kind of game
-      if (!FILTER_ROUTES[next[0]]) window.scrollTo(0, 0);
+      window.scrollTo(0, 0);
     };
     addEventListener("hashchange", change);
     return () => removeEventListener("hashchange", change);
@@ -112,16 +103,8 @@ export default function App() {
         <SettingsMenu />
       </SiteHeader>
       <main id="main" tabIndex={-1}>
-        {filter ? (
-          <Home
-            filter={filter}
-            onFilter={(next) => {
-              // a filter tap on the page itself: keep the address in step
-              // without the jump to the top a hash change brings
-              history.replaceState(null, "", filterHash(next));
-              setRoute(routeFromHash());
-            }}
-          />
+        {isHome ? (
+          <Home />
         ) : !game ? (
           <section className="arena-container page-narrow not-found">
             <h1>

@@ -23,23 +23,26 @@ const players = Array.from({ length: 8 }, (_, i) => ({
 const c = (rank: number, suit: Card["suit"] = "♠"): Card => ({ rank, suit });
 const action = (state: BusState, ...actions: BusAction[]) =>
   actions.reduce((current, next) => playBus(current, next), state);
-function finishH(size = 3) {
-  let state = action(
-    createBusGame(players.slice(0, size), () => 0),
-    { type: "start-h" },
-  );
-  for (let i = 0; i < H_CARD_COUNT; i++)
-    state = action(state, { type: "reveal-h" }, { type: "next-h" });
+function hState(size = 3): BusState {
+  let state = createBusGame(players.slice(0, size), () => 0);
+  while (state.phase === "deal") {
+    state = playBus(state, { type: "confirm-deal" });
+    const player = state.deal.player;
+    const guess = ["red", "higher", "inside", "♠"][state.deal.question] as
+      "red" | "higher" | "inside" | "♠";
+    state = playBus(state, { type: "deal-guess", guess });
+    if (state.deal.correct)
+      state = playBus(state, {
+        type: "deal-award",
+        recipient: (player + 1) % size,
+      });
+    state = playBus(state, { type: "next-player" });
+  }
+  assert.deepEqual(state.hands, state.guessHands);
   return state;
 }
-function guessState(drivers = [0, 1]): BusState {
-  const state = finishH();
-  return {
-    ...state,
-    phase: "deal",
-    drivers,
-    deal: { ...state.deal, player: drivers[0] },
-  };
+function guessState(): BusState {
+  return createBusGame(players.slice(0, 3), () => 0);
 }
 function pyramidState(): BusState {
   return {
@@ -48,19 +51,19 @@ function pyramidState(): BusState {
     pyramid: Array.from({ length: 15 }, (_, i) => c((i % 10) + 1)),
   };
 }
-test("H comes first, four unique cards per player and 12 H cards fit one deck for 2–8 players", () => {
+test("four guesses come first and their cards plus 12 H cards fit one deck for 2–8 players", () => {
   for (let size = 2; size <= BUS_MAX_PLAYERS; size++) {
     const state = createBusGame(players.slice(0, size));
-    assert.equal(state.phase, "h");
+    assert.equal(state.phase, "deal");
     assert.equal(state.table.index, -1);
-    const dealt = [...state.hands.flat(), ...state.h];
+    const dealt = [...state.guessHands.flat(), ...state.h];
     assert.equal(dealt.length, 4 * size + H_CARD_COUNT);
     assert.equal(
       new Set(dealt.map((card) => `${card.rank}${card.suit}`)).size,
       dealt.length,
     );
     assert.equal(state.pyramid.length, PYRAMID_CARD_COUNT);
-    assert.ok(state.hands.every((hand) => hand.length === 4));
+    assert.ok(state.hands.every((hand) => hand.length === 0));
     assert.ok(state.guessHands.every((hand) => hand.length === 4));
   }
   assert.throws(() => createBusGame(players.slice(0, 1)));
@@ -111,7 +114,7 @@ test("H alternates take/give five times, then reveals the two shot connectors", 
   for (const index of [-1, 12, 0.5, NaN]) assert.throws(() => hEffect(index));
 });
 test("private hands require confirmation and cannot be played before H starts", () => {
-  let state = createBusGame(players.slice(0, 3));
+  let state = hState();
   assert.strictEqual(playBus(state, { type: "reveal-h" }), state);
   state = playBus(state, { type: "view-hand", player: 0 });
   assert.equal(state.table.stage, "handoff");
@@ -123,7 +126,7 @@ test("private hands require confirmation and cannot be played before H starts", 
   assert.equal(state.table.viewer, null);
 });
 test("matching on give side removes a card once and requires a valid other recipient", () => {
-  let state = createBusGame(players.slice(0, 3));
+  let state = hState();
   state = {
     ...state,
     h: state.h.map(() => c(7)),
@@ -172,7 +175,7 @@ test("matching on give side removes a card once and requires a valid other recip
 });
 test("take and shot sides apply to the player who placed the card", () => {
   for (const index of [0, 10, 11]) {
-    let state = createBusGame(players.slice(0, 3));
+    let state = hState();
     state = {
       ...state,
       h: state.h.map(() => c(7)),
@@ -193,7 +196,7 @@ test("take and shot sides apply to the player who placed the card", () => {
   }
 });
 test("all H cards must be uncovered, even if every hand is already empty", () => {
-  let state = createBusGame(players.slice(0, 2));
+  let state = hState(2);
   state.hands = [[], []];
   state = playBus(state, { type: "start-h" });
   for (let index = 0; index < H_CARD_COUNT; index++) {
@@ -208,7 +211,7 @@ test("all H cards must be uncovered, even if every hand is already empty", () =>
 test("most remaining cards selects the rider, ties allow physical RPS or a shared bus", () => {
   assert.deepEqual(busCandidates([[c(2)], [c(3), c(4)], [c(5), c(6)]]), [1, 2]);
   assert.deepEqual(busCandidates([[], []]), []);
-  const base = createBusGame(players.slice(0, 3));
+  const base = hState();
   const final = {
     ...base,
     table: { ...base.table, index: 11, stage: "open" as const },
@@ -217,9 +220,8 @@ test("most remaining cards selects the rider, ties allow physical RPS or a share
     { ...final, hands: [[], [c(2)], []] },
     { type: "next-h" },
   );
-  assert.equal(unique.phase, "deal");
+  assert.equal(unique.phase, "bus");
   assert.deepEqual(unique.drivers, [1]);
-  assert.equal(unique.deal.player, 1);
   const tied = playBus(
     { ...final, hands: [[c(2)], [], [c(3)]] },
     { type: "next-h" },
@@ -231,13 +233,13 @@ test("most remaining cards selects the rider, ties allow physical RPS or a share
     [2],
   );
   const together = playBus(tied, { type: "ride-together" });
-  assert.equal(together.phase, "deal");
+  assert.equal(together.phase, "bus");
   assert.deepEqual(together.drivers, [0, 2]);
 });
-test("bus guesses rotate one card per rider for all four rounds, including nonconsecutive rider indices", () => {
-  let state = guessState([0, 2]);
+test("all players guess once per round, retaining exactly those cards for the H", () => {
+  let state = guessState();
   for (let question = 0; question < 4; question++)
-    for (const player of [0, 2]) {
+    for (const player of [0, 1, 2]) {
       assert.equal(state.phase, "deal");
       assert.equal(state.deal.question, question);
       assert.equal(state.deal.player, player);
@@ -252,6 +254,11 @@ test("bus guesses rotate one card per rider for all four rounds, including nonco
         guess: ["red", "higher", "inside", "♠"][question] as
           "red" | "higher" | "inside" | "♠",
       });
+      assert.equal(state.hands[player].length, question + 1);
+      assert.deepEqual(
+        state.hands[player],
+        state.guessHands[player].slice(0, question + 1),
+      );
       const feedback = state;
       assert.strictEqual(
         playBus(state, { type: "deal-guess", guess: "red" }),
@@ -263,7 +270,10 @@ test("bus guesses rotate one card per rider for all four rounds, including nonco
           playBus(state, { type: "deal-award", recipient: player }),
           state,
         );
-        state = playBus(state, { type: "deal-award", recipient: 1 });
+        state = playBus(state, {
+          type: "deal-award",
+          recipient: (player + 1) % 3,
+        });
         assert.strictEqual(
           playBus(state, { type: "deal-award", recipient: 2 }),
           state,
@@ -271,8 +281,10 @@ test("bus guesses rotate one card per rider for all four rounds, including nonco
       }
       state = playBus(state, { type: "next-player" });
     }
-  assert.equal(state.phase, "bus");
-  assert.equal(state.bus.stage, "ready");
+  assert.equal(state.phase, "h");
+  assert.deepEqual(state.hands, state.guessHands);
+  assert.deepEqual(state.drivers, []);
+  assert.equal(state.table.stage, "intro");
 });
 test("pyramid rows, penalties and face-card rules cover every row and ace is safe", () => {
   assert.deepEqual(

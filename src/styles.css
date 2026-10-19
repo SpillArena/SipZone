@@ -158,11 +158,6 @@ main:focus {
     gap: 12px;
   }
 }
-.footer-note {
-  font-size: 10px;
-  color: var(--muted);
-  margin: 0 0 18px;
-}
 .icon-button {
   display: grid;
   place-items: center;

@@ -1,6 +1,6 @@
-/* Live entry points and the shared account pill in its usual corner. */
+/* Live entry points. */
 .app-shell {
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .live-dot {
   display: inline-block;

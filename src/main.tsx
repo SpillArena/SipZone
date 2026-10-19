@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "@fontsource-variable/archivo";
 import "./ui/arena.css";
+import "./ui/settings.css";
 import "./styles.css";
 import "./mobile-games.css";
 import "./live.css";

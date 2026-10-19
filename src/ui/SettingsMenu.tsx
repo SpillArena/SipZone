@@ -1,82 +1,111 @@
-import { Settings } from "lucide-react";
-import { useState } from "react";
-import { useI18n } from "../i18n";
-import { openConsentDialog } from "../account/consent";
-import { Dialog } from "./Dialog";
+import { Check, Monitor, Moon, Settings, Sun } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useI18n, type Theme } from "../i18n";
+import { StorageSettings } from "./SiteShell";
+
+// Dropdown settings menu, styled after ScribbleBot's header menu.
+const LANGUAGES = [
+  { id: "no", label: "Norsk" },
+  { id: "en", label: "English" },
+] as const;
+
 export function SettingsMenu() {
   const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
   const { language, setLanguage, theme, setTheme, t } = useI18n();
+  const themes: { id: Theme; label: string; Icon: typeof Sun }[] = [
+    { id: "dark", label: t("Mørk", "Dark"), Icon: Moon },
+    { id: "system", label: t("System", "System"), Icon: Monitor },
+    { id: "light", label: t("Lys", "Light"), Icon: Sun },
+  ];
+
+  useEffect(() => {
+    if (!open) return;
+    const pointer = (event: MouseEvent) => {
+      if (!root.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const key = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", pointer);
+    window.addEventListener("keydown", key);
+    return () => {
+      document.removeEventListener("mousedown", pointer);
+      window.removeEventListener("keydown", key);
+    };
+  }, [open]);
+
   return (
-    <>
+    <div ref={root} className="arena-settings">
       <button
-        className="icon-button"
+        className="arena-settings-trigger settings-trigger"
         type="button"
+        aria-haspopup="dialog"
+        aria-expanded={open}
         aria-label={t("Innstillinger", "Settings")}
-        onClick={() => setOpen(true)}
+        title={t("Innstillinger", "Settings")}
+        onClick={() => setOpen((value) => !value)}
       >
-        <Settings size={19} />
+        <Settings size={16} />
       </button>
       {open && (
-        <Dialog
-          title={t("Innstillinger", "Settings")}
-          onClose={() => setOpen(false)}
+        <div
+          className="arena-settings-panel settings-panel"
+          role="dialog"
+          aria-label={t("Innstillinger", "Settings")}
         >
-          <fieldset>
-            <legend>{t("Språk", "Language")}</legend>
-            <div className="segmented">
-              {(
-                [
-                  { id: "no", label: "Norsk" },
-                  { id: "en", label: "English" },
-                ] as const
-              ).map((item) => (
-                <button
-                  key={item.id}
-                  aria-pressed={language === item.id}
-                  onClick={() => setLanguage(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
+          <section>
+            <h3 className="settings-label">{t("Språk", "Language")}</h3>
+            <div
+              role="listbox"
+              aria-label={t("Velg språk", "Choose language")}
+              className="settings-languages"
+            >
+              {LANGUAGES.map((item) => {
+                const selected = language === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="option"
+                    aria-selected={selected}
+                    onClick={() => setLanguage(item.id)}
+                  >
+                    {item.label}
+                    {selected && <Check size={14} />}
+                  </button>
+                );
+              })}
             </div>
-            <p className="muted small">
+            <p className="settings-note">
               {t(
                 "Spørsmål og spillinnhold er foreløpig på norsk.",
                 "Questions and game content are currently in Norwegian.",
               )}
             </p>
-          </fieldset>
-          <fieldset>
-            <legend>{t("Utseende", "Appearance")}</legend>
-            <div className="segmented">
-              {(
-                [
-                  { id: "dark", label: t("Mørk", "Dark") },
-                  { id: "light", label: t("Lys", "Light") },
-                  { id: "system", label: t("System", "System") },
-                ] as const
-              ).map((item) => (
+          </section>
+          <section className="settings-section">
+            <h3 className="settings-label">{t("Utseende", "Appearance")}</h3>
+            <div className="settings-themes">
+              {themes.map(({ id, label, Icon }) => (
                 <button
-                  key={item.id}
-                  aria-pressed={theme === item.id}
-                  onClick={() => setTheme(item.id)}
+                  key={id}
+                  type="button"
+                  aria-pressed={theme === id}
+                  onClick={() => setTheme(id)}
                 >
-                  {item.label}
+                  <Icon size={14} />
+                  {label}
                 </button>
               ))}
             </div>
-          </fieldset>
-          <button
-            className="button secondary full"
-            onClick={() => {
-              setOpen(false);
-              openConsentDialog();
-            }}
-          >
-            {t("Endre lagringsvalg", "Manage storage choice")}
-          </button>
-        </Dialog>
+          </section>
+          <StorageSettings
+            language={language}
+            onManage={() => setOpen(false)}
+          />
+        </div>
       )}
-    </>
+    </div>
   );
 }

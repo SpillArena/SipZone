@@ -125,17 +125,43 @@ main:focus {
 .arena-header {
   background: var(--bg);
 }
+/* Header proportions match ScribbleBot's studio header. */
+.arena-header-row {
+  height: 88px;
+}
 .arena-brand-name {
-  font-weight: 800;
-  letter-spacing: -1px;
+  font-size: 24px;
+  letter-spacing: -1.1px;
+}
+.arena-brand-mark {
+  width: 46px;
+  height: 46px;
+}
+.arena-header-actions {
+  gap: 20px;
+}
+.arena-lobby-link {
+  font-size: 13px;
+}
+@media (max-width: 600px) {
+  .arena-header-row {
+    height: 72px;
+  }
+  .arena-brand-name {
+    font-size: 20px;
+  }
+  .arena-brand-mark {
+    width: 39px;
+    height: 39px;
+  }
+  .arena-header-actions {
+    gap: 12px;
+  }
 }
 .footer-note {
   font-size: 10px;
   color: var(--muted);
   margin: 0 0 18px;
-}
-.arena-footer-row {
-  padding-bottom: 14px;
 }
 .icon-button {
   display: grid;
@@ -1478,12 +1504,6 @@ fieldset {
   .tile-copy h3 {
     font-size: 21px;
   }
-  .arena-header-actions {
-    gap: 11px;
-  }
-  .arena-lobby-link {
-    font-size: 11px;
-  }
   .setup-grid {
     gap: 18px;
   }
@@ -1492,9 +1512,6 @@ fieldset {
   }
 }
 @media (max-width: 760px) {
-  .arena-header-row {
-    min-height: 76px;
-  }
   .hero {
     grid-template-columns: 1fr;
     padding-block: 39px 33px;
@@ -1571,23 +1588,6 @@ fieldset {
   .how-section h2 {
     font-size: 32px;
   }
-  .arena-brand {
-    gap: 7px;
-  }
-  .arena-brand-name {
-    font-size: 21px;
-  }
-  .arena-lobby-label {
-    display: none;
-  }
-  .arena-lobby-link {
-    width: 30px;
-    justify-content: center;
-    min-height: 44px;
-  }
-  .arena-header-actions {
-    gap: 7px;
-  }
   .setup-grid {
     grid-template-columns: 1fr;
   }
@@ -1653,9 +1653,6 @@ fieldset {
   .room-heading .button {
     font-size: 12px;
     padding-inline: 13px;
-  }
-  .arena-footer-row {
-    padding-bottom: 12px;
   }
   .finish-page h1 {
     font-size: 58px;
@@ -1825,19 +1822,6 @@ fieldset {
   .hero h1 {
     font-size: 11vw;
   }
-  .arena-brand-name {
-    font-size: 19px;
-  }
-  .arena-brand-mark {
-    width: 31px;
-    height: 34px;
-  }
-  .arena-header-actions {
-    gap: 5px;
-  }
-  .arena-lobby-link {
-    width: 24px;
-  }
   .icon-button {
     width: 40px;
     height: 44px;
@@ -1881,43 +1865,3 @@ fieldset {
   }
 }
 
-/* Shared support destinations from SpillArena's footer. */
-.arena-footer-links > a,
-.arena-footer-links > button {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding-block: 8px;
-}
-.footer-contact {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0 7px;
-  font-size: 12px;
-  line-height: 1.6;
-  margin: 0;
-  padding: 0 0 24px;
-  color: var(--muted);
-}
-.footer-contact > a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-@media (max-width: 720px) {
-  .arena-footer-row {
-    padding-bottom: 12px;
-    gap: 12px;
-  }
-  .arena-footer-links {
-    column-gap: 18px;
-    row-gap: 0;
-  }
-  .footer-contact {
-    padding-bottom: 18px;
-  }
-}

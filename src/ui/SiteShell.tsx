@@ -1,145 +1,64 @@
-// Vendored header, footer and lobby navigation from MelodyRush's SpillArena shell.
-import type { MouseEvent, ReactNode } from "react";
-import { openConsentDialog } from "../account";
-import spillArenaLogo from "./spillarena-logo.svg";
-export function SiteHeader({
-  name,
-  logo,
-  onHome,
-  children,
-  settingsLabel,
-}: {
-  name: string;
-  logo: string;
-  onHome: (event: MouseEvent<HTMLAnchorElement>) => void;
-  children: ReactNode;
-  settingsLabel: string;
-}) {
-  return (
-    <header className="arena-header">
-      <div className="arena-container arena-header-row">
-        <a
-          className="arena-brand"
-          href={import.meta.env.BASE_URL}
-          onClick={onHome}
-          aria-label={name}
-        >
-          <img src={logo} alt="" className="arena-brand-mark" />
-          <span className="arena-brand-name">{name}</span>
-        </a>
-        <nav className="arena-header-actions" aria-label={settingsLabel}>
-          {children}
-        </nav>
-      </div>
-    </header>
-  );
+import type { MouseEvent, ReactNode } from 'react'
+import { openConsentDialog, setConsent, useConsent } from '../account'
+import spillArenaLogo from './spillarena-logo.svg'
+
+const copy = {
+  en: { lobby: 'Back to the Arena', settings: 'Settings', storage: 'Cookies & storage', accepted: 'Storage is on. Your results and settings are remembered on this device.', declined: 'Storage is off. Results and settings stay in this tab only.', undecided: 'Nothing new is saved until you choose.', accept: 'Accept', decline: 'Decline', manage: 'Manage storage choice', affiliation: 'Part of SpillArena' },
+  no: { lobby: 'Tilbake til Arenaen', settings: 'Innstillinger', storage: 'Informasjonskapsler og lagring', accepted: 'Lagring er på. Resultatene og innstillingene dine huskes på denne enheten.', declined: 'Lagring er av. Resultater og innstillinger beholdes bare i denne fanen.', undecided: 'Ingenting nytt lagres før du velger.', accept: 'Godta', decline: 'Avslå', manage: 'Endre lagringsvalg', affiliation: 'En del av SpillArena' },
 }
-export function LobbyLink({ label }: { label: string }) {
-  return (
-    <a
-      className="arena-lobby-link"
-      href="https://spillarena.no/"
-      aria-label={label}
-      title={label}
-    >
-      <span aria-hidden="true">←</span>
-      <span className="arena-lobby-label">{label}</span>
-    </a>
-  );
+const labels = (language: string) => copy[language.startsWith('no') || language.startsWith('nb') ? 'no' : 'en']
+
+export function SiteHeader({ name, logo, mark, language = 'en', onHome, children }: {
+  name: string; logo?: string; mark?: ReactNode; language?: string
+  onHome?: (event: MouseEvent<HTMLAnchorElement>) => void; children: ReactNode
+}) {
+  return <header className="arena-header">
+    <div className="arena-container arena-header-row">
+      <a className="arena-brand" href={import.meta.env.BASE_URL} onClick={onHome} aria-label={name}>
+        {logo ? <img src={logo} alt="" className="arena-brand-mark" /> : <span className="arena-brand-mark" aria-hidden="true">{mark}</span>}
+        <span className="arena-brand-name">{name}</span>
+      </a>
+      <nav className="arena-header-actions" aria-label={labels(language).settings}>{children}</nav>
+    </div>
+  </header>
 }
 
-export function SiteFooter({
-  game,
-  language = "en",
-  children,
-  note,
-}: {
-  game: string;
-  language?: string;
-  children?: ReactNode;
-  note?: ReactNode;
-}) {
-  const norwegian = language.startsWith("no") || language.startsWith("nb");
-  return (
-    <footer className="arena-footer">
-      <div className="arena-container">
-        <div className="arena-footer-row">
-          <a className="arena-footer-affiliation" href="https://spillarena.no/">
-            <img
-              className="arena-footer-logo"
-              src={spillArenaLogo}
-              alt=""
-              width={20}
-              height={20}
-            />
-            <span>
-              {norwegian ? "En del av SpillArena" : "Part of SpillArena"}
-            </span>
-          </a>
-          <div className="arena-footer-links">
-            {children}
-            <a
-              href="https://spillarena.no/#privacy"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {norwegian ? "Personvern" : "Privacy"}
-              <span className="sr-only">
-                {norwegian ? " (åpnes i ny fane)" : " (opens in a new tab)"}
-              </span>
-            </a>
-            <a
-              href="https://spillarena.no/#terms"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {norwegian ? "Vilkår" : "Terms"}
-              <span className="sr-only">
-                {norwegian ? " (åpnes i ny fane)" : " (opens in a new tab)"}
-              </span>
-            </a>
-            <a
-              href="https://spillarena.no/#faq"
-              target="_blank"
-              rel="noreferrer"
-            >
-              FAQ
-              <span className="sr-only">
-                {norwegian ? " (åpnes i ny fane)" : " (opens in a new tab)"}
-              </span>
-            </a>
-            <a
-              href="https://spillarena.no/#contact"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {norwegian ? "Kontakt" : "Contact"}
-              <span className="sr-only">
-                {norwegian ? " (åpnes i ny fane)" : " (opens in a new tab)"}
-              </span>
-            </a>
-            <button type="button" onClick={openConsentDialog}>
-              {norwegian
-                ? "Informasjonskapsler og lagring"
-                : "Cookies & storage"}
-            </button>
-            <a
-              href={`https://github.com/SpillArena/${game}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              GitHub <span aria-hidden="true">↗</span>
-            </a>
-          </div>
+export function LobbyLink({ language = 'en', onClick }: { language?: string; onClick?: (event: MouseEvent<HTMLAnchorElement>) => void }) {
+  const text = labels(language).lobby
+  return <a className="arena-lobby-link" href="https://spillarena.no/" aria-label={text} title={text} onClick={onClick}>
+    <svg className="arena-lobby-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="m12 19-7-7 7-7M5 12h14" /></svg><span className="arena-lobby-label">{text}</span>
+  </a>
+}
+
+export function StorageSettings({ language = 'en', onManage }: { language?: string; onManage?: () => void }) {
+  const t = labels(language)
+  const consent = useConsent()
+  return <section className="arena-storage" aria-label={t.storage}>
+    <h3>{t.storage}</h3>
+    <p role="status">{consent === 'accepted' ? t.accepted : consent === 'declined' ? t.declined : t.undecided}</p>
+    {consent === null ? <div className="arena-storage-actions">
+      <button type="button" onClick={() => setConsent('accepted')}>{t.accept}</button>
+      <button type="button" onClick={() => setConsent('declined')}>{t.decline}</button>
+    </div> : <button type="button" className="arena-text-link" onClick={() => { onManage?.(); openConsentDialog() }}>{t.manage}</button>}
+  </section>
+}
+
+export function SiteFooter({ game, language = 'en', children, note }: { game: string; language?: string; children?: ReactNode; note?: ReactNode }) {
+  const t = labels(language)
+  return <footer className="arena-footer">
+    <div className="arena-container">
+      <div className="arena-footer-row">
+        <a className="arena-footer-affiliation" href="https://spillarena.no/">
+          <img className="arena-footer-logo" src={spillArenaLogo} alt="" width={20} height={20} />
+          <span>{t.affiliation}</span>
+        </a>
+        <div className="arena-footer-links">
+          {children}
+          <button type="button" onClick={openConsentDialog}>{t.storage}</button>
+          <a href={`https://github.com/SpillArena/${game}`} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
         </div>
-        {note}
-        <p className="footer-contact">
-          {norwegian
-            ? "Spørsmål og tilbakemeldinger:"
-            : "Questions and feedback:"}{" "}
-          <a href="mailto:support@spillarena.no">support@spillarena.no</a>
-        </p>
       </div>
-    </footer>
-  );
+      {note}
+    </div>
+  </footer>
 }

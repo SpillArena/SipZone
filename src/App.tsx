@@ -85,17 +85,14 @@ export default function App() {
       <SiteHeader
         name="SipZone"
         logo={logo}
-        settingsLabel={t(
-          "Navigasjon og innstillinger",
-          "Navigation and settings",
-        )}
+        language={language}
         onHome={(event) => {
           event.preventDefault();
           if (active) setExit(true);
           else home();
         }}
       >
-        <LobbyLink label={t("Til SpillArena", "Back to SpillArena")} />
+        <LobbyLink language={language} />
         <SettingsMenu />
       </SiteHeader>
       <main id="main" tabIndex={-1}>

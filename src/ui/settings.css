@@ -1,0 +1,141 @@
+/* Settings dropdown, styled after ScribbleBot's header menu. */
+.settings-trigger {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--muted);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+.settings-trigger:hover {
+  color: var(--ink);
+}
+.settings-trigger[aria-expanded="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
+}
+.settings-trigger svg {
+  transition: transform 0.3s ease;
+}
+.settings-trigger[aria-expanded="true"] svg {
+  transform: rotate(45deg);
+}
+.settings-panel {
+  z-index: 50;
+  top: calc(100% + 0.6rem);
+  width: 288px;
+  max-width: calc(100vw - 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+  border-radius: 3px;
+  box-shadow:
+    0 1px 0 rgb(0 0 0 / 0.4),
+    0 16px 32px -20px rgb(0 0 0 / 0.9);
+  transform-origin: top right;
+  animation: settings-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+:root[data-theme="light"] .settings-panel {
+  box-shadow:
+    0 1px 0 rgb(28 27 34 / 0.06),
+    0 12px 28px -18px rgb(28 27 34 / 0.5);
+}
+@keyframes settings-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+}
+.settings-label {
+  margin: 0 0 8px;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.settings-section {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.settings-languages {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.settings-languages button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  border-radius: 4px;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+.settings-languages button:hover,
+.settings-languages button[aria-selected="true"] {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--ink);
+}
+.settings-languages button[aria-selected="true"] {
+  font-weight: 600;
+}
+.settings-languages svg {
+  color: var(--accent);
+}
+.settings-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.settings-themes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+.settings-themes button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 8px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.settings-themes button:hover {
+  color: var(--ink);
+}
+.settings-themes button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--surface);
+  color: var(--ink);
+}
+.settings-panel .arena-storage {
+  margin-top: 0;
+  padding-top: 16px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings-panel {
+    animation: none;
+  }
+}

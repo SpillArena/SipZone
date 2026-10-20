@@ -15,6 +15,14 @@ import {
   submitAnswer,
 } from "./live-games.ts";
 import type { LiveGame, LiveView, Potato } from "./live-games.ts";
+import type { BusState } from "./bus.ts";
+import {
+  busMove,
+  dropBusPlayer,
+  normalizeLiveBus,
+  type BusPlay,
+} from "./live-bus.ts";
+import { dropTablePlayer, tableMove, type TableState } from "./live-table.ts";
 export const ROOM_CODE = /^\d{3}[A-Z]$/;
 export const ROOM_TTL = 24 * 60 * 60 * 1000;
 export interface Member extends Player {
@@ -48,6 +56,12 @@ export interface Room {
   /** The wheel's landing field this round. */
   pick: number | null;
   potato: Potato | null;
+  /** H-en + Bussruta: the whole table, hands included. Never sent as is. */
+  bus: BusState | null;
+  /** Cards laid on revealed H targets since the host last advanced. */
+  busPlays: BusPlay[];
+  /** Spy, Werewolf, Bluff, Liar's dice or Two truths: their state. Never sent as is. */
+  table: TableState | null;
 }
 export interface RoomView {
   code: string;
@@ -106,6 +120,9 @@ export function createRoom(
     cards: [],
     pick: null,
     potato: null,
+    bus: null,
+    busPlays: [],
+    table: null,
   };
 }
 export function joinRoom(room: Room, account: string, token: string): Member {
@@ -144,6 +161,8 @@ export function applyRoomAction(
   if (action === "answer") submitAnswer(room, member.id, input);
   else if (action === "spin") spinWheel(room, member.id, random);
   else if (action === "pass") passPotato(room, member.id, input.target);
+  else if (action === "bus") busMove(room, member, input, random);
+  else if (action === "table") tableMove(room, member, input, random);
   else if (action === "vote") {
     if (
       room.phase !== "playing" ||
@@ -169,6 +188,8 @@ export function applyRoomAction(
     );
     if (room.host === member.id) room.host = room.members[0]?.id ?? "";
     dropPlayer(room, member.id);
+    dropBusPlayer(room, member.id);
+    dropTablePlayer(room, member.id);
     if (room.members.length < 2) {
       room.phase = "lobby";
       room.votes = {};
@@ -176,7 +197,9 @@ export function applyRoomAction(
       room.potato = null;
     }
   } else {
-    if (member.id !== room.host)
+    const finishedBusLobby =
+      action === "lobby" && room.game === "bus" && room.bus?.phase === "done";
+    if (member.id !== room.host && !finishedBusLobby)
       throw new RoomError("Bare verten kan gjøre dette.", 403);
     if (input.version !== room.version)
       throw new RoomError("Rommet har endret seg. Prøv igjen.", 409);
@@ -193,8 +216,16 @@ export function applyRoomAction(
     } else if (action === "start") {
       if (room.phase !== "lobby")
         throw new RoomError("Spillet har allerede startet.", 409);
-      if (room.members.length < 2)
-        throw new RoomError("Inviter minst én venn først.");
+      const info = liveGame(room.game);
+      const fewest = info?.min ?? 2;
+      if (room.members.length < fewest)
+        throw new RoomError(
+          fewest === 2
+            ? "Inviter minst én venn først."
+            : `${info?.name} trenger minst ${fewest} spillere.`,
+        );
+      if (info && room.members.length > info.max)
+        throw new RoomError(`${info.name} er for høyst ${info.max} spillere.`);
       startGame(room, now, random);
     } else if (action === "next") {
       if (room.phase !== "playing")
@@ -221,6 +252,9 @@ export function applyRoomAction(
       room.cards = [];
       room.pick = null;
       room.potato = null;
+      room.bus = null;
+      room.busPlays = [];
+      room.table = null;
     } else throw new RoomError("Ukjent handling.");
   }
   room.version++;
@@ -232,6 +266,10 @@ export function normalizeRoom(room: Room): Room {
   room.cards ??= [];
   room.pick ??= null;
   room.potato ??= null;
+  room.bus ??= null;
+  if (room.bus) room.bus = normalizeLiveBus(room.bus);
+  room.busPlays ??= [];
+  room.table ??= null;
   return room;
 }
 export function publicRoom(room: Room, memberId: string): RoomView {
@@ -260,6 +298,6 @@ export function publicRoom(room: Room, memberId: string): RoomView {
         ? voteResults(members, room.votes)
         : null,
     scores: room.scores,
-    live: liveView(room),
+    live: liveView(room, memberId),
   };
 }

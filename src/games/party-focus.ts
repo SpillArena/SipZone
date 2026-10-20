@@ -8,10 +8,7 @@ export function focusTimedRound() {
     return;
   requestAnimationFrame(() => {
     const board = document.querySelector(".round-board");
-    if (board)
-      window.scrollTo({
-        top: board.getBoundingClientRect().top + window.scrollY,
-        behavior: "instant",
-      });
+    const target = board?.querySelector(".party-timer") ?? board;
+    target?.scrollIntoView({ block: "start", behavior: "instant" });
   });
 }

@@ -1,0 +1,378 @@
+:root {
+  --motion-quick: 160ms;
+  --motion-medium: 280ms;
+  --motion-scene: 380ms;
+  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-spring: cubic-bezier(0.2, 0.9, 0.25, 1.12);
+}
+
+/* Shared touch and keyboard feedback, without changing any hit targets. */
+:is(
+  .button,
+  .icon-button,
+  .text-button,
+  .back-link,
+  .live-pick,
+  .player-pick,
+  .bus-recipient,
+  .arena-header a,
+  .game-tile
+) {
+  transition:
+    transform var(--motion-quick) var(--motion-ease),
+    scale var(--motion-quick) var(--motion-ease),
+    background-color var(--motion-quick),
+    color var(--motion-quick),
+    border-color var(--motion-quick),
+    box-shadow var(--motion-medium),
+    opacity var(--motion-quick);
+}
+:where(
+    .button,
+    .icon-button,
+    .text-button,
+    .back-link,
+    .live-pick,
+    .bus-recipient,
+    .player-pick
+  ):active:not(:disabled) {
+  scale: 0.96;
+}
+:where(input, select) {
+  transition:
+    border-color var(--motion-quick),
+    box-shadow var(--motion-quick);
+}
+:where(input, select):focus-visible {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+.button > svg {
+  transition: translate var(--motion-quick) var(--motion-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .button:hover:not(:disabled) > svg:last-child {
+    translate: 2px -1px;
+  }
+  :is(.bus-recipient, .live-pick, .player-pick):hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px #0002;
+    transition:
+      transform var(--motion-quick),
+      box-shadow var(--motion-quick),
+      border-color var(--motion-quick);
+  }
+  :where(.bus-h-card, .bus-pyramid-choice):hover:enabled .playing-card {
+    translate: 0 -4px;
+  }
+}
+
+/* Arrival at the table and in the lobby. */
+:where(.hero-copy > *, .live-intro > *, .live-entry, .live-lobby) {
+  animation: motion-rise var(--motion-scene) var(--motion-ease) backwards;
+}
+.hero-copy > :nth-child(2),
+.live-intro > :nth-child(2) {
+  animation-delay: 60ms;
+}
+.hero-copy > :nth-child(3),
+.live-intro > :nth-child(3) {
+  animation-delay: 120ms;
+}
+.hero-copy > :nth-child(4),
+.live-intro > :nth-child(4) {
+  animation-delay: 180ms;
+}
+.table-scene {
+  animation: motion-table 650ms var(--motion-ease) both;
+}
+.room-members > li {
+  animation: motion-rise 300ms var(--motion-ease) backwards;
+}
+.connection-status > svg {
+  transition:
+    color var(--motion-medium),
+    opacity var(--motion-medium);
+}
+.live-lobby.panel,
+.bus-board {
+  view-transition-name: bus-scene;
+}
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-group(bus-scene) {
+  animation-duration: var(--motion-scene);
+  animation-timing-function: var(--motion-ease);
+}
+::view-transition-old(bus-scene) {
+  animation: motion-scene-out 180ms var(--motion-ease) both;
+}
+::view-transition-new(bus-scene) {
+  animation: motion-scene-in 300ms var(--motion-ease) 60ms both;
+}
+
+/* Disclosure panels keep the main play screen quiet. */
+details > summary {
+  transition:
+    color var(--motion-quick),
+    background-color var(--motion-quick);
+}
+details[open] > :not(summary) {
+  animation: motion-rise 240ms var(--motion-ease) backwards;
+}
+@supports (interpolate-size: allow-keywords) {
+  details::details-content {
+    interpolate-size: allow-keywords;
+    block-size: 0;
+    opacity: 0;
+    overflow: clip;
+    transition:
+      block-size var(--motion-medium) var(--motion-ease),
+      opacity 200ms var(--motion-ease),
+      content-visibility var(--motion-medium) allow-discrete;
+  }
+  details[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+}
+
+/* Dealing, choosing, revealing, and the private hand use the same tempo. */
+.bus-deal-board .bus-hand-slot {
+  animation: motion-deal 360ms var(--motion-spring) backwards;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+.bus-deal-board .bus-deal-progress i {
+  transition: background-color var(--motion-medium);
+}
+.bus-deal-board .bus-deal-progress i.is-complete {
+  transform-origin: left;
+  animation: motion-progress 300ms var(--motion-ease) both;
+}
+.bus-deal-turn .live-avatar {
+  animation: motion-pop 320ms var(--motion-spring) both;
+}
+.bus-deal-hand-owner,
+.bus-deal-status {
+  animation: motion-rise 220ms var(--motion-ease) both;
+}
+:where(.bus-h-card, .bus-pyramid-choice) .playing-card {
+  transition:
+    translate var(--motion-medium) var(--motion-spring),
+    box-shadow var(--motion-medium);
+}
+:where(.bus-h-card, .bus-pyramid-choice):active:enabled .playing-card {
+  scale: 0.95;
+}
+.bus-h-card.bus-active-card:enabled {
+  animation: motion-target 1200ms ease-in-out 2;
+}
+.bus-hand-dock .bus-hand,
+.bus-hand-dock-spacer {
+  transition-timing-function: var(--motion-ease);
+  transition-duration: 360ms;
+}
+.bus-hand-dock-card {
+  transition: transform 380ms var(--motion-spring);
+}
+.bus-hand-dock-card .playing-card {
+  transition:
+    box-shadow 250ms,
+    scale 180ms var(--motion-spring);
+}
+.bus-hand-dock-card:active:enabled .playing-card {
+  scale: 0.96;
+}
+.bus-hand-dock-card.is-playable .playing-card {
+  animation: motion-match 1200ms ease-in-out 2;
+}
+.bus-remaining strong {
+  transition: color var(--motion-quick);
+  font-variant-numeric: tabular-nums;
+}
+.bus-current-row {
+  transition:
+    background-color var(--motion-medium),
+    border-color var(--motion-medium);
+}
+.bus-intro-ready .is-ready .live-avatar {
+  animation: motion-ready 400ms var(--motion-spring) both;
+}
+.bus-intro-ready .is-ready .bus-ready-mark {
+  animation: motion-pop 300ms var(--motion-spring) both;
+}
+.bus-intro-art {
+  animation: motion-table 700ms var(--motion-ease) both;
+}
+
+/* Dialogs and live notices have a short entrance and a matching exit. */
+.dialog[open] {
+  animation: motion-dialog-in 320ms var(--motion-spring) both;
+}
+.dialog[open]::backdrop {
+  animation: motion-fade 220ms ease both;
+}
+.dialog:has(.bus-drink-confirmation) {
+  animation-name: motion-dialog-in;
+  animation-duration: 380ms;
+}
+.dialog .bus-drink-sender .live-avatar {
+  animation: motion-pop 450ms var(--motion-spring) 80ms both;
+}
+.dialog .bus-drink-sender .live-chip-name,
+.dialog .bus-drink-sender > p {
+  animation: motion-rise 300ms var(--motion-ease) 120ms backwards;
+}
+.dialog .bus-drink-confirmation > .button {
+  animation: motion-rise 300ms var(--motion-ease) 160ms backwards;
+}
+.bus-end-stats > div {
+  animation: motion-rise 420ms var(--motion-ease) backwards;
+}
+.bus-end-stats > div:nth-child(2) {
+  animation-delay: 80ms;
+}
+.bus-end-stats > div:nth-child(3) {
+  animation-delay: 160ms;
+}
+.bus-end-next {
+  animation: motion-rise 450ms var(--motion-ease) 220ms backwards;
+}
+.motion-ghost,
+.motion-ghost * {
+  animation: none !important;
+  transition: none !important;
+}
+.motion-backdrop-ghost {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes motion-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes motion-table {
+  from {
+    opacity: 0;
+    transform: translateY(16px) rotate(-2deg) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+@keyframes motion-scene-out {
+  to {
+    opacity: 0;
+    transform: translateX(-16px) scale(0.985);
+  }
+}
+@keyframes motion-scene-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+@keyframes motion-deal {
+  from {
+    opacity: 0;
+    transform: translateY(20px) rotate(-5deg) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+@keyframes motion-progress {
+  from {
+    transform: scaleX(0.3);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes motion-pop {
+  from {
+    opacity: 0;
+    scale: 0.82;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes motion-ready {
+  0% {
+    scale: 1;
+  }
+  45% {
+    scale: 1.12;
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes motion-target {
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+}
+@keyframes motion-match {
+  50% {
+    box-shadow:
+      inset 0 0 0 3px var(--accent),
+      0 0 18px #ff825b55;
+  }
+}
+@keyframes motion-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes motion-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  dialog::backdrop,
+  details::details-content {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

@@ -299,11 +299,69 @@ main:focus {
   padding-block: 52px 58px;
   max-width: 1480px;
 }
-.hero h1 > span {
-  color: var(--accent);
+/*
+ * The landing card: SipZone's orange behind pine ink, one header for the
+ * whole page instead of a hero and an orange Live card stacked under it.
+ */
+.hero-section {
+  max-width: 1480px;
+  padding-block: 24px 40px;
 }
-[data-theme="light"] .hero h1 > span {
-  color: #b43820;
+.hero {
+  padding-inline: 48px;
+  border-radius: 20px;
+  background: var(--accent);
+  color: var(--pine);
+  overflow: hidden;
+}
+.hero .eyebrow {
+  color: var(--pine);
+}
+.hero .status-dot {
+  background: var(--pine);
+}
+.hero h1 > span {
+  color: var(--paper);
+  text-shadow: 0 4px 0 var(--pine);
+}
+.hero .hero-description,
+.hero .hero-note,
+.hero .scene-label,
+.hero .scene-caption {
+  color: color-mix(in srgb, var(--pine) 82%, transparent);
+}
+.hero .button.primary {
+  background: var(--pine);
+  color: var(--paper);
+}
+.hero .button.primary:hover {
+  background: #214d3d;
+}
+.hero .button.secondary {
+  background: transparent;
+  border-color: var(--pine);
+  color: var(--pine);
+}
+.hero .button.secondary:hover {
+  background: color-mix(in srgb, var(--pine) 10%, transparent);
+}
+.hero .live-join-link {
+  min-height: 0;
+  color: var(--pine);
+  font-size: inherit;
+}
+.hero :focus-visible {
+  outline: 2px solid var(--pine);
+  outline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .hero-section {
+    padding-block: 16px 28px;
+  }
+  .hero {
+    padding-inline: 22px;
+    border-radius: 16px;
+  }
 }
 .hero-description {
   max-width: 385px;
@@ -402,6 +460,9 @@ main:focus {
   background: var(--ink);
   color: var(--bg);
 }
+.games-section .game-grid {
+  grid-template-columns: minmax(0, 420px);
+}
 .game-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -467,6 +528,77 @@ main:focus {
 .tile-arrow {
   margin-left: auto;
   color: var(--pine);
+}
+/* One phone or a phone each: a heading per group and a badge on every tile. */
+.game-group + .game-group {
+  margin-top: 48px;
+}
+.game-group-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+  max-width: 760px;
+}
+.game-group-heading h3 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  letter-spacing: -0.6px;
+}
+.game-group-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.device-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.game-group-heading > .device-badge {
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+.game-group-heading > .device-badge.is-many {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--pine);
+}
+.device-icons {
+  display: inline-flex;
+}
+.is-many .device-icons {
+  gap: 1px;
+}
+.is-many .device-icons > svg + svg {
+  transform: translateY(2px) rotate(8deg);
+}
+.game-tile {
+  position: relative;
+}
+.tile-devices {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--pine);
+  box-shadow: 0 2px 10px #05180f30;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+.tile-devices.is-many {
+  background: var(--accent);
 }
 .game-art {
   position: relative;
@@ -1860,3 +1992,16 @@ fieldset {
   }
 }
 
+.device-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}

@@ -113,7 +113,8 @@
   .button svg {
     flex-shrink: 0;
   }
-  .play-page {
+  .play-page,
+  .live-playing {
     padding-top: 10px;
     padding-bottom: 24px;
   }
@@ -144,9 +145,7 @@
     margin-bottom: 14px;
   }
   .turn-banner {
-    position: sticky;
-    top: max(8px, env(safe-area-inset-top, 0px));
-    z-index: 8;
+    position: static;
     gap: 12px;
     padding: 12px 14px;
     margin-bottom: 16px;
@@ -196,9 +195,7 @@
     margin: 18px auto;
   }
   .game-actions {
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
+    position: static;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
@@ -206,7 +203,7 @@
     padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid var(--line);
     background: var(--bg);
-    margin-top: auto;
+    margin-top: 20px;
   }
   .game-actions > .button {
     min-width: 0;
@@ -477,7 +474,7 @@
     min-height: 56px;
   }
   /* Keep the shared storage reminder from covering game buttons. */
-  .app-shell:has(.play-page, .live-playing) .sac-reminder {
+  .app-shell .sac-reminder {
     position: static;
     margin: 0 0 16px;
     padding-inline: 16px;
@@ -528,5 +525,146 @@
   }
   .game-actions {
     padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Narrow grids must shrink with long names, translated copy and the keyboard. */
+.setup-grid > *,
+.setup-heading > *,
+.play-top > *,
+.dialog-top > *,
+.live-board > *,
+.live-entry-grid > *,
+.quick-options > *,
+.player-list li > span {
+  min-width: 0;
+}
+.icon-button,
+.back-link {
+  flex-shrink: 0;
+}
+@media (max-width: 760px), (max-width: 960px) and (max-height: 500px) {
+  .play-page,
+  .live-playing {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+  .round-board {
+    min-height: 0;
+  }
+  .back-link,
+  .text-button {
+    min-height: 44px;
+  }
+  .dialog {
+    padding: 20px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .dialog-top {
+    position: sticky;
+    top: -20px;
+    padding-block: 12px;
+    background: var(--bg);
+    z-index: 1;
+  }
+  .dialog-top .icon-button {
+    flex: 0 0 44px;
+  }
+  .dialog .actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dialog .button {
+    width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .button {
+    white-space: normal;
+    line-height: 1.4;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .score-strip {
+    scroll-padding-inline: 4px;
+    overscroll-behavior-x: contain;
+  }
+  .score-strip li {
+    max-width: 85%;
+  }
+  .vote-options > .button,
+  .quick-option {
+    overflow-wrap: anywhere;
+  }
+  .live-board {
+    width: 100%;
+    min-width: 0;
+  }
+  .live-potato,
+  .live-potato > * {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .live-board .game-actions,
+  .live-board .vote-options {
+    width: 100%;
+  }
+  .live-board .player-pick {
+    min-width: 0;
+    width: 100%;
+    max-width: none;
+  }
+  .live-emoji h2 {
+    overflow-wrap: anywhere;
+  }
+  .room-code {
+    overflow-wrap: anywhere;
+  }
+  .bottle-table {
+    width: min(calc(100% - 32px), clamp(180px, 32svh, 290px));
+  }
+  .quick-option {
+    align-items: flex-start;
+  }
+  .quick-option > span {
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 350px) {
+  .arena-brand {
+    gap: 5px;
+  }
+  .arena-brand-mark {
+    width: 30px;
+    height: 30px;
+  }
+  .arena-brand-name {
+    font-size: 16px;
+  }
+  .arena-header-actions {
+    gap: 4px;
+  }
+  .turn-name {
+    font-size: 26px;
+  }
+  .higher-cards {
+    gap: 8px;
+  }
+  .higher-cards .playing-card {
+    width: clamp(88px, 29vw, 110px);
+  }
+  .bus-pyramid {
+    --pyramid-card: 44px;
+  }
+}
+
+@media (max-width: 760px), (max-width: 960px) and (max-height: 500px) {
+  .game-actions > .button:first-child:nth-last-child(2):has(+ .text-button) {
+    grid-column: 1 / -1;
+  }
+  .arena-lobby-link,
+  .arena-settings-trigger {
+    min-width: 44px;
+    min-height: 44px;
   }
 }

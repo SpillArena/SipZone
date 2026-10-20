@@ -2,14 +2,6 @@
 .app-shell {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-.live-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-}
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -19,55 +11,6 @@
 .hero-actions > .button {
   gap: 12px;
 }
-.live-spotlight {
-  max-width: 1480px;
-  margin-bottom: 48px;
-}
-.live-spotlight-card {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  align-items: center;
-  gap: 28px;
-  padding: 44px 48px;
-  border-radius: 20px;
-  background: var(--accent);
-  color: var(--pine);
-  overflow: hidden;
-}
-.live-spotlight h2 {
-  font-size: clamp(36px, 4.1vw, 58px);
-  letter-spacing: -2px;
-  margin-block: 18px;
-}
-.live-spotlight-copy > p:not(.eyebrow) {
-  max-width: 500px;
-  font-size: 15px;
-  line-height: 1.7;
-  margin-bottom: 22px;
-}
-.live-perks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 20px;
-  margin-bottom: 25px;
-}
-.live-perks > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.live-perks svg {
-  flex-shrink: 0;
-}
-.live-start {
-  background: var(--pine);
-  color: var(--paper);
-}
-.live-start:hover {
-  background: #214d3d;
-}
 .live-join-link {
   display: inline-flex;
   align-items: center;
@@ -76,115 +19,6 @@
   font-weight: 650;
   text-decoration: underline;
   text-underline-offset: 4px;
-}
-.live-spotlight :focus-visible {
-  outline-color: var(--pine);
-}
-.live-phone-scene {
-  position: relative;
-  height: 320px;
-  min-width: 0;
-}
-.live-phone {
-  position: absolute;
-  border: 6px solid var(--pine);
-  border-radius: 25px;
-  padding: 20px 15px 16px;
-  box-shadow: 6px 10px 0 #153a3025;
-}
-.phone-host {
-  width: 176px;
-  height: 286px;
-  background: var(--paper);
-  left: 7%;
-  top: 8px;
-  transform: rotate(-10deg);
-}
-.phone-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 8px;
-  font-weight: 750;
-  letter-spacing: 1px;
-}
-.phone-top > i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.phone-game {
-  display: block;
-  margin-top: 24px;
-  font-size: 7px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-.phone-host > strong {
-  display: block;
-  font-size: 23px;
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.9px;
-  margin: 10px 0 16px;
-}
-.phone-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-block: 6px;
-  min-height: 25px;
-  padding: 5px 10px;
-  border: 1px solid #153a3035;
-  border-radius: 5px;
-  font-size: 10px;
-}
-.phone-option.selected {
-  background: var(--pine);
-  color: var(--paper);
-}
-.phone-voter {
-  width: 160px;
-  height: 256px;
-  background: var(--pine);
-  color: var(--paper);
-  right: 4%;
-  bottom: 0;
-  transform: rotate(11deg);
-}
-.phone-vote-icon {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  margin: 28px auto 18px;
-  border-radius: 50%;
-  background: var(--yellow);
-  color: var(--pine);
-  font-size: 31px;
-}
-.phone-voter > strong {
-  display: block;
-  font-size: 22px;
-  line-height: 1.1;
-  text-align: center;
-  letter-spacing: -0.5px;
-}
-.phone-bottom {
-  display: block;
-  text-align: center;
-  font-size: 6px;
-  letter-spacing: 1px;
-  margin-top: 24px;
-}
-.phone-connection {
-  position: absolute;
-  top: 4px;
-  right: 13%;
-  font-size: 48px;
-  transform: rotate(14deg);
 }
 .live-onboarding {
   max-width: 1100px;
@@ -328,16 +162,6 @@
 }
 
 @media (max-width: 1050px) {
-  .live-spotlight-card {
-    padding: 32px;
-    grid-template-columns: 1.2fr 1fr;
-  }
-  .phone-host {
-    left: 0;
-  }
-  .phone-voter {
-    right: 0;
-  }
   .live-entry-grid {
     gap: 32px;
   }
@@ -351,58 +175,8 @@
   .hero-actions > .button {
     width: 100%;
   }
-  .live-spotlight {
-    margin-bottom: 30px;
-  }
-  .live-spotlight-card {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    padding: 28px;
-    border-radius: 15px;
-  }
-  .live-spotlight h2 {
-    font-size: 40px;
-    letter-spacing: -1.7px;
-  }
-  .live-spotlight-copy > p:not(.eyebrow) {
-    font-size: 14px;
-  }
-  .live-spotlight .actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-  .live-spotlight .button {
-    width: 100%;
-  }
   .live-join-link {
     justify-content: center;
-  }
-  .live-perks {
-    gap: 12px;
-  }
-  .live-perks > span {
-    font-size: 11px;
-  }
-  .live-phone-scene {
-    width: min(100%, 350px);
-    height: 280px;
-    margin: 0 auto;
-  }
-  .phone-host {
-    width: 158px;
-    height: 260px;
-    left: 5%;
-    padding-inline: 12px;
-  }
-  .phone-voter {
-    width: 146px;
-    height: 238px;
-    right: 3%;
-  }
-  .phone-connection {
-    right: 6%;
-    top: -10px;
   }
   .live-entry-grid {
     grid-template-columns: 1fr;
@@ -456,54 +230,6 @@
   }
 }
 @media (max-width: 380px) {
-  .live-spotlight-card {
-    padding: 24px 20px;
-  }
-  .live-spotlight h2 {
-    font-size: 35px;
-  }
-  .live-phone-scene {
-    height: 246px;
-  }
-  .phone-host {
-    width: 137px;
-    height: 232px;
-    left: 2%;
-    padding: 17px 10px 12px;
-    border-width: 5px;
-  }
-  .phone-host > strong {
-    font-size: 21px;
-    margin-bottom: 10px;
-  }
-  .phone-game {
-    margin-top: 17px;
-  }
-  .phone-option {
-    min-height: 22px;
-    margin-block: 5px;
-    padding: 4px 7px;
-  }
-  .phone-voter {
-    width: 125px;
-    height: 207px;
-    right: 0;
-    padding: 16px 10px;
-    border-width: 5px;
-  }
-  .phone-vote-icon {
-    width: 45px;
-    height: 45px;
-    font-size: 26px;
-    margin-block: 23px 13px;
-  }
-  .phone-voter > strong {
-    font-size: 18px;
-  }
-  .phone-bottom {
-    font-size: 5px;
-    margin-top: 18px;
-  }
   .live-entry {
     padding: 19px;
   }
@@ -768,4 +494,20 @@
   .live-picker {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* The lobby's game picker, split by whether the game needs a phone each. */
+.live-picker-group + .live-picker-group {
+  margin-top: 6px;
+}
+.live-picker-title {
+  margin: 18px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.live-picker-title span {
+  color: var(--muted);
+}
+.live-picker-group .live-picker {
+  margin-top: 10px;
 }

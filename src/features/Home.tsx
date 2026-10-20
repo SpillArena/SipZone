@@ -1,178 +1,73 @@
-import { useState } from "react";
-import {
-  ArrowUpRight,
-  Clock3,
-  Users,
-  Smartphone,
-  Radio,
-  Vote,
-} from "lucide-react";
-import { games } from "../../shared/catalog";
+import { ArrowUpRight, Clock3, Users, Smartphone } from "lucide-react";
+import { availableGames } from "../../shared/catalog";
 import { useI18n } from "../i18n";
 import { GameArt } from "../ui/GameArt";
 import tableArt from "../assets/vorsbord.svg";
 export function Home() {
   const { t } = useI18n();
-  const [filter, setFilter] = useState("all");
-  const shown = games.filter(
-    (game) =>
-      filter === "all" ||
-      (filter === "live" ? game.kind === "live" : game.kind !== "live"),
-  );
   return (
     <>
-      <section className="hero arena-container">
-        <div className="hero-copy">
-          <p className="eyebrow">
-            <span className="status-dot" />
-            {t(
-              "Fra SpillArena. Til vorset.",
-              "From SpillArena. For the pre-party.",
-            )}
-          </p>
-          <h1>
-            {t("Gode venner.", "Good friends.")}
-            <br />
-            {t("Dårlige", "Questionable")}
-            <br />
-            <span>{t("unnskyldninger.", "excuses.")}</span>
-          </h1>
-          <p className="hero-description">
-            {t(
-              "Kort på bordet. Gjengen samlet. Drikkelekene til vorset, hytteturen og den ene runden til.",
-              "Cards on the table. Friends around it. Party games for the pre-party, cabin trip and one more round.",
-            )}
-          </p>
-          <div className="hero-actions">
-            <a className="button primary" href="#/live">
-              <Smartphone size={18} />
-              {t("Spill på hver sin mobil", "Play on your own phones")}
-              <ArrowUpRight size={20} />
-            </a>
-            <a
-              className="button secondary"
-              href="#lekene"
-              onClick={(event) => {
-                event.preventDefault();
-                setFilter("local");
-                document.getElementById("lekene")?.scrollIntoView({
-                  behavior: matchMedia("(prefers-reduced-motion: reduce)")
-                    .matches
-                    ? "instant"
-                    : "smooth",
-                });
-              }}
-            >
-              {t("Spill på én enhet", "Play on one device")}
-              <ArrowUpRight size={20} />
-            </a>
-          </div>
-          <p className="hero-note">
-            {t(
-              "Én oppretter rommet. Resten blir med med kode eller lenke.",
-              "One creates a room. Everyone else joins with a code or link.",
-            )}
-          </p>
-        </div>
-        <div className="table-scene">
-          <span className="scene-label">
-            {t("BORDET ER DEKKET", "THE TABLE IS SET")}
-          </span>
-          <img
-            src={tableArt}
-            alt={t(
-              "Kortstokk, ølglass og snusboks på et vorsbord",
-              "Playing cards, a beer glass and a snus box on a party table",
-            )}
-            width="620"
-            height="550"
-          />
-          <p className="scene-caption">
-            ↳{" "}
-            {t(
-              "Ta med gjengen. Vi tar med kortene.",
-              "Bring your friends. We’ll bring the cards.",
-            )}
-          </p>
-        </div>
-      </section>
-      <section
-        className="live-spotlight arena-container"
-        aria-labelledby="live-spotlight-heading"
-      >
-        <div className="live-spotlight-card">
-          <div className="live-spotlight-copy">
+      <section className="hero-section arena-container">
+        <div className="hero">
+          <div className="hero-copy">
             <p className="eyebrow">
-              <span className="live-dot" />
-              SipZone Live · 2–16 {t("spillere", "players")}
-            </p>
-            <h2 id="live-spotlight-heading">
-              {t("Hver sin mobil.", "Your own phone.")}
-              <br />
-              {t("Samme vors.", "One shared party.")}
-            </h2>
-            <p>
+              <span className="status-dot" />
               {t(
-                "Ingen mobil på rundgang. Få samme spørsmål, stem i skjul og se hvem gjengen velger. Verten tar dere videre.",
-                "No phone to pass around. Get the same question, vote privately and see who your friends pick. The host takes you to the next round.",
+                "Fra SpillArena. Til vorset.",
+                "From SpillArena. For the pre-party.",
               )}
             </p>
-            <div className="live-perks">
-              <span>
-                <Smartphone size={16} />
-                {t("Din egen skjerm", "Your own screen")}
-              </span>
-              <span>
-                <Vote size={16} />
-                {t("Private stemmer", "Private votes")}
-              </span>
-              <span>
-                <Radio size={16} />
-                {t("Spill sammen", "Play together")}
-              </span>
-            </div>
-            <div className="actions">
-              <a className="button live-start" href="#/live">
-                {t("Opprett et rom", "Create a room")}
-                <ArrowUpRight size={18} />
+            <h1>
+              {t("Gode venner.", "Good friends.")}
+              <br />
+              {t("Dårlige", "Questionable")}
+              <br />
+              <span>{t("unnskyldninger.", "excuses.")}</span>
+            </h1>
+            <p className="hero-description">
+              {t(
+                "Kort på bordet. Gjengen samlet. Spill H-en + Bussruta med venner på hver deres mobil.",
+                "Cards on the table. Friends around it. Play H-en + Bussruta together, each on your own phone.",
+              )}
+            </p>
+            <div className="hero-actions">
+              <a className="button primary" href="#/bus">
+                <Smartphone size={18} />
+                {t("Spill Bussruta", "Play Bussruta")}
+                <ArrowUpRight size={20} />
               </a>
-              <a className="live-join-link" href="#/live/join">
-                {t("Har du en kode? Bli med →", "Got a code? Join →")}
+              <a className="button secondary" href="#/live/join">
+                {t("Bli med i rom", "Join a room")}
+                <ArrowUpRight size={20} />
               </a>
             </div>
+            <p className="hero-note">
+              {t(
+                "Én oppretter rommet. Resten blir med med kode eller lenke.",
+                "One creates a room. Everyone else joins with a code or link.",
+              )}
+            </p>
           </div>
-          <div className="live-phone-scene" aria-hidden="true">
-            <div className="live-phone phone-host">
-              <span className="phone-top">
-                SIPZONE LIVE <i />
-              </span>
-              <span className="phone-game">HVEM AV DERE?</span>
-              <strong>
-                Gjengens
-                <br />
-                største
-                <br />
-                optimist?
-              </strong>
-              <span className="phone-option">Emil</span>
-              <span className="phone-option selected">
-                Ada <span>✓</span>
-              </span>
-              <span className="phone-option">Siri</span>
-            </div>
-            <div className="live-phone phone-voter">
-              <span className="phone-top">
-                DIN SKJERM <i />
-              </span>
-              <span className="phone-vote-icon">✓</span>
-              <strong>
-                Stemmen
-                <br />
-                din er inne.
-              </strong>
-              <span className="phone-bottom">BARE DU VET HVEM.</span>
-            </div>
-            <span className="phone-connection">✳</span>
+          <div className="table-scene">
+            <span className="scene-label">
+              {t("BORDET ER DEKKET", "THE TABLE IS SET")}
+            </span>
+            <img
+              src={tableArt}
+              alt={t(
+                "Kortstokk, ølglass og snusboks på et vorsbord",
+                "Playing cards, a beer glass and a snus box on a party table",
+              )}
+              width="620"
+              height="550"
+            />
+            <p className="scene-caption">
+              ↳{" "}
+              {t(
+                "Ta med gjengen. Vi tar med kortene.",
+                "Bring your friends. We’ll bring the cards.",
+              )}
+            </p>
           </div>
         </div>
       </section>
@@ -199,45 +94,16 @@ export function Home() {
           </div>
           <p className="muted small">
             {t(
-              "Velg en lek. Resten tar vi underveis.",
-              "Pick a game. We’ll take it from there.",
+              "H-en + Bussruta. 2–8 spillere, hver sin mobil.",
+              "H-en + Bussruta. 2–8 players, a phone each.",
             )}
           </p>
         </div>
-        <div
-          className="filters"
-          aria-label={t("Filtrer leker", "Filter games")}
-        >
-          {[
-            { id: "all", label: t("Alle leker", "All games") },
-            { id: "local", label: t("Én enhet", "One device") },
-            { id: "live", label: t("SipZone Live", "SipZone Live") },
-          ].map((item) => (
-            <button
-              key={item.id}
-              className="filter"
-              aria-pressed={filter === item.id}
-              onClick={() => setFilter(item.id)}
-            >
-              {item.label}
-              <span>
-                {
-                  games.filter(
-                    (game) =>
-                      item.id === "all" ||
-                      (item.id === "live"
-                        ? game.kind === "live"
-                        : game.kind !== "live"),
-                  ).length
-                }
-              </span>
-            </button>
-          ))}
-        </div>
         <div className="game-grid">
-          {shown.map((game) => (
+          {availableGames.map((game) => (
             <a key={game.id} className="game-tile" href={`#/${game.id}`}>
               <GameArt id={game.id} />
+              <Devices many label />
               <div className="tile-copy">
                 <p className="tile-kicker">{game.subtitle}</p>
                 <h3>{game.name}</h3>
@@ -272,24 +138,24 @@ export function Home() {
         <ol className="steps">
           {[
             [
-              t("Finn en lek", "Pick a game"),
+              t("Opprett et rom", "Create a room"),
               t(
-                "En kort forklaring, så skjønner alle greia.",
-                "A quick explanation gets everyone ready.",
+                "Logg inn med SpillArena-kontoen din og åpne Bussruta.",
+                "Sign in with your SpillArena account and open Bussruta.",
               ),
             ],
             [
               t("Samle gjengen", "Gather your friends"),
               t(
-                "Legg til navnene deres. Konto trengs bare i Live.",
-                "Add your names. Only Live requires an account.",
+                "Del romkoden. Alle blir med fra sin egen mobil.",
+                "Share the room code. Everyone joins on their own phone.",
               ),
             ],
             [
-              t("La det gå på rundgang", "Pass it around"),
+              t("Tøm hånden i H-en", "Empty your hand in the H"),
               t(
-                "Spill i deres eget tempo. Hopp over når dere vil.",
-                "Play at your own pace. Skip whenever you want.",
+                "Fire gjetninger gir dere hånden til H-en. De med flest kort igjen tar bussen.",
+                "Four guesses give you your hand for the H. Most cards left means a ride on the bus.",
               ),
             ],
           ].map(([title, text], index) => (
@@ -304,5 +170,27 @@ export function Home() {
         </ol>
       </section>
     </>
+  );
+}
+
+/** One phone or a phone each, as an icon and, on the tiles, in words. */
+function Devices({ many, label }: { many: boolean; label?: boolean }) {
+  const { t } = useI18n();
+  const text = many
+    ? t("Hver sin mobil", "A phone each")
+    : t("Én mobil", "One phone");
+  return (
+    <span
+      className={`device-badge ${many ? "is-many" : "is-one"} ${label ? "tile-devices" : ""}`}
+      title={text}
+      aria-label={label ? text : undefined}
+      aria-hidden={label ? undefined : true}
+    >
+      <span className="device-icons" aria-hidden="true">
+        <Smartphone size={label ? 13 : 20} />
+        {many && <Smartphone size={label ? 13 : 20} />}
+      </span>
+      {label && <span aria-hidden="true">{text}</span>}
+    </span>
   );
 }

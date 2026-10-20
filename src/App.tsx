@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { AccountBadge, ConsentDialog } from "./account";
 import { useI18n } from "./i18n";
-import { gameById } from "../shared/catalog";
+import { availableGames } from "../shared/catalog";
+import { isLiveGame } from "../shared/live-games";
 import type { Player } from "../shared/engine";
 import { SiteFooter, SiteHeader, LobbyLink } from "./ui/SiteShell";
 import { SettingsMenu } from "./ui/SettingsMenu";
@@ -25,7 +26,11 @@ export default function App() {
   const [party, setParty] = useState<Player[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const [exit, setExit] = useState(false);
-  const game = gameById(route[0]);
+  // Keep existing room invitations working, with Bussruta as the only game.
+  const game = availableGames.find(
+    (game) => game.id === (route[0] === "live" ? "bus" : route[0]),
+  );
+  const isHome = !route[0] || ["en-mobil", "hver-sin-mobil"].includes(route[0]);
   const active = session && !session.finished;
   const home = () => {
     setSession(null);
@@ -50,7 +55,8 @@ export default function App() {
         return;
       }
       setSession(null);
-      setRoute(routeFromHash());
+      const next = routeFromHash();
+      setRoute(next);
       window.scrollTo(0, 0);
     };
     addEventListener("hashchange", change);
@@ -97,7 +103,7 @@ export default function App() {
         <SettingsMenu />
       </SiteHeader>
       <main id="main" tabIndex={-1}>
-        {!route[0] ? (
+        {isHome ? (
           <Home />
         ) : !game ? (
           <section className="arena-container page-narrow not-found">
@@ -108,8 +114,12 @@ export default function App() {
               {t("Til alle leker", "All games")}
             </a>
           </section>
-        ) : game.id === "live" ? (
-          <Live key={route[1] ?? "live"} initialCode={route[1] ?? ""} />
+        ) : game.kind === "live" ? (
+          <Live
+            key={`${game.id}-${route[1] ?? ""}`}
+            initialCode={route[1] ?? ""}
+            game={isLiveGame(game.id) ? game.id : undefined}
+          />
         ) : session?.game === game.id ? (
           <LocalGame
             key={session.id}

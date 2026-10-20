@@ -177,8 +177,8 @@ const play = (game: string, extra = 0) => {
   return { room, host, friend };
 };
 test("every live game starts, advances and returns to the lobby", () => {
-  for (const { id } of LIVE_GAMES) {
-    const { room, host } = play(id);
+  for (const { id, min } of LIVE_GAMES) {
+    const { room, host } = play(id, Math.max(0, min - 2));
     assert.ok(publicRoom(room, host.id).round === 1, id);
     for (let i = 0; i < 80; i++)
       applyRoomAction(room, host, { action: "next", version: room.version });

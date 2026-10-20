@@ -1,4 +1,5 @@
 import { cardDeck, compareCards, potatoDuration, shuffle } from "./engine.ts";
+import { availableGames } from "./catalog.ts";
 import type { Card } from "./engine.ts";
 import { promptDeck } from "./engine.ts";
 import { rouletteOutcomes } from "./content.ts";
@@ -7,6 +8,13 @@ import { dares, emojiPuzzles, quickQuestions } from "./party-content.ts";
 import { matchesAnswer } from "./party-engine.ts";
 import type { Room } from "./rooms.ts";
 import { RoomError } from "./rooms.ts";
+import { busView, startLiveBus, type LiveBusView } from "./live-bus.ts";
+import {
+  isTableGame,
+  startTable,
+  tableView,
+  type LiveTableView,
+} from "./live-table.ts";
 
 export type LiveGame =
   | "most-likely"
@@ -17,7 +25,13 @@ export type LiveGame =
   | "higher-lower"
   | "emoji"
   | "quickfire"
-  | "hot-potato";
+  | "hot-potato"
+  | "bus"
+  | "spy"
+  | "werewolf"
+  | "bluff"
+  | "liars-dice"
+  | "two-truths";
 
 export interface LiveGameInfo {
   id: LiveGame;
@@ -31,8 +45,106 @@ export interface LiveGameInfo {
   turns: boolean;
   /** The category filter shapes the cards. */
   categories: boolean;
+  /**
+   * Needs a phone per player: everyone holds their own cards or answers in
+   * secret at the same time. The others are one shared object — a potato, a
+   * wheel, a card read aloud — and work just as well on a single phone.
+   */
+  ownPhones: boolean;
+  /** Fewest and most players the game works with. */
+  min: number;
+  max: number;
+  /**
+   * Draws its own board with its own controls, instead of a prompt card and the
+   * host's next-round bar.
+   */
+  board: boolean;
 }
 export const LIVE_GAMES: readonly LiveGameInfo[] = [
+  {
+    id: "bus",
+    name: "H-en + Bussruta",
+    symbol: "↗",
+    no: "Fire gjetninger gir deg hånden til H-en. De med flest kort igjen tar pyramiden. 2–8 spillere.",
+    en: "Guess four cards, then use the same hand in the H. Most cards left means the pyramid. 2–8 players.",
+    answers: false,
+    turns: false,
+    categories: false,
+    ownPhones: true,
+    min: 2,
+    max: 8,
+    board: true,
+  },
+  {
+    id: "spy",
+    name: "Hvem er spionen?",
+    symbol: "🕵",
+    no: "Alle ser stedet unntatt spionen. Still spørsmål og avslør hvem som bløffer. 3–12 spillere.",
+    en: "Everyone sees the place except the spy. Ask questions and find the bluffer. 3–12 players.",
+    answers: false,
+    turns: false,
+    categories: false,
+    ownPhones: true,
+    min: 3,
+    max: 12,
+    board: true,
+  },
+  {
+    id: "werewolf",
+    name: "Varulv",
+    symbol: "🐺",
+    no: "Hemmelige roller. Ulvene tar én hver natt, landsbyen stemmer ut én hver dag. 4–12 spillere.",
+    en: "Secret roles. The wolves take one each night, the village votes one out each day. 4–12 players.",
+    answers: false,
+    turns: false,
+    categories: false,
+    ownPhones: true,
+    min: 4,
+    max: 12,
+    board: true,
+  },
+  {
+    id: "bluff",
+    name: "Snyd",
+    symbol: "♣",
+    no: "Legg kort med bunnen opp og påstå hva de er. Tviler noen, må den som tok feil ta hele bunken. 2–6 spillere.",
+    en: "Lay cards face down and claim what they are. If someone calls it, whoever is wrong takes the pile. 2–6 players.",
+    answers: false,
+    turns: false,
+    categories: false,
+    ownPhones: true,
+    min: 2,
+    max: 6,
+    board: true,
+  },
+  {
+    id: "liars-dice",
+    name: "Løgnerdyst",
+    symbol: "⚅",
+    no: "Fem terninger under koppen. Byd opp hvor mange som finnes på bordet, eller kall budet løgn. 2–8 spillere.",
+    en: "Five dice under a cup. Bid how many are on the table, or call the bid a lie. 2–8 players.",
+    answers: false,
+    turns: false,
+    categories: false,
+    ownPhones: true,
+    min: 2,
+    max: 8,
+    board: true,
+  },
+  {
+    id: "two-truths",
+    name: "To sannheter og en løgn",
+    symbol: "≟",
+    no: "Skriv tre påstander om deg selv, hvorav én er løgn. Gjengen stemmer i skjul. 3–12 spillere.",
+    en: "Write three statements about yourself, one of them a lie. Everyone votes in secret. 3–12 players.",
+    answers: false,
+    turns: false,
+    categories: false,
+    ownPhones: true,
+    min: 3,
+    max: 12,
+    board: true,
+  },
   {
     id: "most-likely",
     name: "Who’s Most Likely?",
@@ -42,6 +154,10 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     answers: true,
     turns: false,
     categories: true,
+    ownPhones: true,
+    min: 2,
+    max: 16,
+    board: false,
   },
   {
     id: "higher-lower",
@@ -52,6 +168,10 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     answers: true,
     turns: false,
     categories: false,
+    ownPhones: true,
+    min: 2,
+    max: 16,
+    board: false,
   },
   {
     id: "emoji",
@@ -62,6 +182,10 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     answers: true,
     turns: false,
     categories: false,
+    ownPhones: true,
+    min: 2,
+    max: 16,
+    board: false,
   },
   {
     id: "quickfire",
@@ -72,6 +196,10 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     answers: true,
     turns: false,
     categories: false,
+    ownPhones: true,
+    min: 2,
+    max: 16,
+    board: false,
   },
   {
     id: "hot-potato",
@@ -82,6 +210,10 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     answers: false,
     turns: false,
     categories: false,
+    ownPhones: false,
+    min: 2,
+    max: 16,
+    board: false,
   },
   {
     id: "roulette",
@@ -92,6 +224,10 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     answers: false,
     turns: true,
     categories: false,
+    ownPhones: false,
+    min: 2,
+    max: 16,
+    board: false,
   },
   {
     id: "sip-dare",
@@ -102,6 +238,10 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     answers: false,
     turns: true,
     categories: true,
+    ownPhones: false,
+    min: 2,
+    max: 16,
+    board: false,
   },
   {
     id: "truth",
@@ -112,6 +252,10 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     answers: false,
     turns: true,
     categories: true,
+    ownPhones: false,
+    min: 2,
+    max: 16,
+    board: false,
   },
   {
     id: "never",
@@ -122,10 +266,17 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     answers: false,
     turns: false,
     categories: true,
+    ownPhones: false,
+    min: 2,
+    max: 16,
+    board: false,
   },
 ];
 export const liveGame = (id: string) =>
   LIVE_GAMES.find((game) => game.id === id);
+export const availableLiveGames = LIVE_GAMES.filter((game) =>
+  availableGames.some((available) => available.id === game.id),
+);
 export const isLiveGame = (id: unknown): id is LiveGame =>
   LIVE_GAMES.some((game) => game.id === id);
 const isPrompt = (game: LiveGame) =>
@@ -164,7 +315,9 @@ export type LiveView =
       results: Record<string, RoundResult> | null;
     }
   | { kind: "roulette"; outcome: number | null }
-  | { kind: "hot-potato"; holder: string; exploded: boolean };
+  | { kind: "hot-potato"; holder: string; exploded: boolean }
+  | LiveBusView
+  | LiveTableView;
 
 const DARES: Prompt[] = dares.map((dare, index) => ({
   id: `dare-${dare.level}-${index}`,
@@ -219,6 +372,9 @@ export function startGame(
   room.queue = [];
   room.cards = [];
   room.potato = null;
+  room.bus = null;
+  room.busPlays = [];
+  room.table = null;
   resetRound(room);
   fillDeck(room, now, random);
 }
@@ -231,6 +387,8 @@ function fillDeck(room: Room, now: number, random: () => number) {
   else if (game === "emoji" || game === "quickfire")
     room.queue = queueFor(game, random);
   else if (game === "hot-potato") room.potato = newPotato(room, now, random);
+  else if (game === "bus") startLiveBus(room, random);
+  else if (isTableGame(game)) startTable(room, random);
 }
 /** Moves to the next prompt, card, question or potato. */
 export function advanceRound(
@@ -401,8 +559,10 @@ export function dropPlayer(room: Room, memberId: string): void {
   }
 }
 
-export function liveView(room: Room): LiveView | null {
+export function liveView(room: Room, memberId = ""): LiveView | null {
   if (room.phase !== "playing") return null;
+  if (room.game === "bus") return busView(room, memberId);
+  if (isTableGame(room.game)) return tableView(room, memberId);
   const results = room.revealed ? judge(room) : null;
   if (room.game === "higher-lower")
     return {

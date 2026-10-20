@@ -5,8 +5,17 @@ import type { RoomView } from "../../../shared/rooms";
 import type { RoundResult } from "../../../shared/live-games";
 import { PlayingCard } from "../../games/GameControls";
 import { PlayerChip } from "./PlayerChip";
+import { LiveBus } from "./LiveBus";
+import { BusPersonalFeedback } from "./BusPersonalFeedback";
+import { BusDrinkConfirmation } from "./BusDrinkConfirmation";
+import { BusPhaseIntro } from "./BusPhaseIntro";
+import { LiveBluff } from "./LiveBluff";
+import { LiveDice } from "./LiveDice";
+import { LiveSpy } from "./LiveSpy";
+import { LiveTruths } from "./LiveTruths";
+import { LiveWolf } from "./LiveWolf";
 
-type Send = (input: Record<string, unknown>) => void;
+type Send = (input: Record<string, unknown>) => Promise<boolean>;
 interface BoardProps {
   room: RoomView;
   disabled: boolean;
@@ -18,6 +27,34 @@ export function LiveBoard({ room, disabled, send }: BoardProps) {
   const live = room.live;
   if (!live) return null;
   const props = { room, disabled, send };
+  if (live.kind === "bus")
+    return (
+      <>
+        <BusPersonalFeedback view={live} />
+        <BusDrinkConfirmation view={live} disabled={disabled} send={send} />
+        {live.phaseIntro ? (
+          <BusPhaseIntro
+            key={live.phaseIntro.id}
+            view={live}
+            disabled={disabled || Boolean(live.pendingDrinks?.length)}
+            send={send}
+          />
+        ) : (
+          <div className="bus-phase-play" key={`${room.code}-${live.phase}`}>
+            <LiveBus
+              view={live}
+              {...props}
+              disabled={disabled || Boolean(live.pendingDrinks?.length)}
+            />
+          </div>
+        )}
+      </>
+    );
+  if (live.kind === "spy") return <LiveSpy view={live} {...props} />;
+  if (live.kind === "werewolf") return <LiveWolf view={live} {...props} />;
+  if (live.kind === "bluff") return <LiveBluff view={live} {...props} />;
+  if (live.kind === "liars-dice") return <LiveDice view={live} {...props} />;
+  if (live.kind === "two-truths") return <LiveTruths view={live} {...props} />;
   return (
     <>
       {live.kind === "higher-lower" && <HigherLowerBoard {...props} />}

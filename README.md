@@ -8,74 +8,55 @@ Norske drikkeleker for vors, hyttetur og spillkveld. En del av
 MVP-en er implementert lokalt. Cloudflare-ressurser og domeneruting er ikke
 publisert fra dette repoet ennå.
 
-## Spill
+## Spill og prioritering
 
-| Lek                 | Implementert                                                                                      |
-| ------------------- | ------------------------------------------------------------------------------------------------- |
-| Sip Roulette        | Hjul med åtte felt, slurker, utfordringer og turbytte.                                            |
-| Truth or Sip        | 36 norske spørsmål. Svar, ta en slurk eller hopp over.                                            |
-| Never Have I Ever   | 36 norske påstander på felles skjerm.                                                             |
-| Higher or Lower     | 52 kort, rask runde/rekkemodus, valgbart ess/like kort og sikring av poeng.                       |
-| Who’s Most Likely?  | 36 spørsmål, samtidig peking eller skjult avstemming på én enhet.                                 |
-| Hot Potato          | Send enheten rundt før en skjult tilfeldig tidtaker går ut.                                       |
-| Card of Fate        | 52 kort, 13 regler, synlige makkerpar, husregler og fjerde konge.                                 |
-| SipZone Live        | Rom og lobby med synkroniserte spørsmål og privat avstemming.                                     |
-| Sip or Dare         | 48 utfordringer, kategorier, rolig/modig nivå og mulighet til å hoppe over.                       |
-| Spin the Bottle     | Animert flaske, like sjanser per spiller, spørsmål og utfordringer.                               |
-| The Snus Box        | Overlevering, animert lokk og 24 tilfeldige oppgaver uten gjentakelser.                           |
-| Quickfire Questions | 30 spørsmål, fire svar, tidsfrist, personlige poeng og serier.                                    |
-| Sip Showdown        | Tilfeldig utslagsturnering for 2–16 spillere, omkamp og fripass ved oddetall.                     |
-| Emoji Decoder       | 24 oppgaver, svarvarianter, to forsøk, poeng og manuell godkjenning.                              |
-| Category Rush       | 30 forslag og egne kategorier, taperen velger neste, tidsfrist og manuell dømming.                |
-| Truth Train         | 24 personlige spørsmål med oppfølgere og gruppens godkjenning.                                    |
-| Bussruta            | 2–8 spillere, fire gjetninger, skjulte hender, pyramide, sjåførtrekning og inntil tre bussforsøk. |
+**H-en + Bussruta er det eneste tilgjengelige spillet.** Vi prioriterer kvalitet
+før vi åpner flere leker. De øvrige spillene er skjult fra forsiden, direkte
+spillsider og spillvalget i rommet, og er merket **TODO** i [TODO.md](TODO.md).
+Koden beholdes som utgangspunkt for senere arbeid.
 
-De 16 lokale lekene trenger ingen konto. Spillere, lokale runder og poeng
-lever i minnet i fanen. Gjengen følger med når dere bytter lek.
-Spørsmålslekene har kategoriene **vors**, **hytta** og **venner**. En økt
-bruker bare unike spørsmål: velger du 20 runder i en kategori med 12 spørsmål,
-blir økten 12 runder. De tre opprinnelige spørsmålslekene har 108 spørsmål og påstander.
-Sip or Dare har 24 oppgaver per nivå, åtte per kategori; rundetallet
-avkortes til antall unike oppgaver i utvalget. Quickfire og Category Rush
-har valgbar tidsfrist på 5, 10 eller 15 sekunder. Klokken fortsetter ved
-fanebytte, og svar etter fristen teller som tidsslutt. Category Rush og
-Showdown dømmes av gjengen. Alle nye leker bruker den felles turmarkeringen
-og mobilkontrollene, med plass til kontopillen nederst.
+Bussruta spilles av **2–8 spillere på hver sin mobil**, med SpillArena-konto.
+Én oppretter et rom, og resten blir med med kode eller invitasjonslenke.
+Rekkefølgen er **Fire gjetninger → H-en → Pyramiden**. Før hver fase vises en
+animert intro med korte regler og klarstatus for alle spillerne. Alle må trykke
+«Jeg er klar» på sin egen enhet før fasen starter. Dette håndheves på serveren;
+verten kan ikke starte fasen alene. Pyramiden åpner direkte på første rad etter introen.
+Trygge pyramidekort aktiverer neste rad automatisk, med animasjon og flytting av fokus.
+Ved bildekort vises treffet først, deretter at pyramiden går tilbake til start.
+Etter tre sekunder vises drikkevinduet med bildekortet og antall slurker én gang.
+Når alle på bussen har bekreftet, stokkes pyramiden og et nytt forsøk starter automatisk.
+Avslutningen har en egen scene med resultat, spillerne og «Ny runde · til lobbyen».
+Alle kan åpne den nye lobbyen etter fullført runde; hele gjengen følger med automatisk
+og beholder romkoden. Verten starter neste runde med nye kort og ny klarstatus.
+Alle gjetter ett kort
+hver på rundgang i fire runder. De samme fire kortene blir hånden i H-en,
+og H-kortene tas fra resten av samme kortstokk. Hånden vises i en dock nederst. Når docken er minimert,
+vises toppen av hvert kort. Trykk på et hvilende kort for å vise
+full høyde, og trykk på et kort uten match igjen for å minimere. Kort som matcher
+et snudd H-kort, løftes automatisk til full høyde mens de øvrige hviler nederst.
+Trykk på et spillbart håndkort for å legge det automatisk på det sist snudde
+H-kortet med samme verdi. Slurkeregelen følger dette H-kortet; ved «gi bort»
+velger du bare hvem som skal drikke. Tøm hånden i H-en; de med flest kort igjen
+går til pyramiden uten nye gjetninger eller ny hånd.
+Fire gjetninger har en kompakt mobilvisning med én turlinje, fire kort og svarvalg.
+Regler og romdetaljer åpnes ved behov. Spillere som venter ser «Ser på X»
+og «X sine kort», så de delte kortene ikke forveksles med deres egen hånd. Ved feil svar vises kortet og «Feil svar»
+i to sekunder før drikkebekreftelsen åpnes. Spilleren må bekrefte å ha drukket. Ved riktig svar vises
+spillervalget etter to sekunder, med avatar og navn. Mottakeren må trykke
+«Jeg har drukket» før turen går videre. Bare riktig mottaker kan bekrefte,
+og bekreftelsen kontrolleres på serveren, også i H-en og pyramiden.
+Informasjonsvarsler vises i høyst ti sekunder og kan lukkes med krysset.
+De fjernes hos både giver og mottaker straks drikkingen bekreftes. Å lukke
+et varsel eller vente på at det forsvinner erstatter aldri drikkebekreftelsen. Kort, turbytte, popup og varsler har animerte overganger. Lobby og faser bytter
+med en kort overgang; kort deles ut forskjøvet og flytter seg mykt på hånden.
+Vinduer og varsler får en 150 ms uttoning uten aktive kontroller. Redusert
+bevegelse slår av bevegelsene og bruker umiddelbare overganger.
+Se reglene i spillet og [SPILLREGLER.md](docs/SPILLREGLER.md).
 
-SipZone Live bruker SpillArena-kontoer og har ni leker: **Who’s Most Likely?**,
-**Higher or Lower**, **Emoji Decoder**, **Quickfire**, **Hot Potato**,
-**Sip Roulette**, **Sip or Dare**, **Truth or Sip** og **Never Have I Ever**.
-Svar og gjetting er private til runden avsluttes, quizene gir poeng, og
-Hot Potato-fusen ligger bare på serveren. Spillerne vises med kontobilde og navn.
-Rommet har opptil 16 deltakere. Verten velger lek, starter runder og viser avstemningen.
-Ved likt resultat deler spillerne førsteplassen. Verten kan gå tilbake til
-lobbyen for å slippe inn flere eller bytte lek. Rommet utløper etter 24 timer.
-
-Live er fremhevet på forsiden. Velg **Opprett rom** eller
-**Bli med**; en invitasjonslenke fyller inn romkoden automatisk. Ved behov
-åpnes innloggingen i den vanlige kontopillen nederst til høyre, og opprettelse
-eller tilkobling fortsetter automatisk etter innlogging. Hver deltaker bruker
-sin egen enhet og SpillArena-konto. Headeren viser ingen profilinformasjon.
-
-Alle de **43 foreslåtte lekene** er beskrevet i [TODO.md](TODO.md), med **17 implementerte** (åtte MVP-deler og ni nye leker) og **26 gjenstående**.
-
-Regelgjennomgangen av Drikkespill.no og Annes Drikkeleker er beskrevet i
-[docs/SPILLREGLER.md](docs/SPILLREGLER.md). Higher or Lower beholder rask modus
-som standard (ess lavt og trygge like kort), med valgfri rekkemodus og husregler.
-Category Rush starter med fem sekunder per spiller; taperen får kategorivalget
-og kan gi det videre. Makkerpar i Card of Fate varer til noen velger ny makker
-eller økten slutter. Disse er SipZones avtalte varianter.
-
-Bussruta bruker én stokk til fire kort per spiller og 15 pyramidekort. Hender
-vises først etter bekreftet overlevering og skjules igjen før mobilen går videre.
-Det er ingen valgbart rundetall: økten følger de tre fasene. Bussturen bruker
-fem nye kort per forsøk, med ess høyest, like kort som feil og høyst tre forsøk.
-Se alle regelvalgene i [SPILLREGLER.md](docs/SPILLREGLER.md).
-
-Footeren har kontakt, FAQ, personvern og vilkår som peker til SpillArena i en
-ny fane, samt lagringsvalg, GitHub og `support@spillarena.no`. Lenker og
-kontaktadresse er hentet fra det oppdaterte SpillArena-repoet. Kontaktmeldingene
-sendes gjennom hubens eksisterende skjema.
+Rom, innlogging og invitasjoner bruker fortsatt SipZone Live. Eksisterende
+`#/live/<romkode>`-lenker fungerer, og nye rom velger Bussruta automatisk.
+`availableGames` i `shared/catalog.ts` styrer hvilke spill som vises og kan
+åpnes i appen; rommets synlige spillvalg følger samme liste.
 
 ## Lokal oppstart
 
@@ -88,9 +69,10 @@ npm run dev
 
 Åpne adressen Vite skriver ut, normalt
 [localhost:5173/sipzone/](http://localhost:5173/sipzone/). Hvis porten er opptatt,
-velger Vite neste ledige port. De 16 lokale lekene virker med bare Vite.
+velger Vite neste ledige port. Forsiden kan vises med bare Vite; Bussruta
+trenger også romserveren og hubens konto-API som beskrevet under.
 
-### Konto og Live lokalt
+### Konto og Bussruta lokalt
 
 | Tjeneste           | Port                     | Oppstart                     |
 | ------------------ | ------------------------ | ---------------------------- |
@@ -132,6 +114,16 @@ for å gi vertskapet videre; det å lukke fanen fjerner ikke medlemskapet.
 Romtesten starter og stopper sin egen runtime med separat lagring og en
 tilfeldig testnøkkel. Den trenger hverken hub, innlogging eller eksisterende rom.
 
+
+For mobilgjennomgang: start `npm run dev` og åpne
+`/sipzone/tests/mobile-layout/index.html`. Siden sjekker reelle spillkomponenter
+ved 320, 375 og 430 px, liggende 812 × 375 og skrivebord 1280 × 800, med lange
+spillernavn. Velg en enkeltscene for å prøve knapper og spilltilstander manuelt.
+Den måler horisontal overflyt og om handlingsfelter dekker spillinnhold; visuell
+kontroll og test på en fysisk mobil kommer i tillegg. Live-brettene bruker lokale
+romdata og tester ikke tilkoblingen til romserveren. Gjennomgangssiden følger
+ikke med i produksjonsbygget.
+
 ## Struktur
 
 ```text
@@ -148,7 +140,7 @@ src/
   styles.css           SipZones bord-, kort- og mobilutforming
   mobile-games.css      Tydelig turmarkering og mobiltilpassede spillkontroller
   party-games.css       Illustrasjoner og oppsett for de åtte nye lekene
-  bus.css               Bussruta, private hender, pyramide og busstur
+  bus.css               H-en + Bussruta, private hender og pyramide
   live.css              Live-fremheving, enkelt romoppsett og plass til kontopillen
 shared/
   catalog.ts           De 17 spilloppføringene og deres regler
@@ -166,6 +158,8 @@ workers/rooms/         Durable Objects, SQLite og WebSockets
 tests/                 Enhets- og integrasjonstester
 docs/                  Opprinnelig oppsettsplan og designskisse
 ```
+
+Spillkode og dokumentasjon for skjulte TODO-leker beholdes i repoet.
 
 Grunnlaget følger Hitline: React 19, TypeScript 6, Vite 8, egen CSS,
 lokalt hostet Archivo og Lucide. Navigasjon og footer er hentet fra Hitline;

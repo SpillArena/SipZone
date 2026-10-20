@@ -61,33 +61,41 @@
   transform: scale(0.6) rotate(-9deg);
   flex-shrink: 0;
 }
+/* H-en and both bus stages share fluid cards and normal document scrolling. */
+.bus-board {
+  max-width: 780px;
+}
+.bus-board:focus {
+  outline: none;
+}
 .bus-phases {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   list-style: none;
   padding: 0;
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   gap: 8px;
 }
 .bus-phases li {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  font-size: 12px;
-  padding: 10px;
-  border-bottom: 2px solid var(--line);
-  color: var(--muted);
   min-width: 0;
+  padding: 12px 5px;
+  border-bottom: 2px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
 }
 .bus-phases li > span {
   display: grid;
   place-items: center;
-  width: 25px;
-  height: 25px;
-  flex: 0 0 25px;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  border: 1px solid currentColor;
   border-radius: 50%;
-  border: 1px solid var(--line);
-  font-size: 11px;
 }
 .bus-phases .bus-phase-current {
   color: var(--ink);
@@ -96,253 +104,301 @@
 }
 .bus-phase-current > span {
   background: var(--accent);
-  border-color: var(--accent) !important;
   color: var(--pine);
+  border-color: var(--accent);
 }
 .bus-phases .bus-phase-complete {
-  color: var(--yellow);
-}
-[data-theme="light"] .bus-phases .bus-phase-complete {
-  color: var(--pine);
+  color: var(--muted);
+  border-color: var(--yellow);
 }
 .bus-counter {
+  text-align: center;
   font-size: 12px;
   color: var(--muted);
-  line-height: 1.6;
-  margin: 10px 0 18px;
+  margin: 8px 0 20px;
+}
+.bus-content {
+  min-width: 0;
+  width: 100%;
 }
 .bus-message {
+  max-width: 570px;
   text-align: center;
-  margin: 26px auto;
-  max-width: 580px;
-  overflow-wrap: anywhere;
+  margin: 22px auto;
 }
 .bus-message h2 {
-  font-size: clamp(26px, 4vw, 38px);
+  font-size: clamp(25px, 4vw, 34px);
   line-height: 1.2;
-  letter-spacing: -1px;
-  margin: 18px 0;
 }
 .bus-message p {
-  line-height: 1.7;
-  font-size: 16px;
-}
-.bus-message p.small {
-  font-size: 13px;
-}
-.bus-ticket {
-  display: inline-block;
-  border: 1px dashed var(--line);
-  padding: 10px 18px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  border-radius: 6px;
-  transform: rotate(-4deg);
+  font-size: 15px;
 }
 .bus-hand {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
+  width: min(100%, 520px);
   margin: 24px auto;
-  max-width: 600px;
 }
-.bus-hand .playing-card,
-.bus-road .playing-card,
-.bus-pyramid .playing-card {
+.bus-hand > * {
+  min-width: 0;
+  position: relative;
+}
+.bus-hand .playing-card {
   width: 100%;
   height: auto;
-  aspect-ratio: 12/17;
-  max-width: 100%;
+  aspect-ratio: 12 / 17;
 }
-.bus-hand .rank,
-.bus-road .rank {
-  font-size: 22px;
+.bus-active-card {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 10px;
 }
-.bus-hand .rank small,
-.bus-road .rank small {
-  font-size: 18px;
+.bus-card-caption {
+  display: block;
+  min-height: 32px;
+  text-align: center;
+  padding-top: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
 }
-.bus-hand .big-suit,
-.bus-road .big-suit {
-  font-size: 60px;
-}
-.bus-hand .card-back > span,
-.bus-road .card-back > span {
-  width: 50px;
-  height: 50px;
-  font-size: 30px;
+.bus-active-card .bus-card-caption {
+  color: var(--ink);
+  font-weight: 750;
 }
 .bus-card-choice {
+  padding: 0 0 8px;
   background: transparent;
-  border: 0;
-  padding: 0;
-  color: inherit;
-  min-width: 0;
-}
-.bus-card-choice:not(:disabled) .playing-card {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
+  border-radius: 10px;
+  text-align: center;
 }
 .bus-card-choice > span {
   display: block;
   font-size: 12px;
-  margin-top: 15px;
-  min-height: 35px;
-  line-height: 1.4;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.bus-card-choice:enabled {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 .bus-card-choice:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-.bus-card-choice:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 7px;
-  border-radius: 8px;
-}
-.bus-feedback {
-  padding: 16px 20px;
-  border-radius: 10px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  font-weight: 650;
-}
-.bus-correct {
-  background: var(--yellow);
-  color: var(--pine);
-  border-color: var(--yellow);
-}
-.bus-pyramid {
-  --bus-mini: 52px;
-  display: grid;
-  gap: 8px;
-  justify-content: center;
-  margin: 24px auto;
-}
-.bus-pyramid-row {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-.bus-pyramid-row > div {
-  width: var(--bus-mini);
-}
-.bus-pyramid .playing-card {
-  border-radius: 5px;
-  box-shadow: 0 3px 0 #061e1630;
-}
-.bus-pyramid .rank {
-  font-size: 13px;
-  line-height: 1;
-}
-.bus-pyramid .rank small {
-  font-size: 11px;
-}
-.bus-pyramid .top-rank {
-  top: 5px;
-  left: 5px;
-}
-.bus-pyramid .bottom-rank {
-  bottom: 5px;
-  right: 5px;
-}
-.bus-pyramid .big-suit {
-  font-size: 25px;
-}
-.bus-pyramid .card-back > span {
-  width: 27px;
-  height: 27px;
-  font-size: 16px;
-  border-width: 1px;
-}
-.bus-active-card .playing-card {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
+  opacity: 0.55;
 }
 .bus-player-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  margin: 22px auto;
-  max-width: 620px;
+  margin: 18px 0 24px;
 }
-.bus-player-grid > button {
-  display: flex;
+.bus-player-grid > .button {
   flex-direction: column;
   min-width: 0;
-  gap: 6px;
+  min-height: 60px;
+  padding: 12px;
   overflow-wrap: anywhere;
-  min-height: 62px;
-  padding: 14px;
 }
 .bus-player-grid small {
+  display: block;
+  font-size: 11px;
   font-weight: 450;
-  font-size: 12px;
+  line-height: 1.5;
 }
-.bus-candidates {
+.bus-hand-hint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin: 18px 0 12px;
+}
+.bus-remaining {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin: 26px 0;
-  padding: 0;
+  gap: 8px;
+  padding: 16px 0 0;
+  margin: 12px 0;
+  border-top: 1px solid var(--line);
   list-style: none;
 }
-.bus-candidates li {
+.bus-remaining li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 14px 20px;
-  overflow-wrap: anywhere;
-  max-width: 100%;
-}
-.bus-road {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
-  padding: 0;
-  list-style: none;
-  margin: 35px auto;
-  max-width: 650px;
-}
-.bus-road > li {
-  min-width: 0;
-  text-align: center;
-}
-.bus-road > li > span {
-  display: block;
-  margin-top: 16px;
   font-size: 12px;
-  color: var(--muted);
 }
-.bus-road-current .playing-card {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-.bus-destination > span {
-  font-size: 64px;
-  color: var(--accent);
-}
-.bus-final-scores {
-  text-align: center;
-  margin: 28px 0;
+.bus-remaining li > span {
+  min-width: 0;
   overflow-wrap: anywhere;
 }
-.bus-final-scores h3 {
-  font-size: 22px;
-  line-height: 1.4;
+.bus-remaining strong {
+  flex-shrink: 0;
 }
-.bus-board .game-actions {
-  position: static;
-  margin-top: 24px;
+.bus-feedback {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 750;
+  padding: 16px;
+  border-radius: 10px;
+}
+.bus-correct {
+  background: var(--yellow);
+  color: var(--pine);
+}
+.bus-wrong {
+  background: var(--accent);
+  color: var(--pine);
+}
+.bus-h {
+  --h-card: clamp(44px, 12vw, 74px);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, var(--h-card)));
+  gap: 10px;
+  justify-content: space-between;
+  width: min(100%, 420px);
+  margin: 18px auto 30px;
+}
+.bus-h-card,
+.bus-pyramid-choice {
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 7px;
+}
+.bus-h-card:disabled,
+.bus-pyramid-choice:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.bus-h-card:enabled,
+.bus-pyramid-choice:enabled {
+  cursor: pointer;
+}
+.bus-h .playing-card {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 12 / 17;
+  border-radius: 7px;
+}
+.bus-h-legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  max-width: 420px;
+  margin: 20px auto 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.bus-pyramid {
+  --pyramid-card: clamp(44px, 10vw, 64px);
+  display: grid;
+  gap: 12px;
+  width: min(100%, 460px);
+  margin: 24px auto;
+}
+.bus-pyramid-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 9px;
+  padding: 6px;
+  border: 1px solid transparent;
+}
+.bus-pyramid-cards {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  min-width: 0;
+}
+.bus-pyramid-choice {
+  width: var(--pyramid-card);
+  flex-shrink: 0;
+}
+.bus-pyramid .playing-card {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 12 / 17;
+  border-radius: 6px;
+}
+.bus-current-row {
+  background: var(--surface);
+  border-color: var(--accent);
+  scroll-margin-block: 100px;
+  animation: bus-turn-arrive 450ms ease both;
+}
+.bus-current-row:focus {
+  outline: none;
+}
+.bus-pyramid-choice:enabled {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.bus-picked-card {
+  outline: 2px solid var(--yellow);
+  outline-offset: 1px;
+}
+.bus-row-value {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+.bus-row-value small {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  font-weight: 450;
+}
+.bus-h .rank,
+.bus-pyramid .rank {
+  font-size: 16px;
+}
+.bus-h .rank small,
+.bus-pyramid .rank small {
+  font-size: 12px;
+  margin-top: 2px;
+}
+.bus-h .top-rank,
+.bus-pyramid .top-rank {
+  top: 5px;
+  left: 5px;
+}
+.bus-h .bottom-rank,
+.bus-pyramid .bottom-rank {
+  bottom: 5px;
+  right: 5px;
+}
+.bus-h .big-suit,
+.bus-pyramid .big-suit {
+  font-size: 25px;
+}
+.bus-h .card-back,
+.bus-pyramid .card-back {
+  border-width: 3px;
+}
+.bus-h .card-back > span,
+.bus-pyramid .card-back > span {
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+}
+.bus-finish-symbol {
+  display: block;
+  font-size: 70px;
+  margin: 24px auto;
 }
 @media (max-width: 760px), (max-width: 960px) and (max-height: 500px) {
   .bus-phases {
-    gap: 6px;
+    gap: 5px;
   }
   .bus-phases li {
-    padding: 8px 2px;
     gap: 5px;
-    font-size: 10px;
+    padding: 8px 2px;
+    font-size: 11px;
   }
   .bus-phases li > span {
     width: 22px;
@@ -355,89 +411,1469 @@
     margin-bottom: 14px;
   }
   .bus-message {
-    margin: 22px auto;
-  }
-  .bus-message h2 {
-    font-size: clamp(25px, 6.5vw, 31px);
-  }
-  .bus-message p {
-    font-size: 15px;
+    margin-block: 18px;
   }
   .bus-hand {
     gap: 9px;
-    margin-block: 20px;
+    margin-block: 22px;
   }
-  .bus-hand .rank,
-  .bus-road .rank {
-    font-size: 17px;
+  .bus-hand .rank {
+    font-size: 18px;
   }
-  .bus-hand .rank small,
-  .bus-road .rank small {
+  .bus-hand .rank small {
     font-size: 13px;
   }
-  .bus-hand .top-rank,
-  .bus-road .top-rank {
-    top: 8px;
-    left: 8px;
+  .bus-hand .top-rank {
+    top: 7px;
+    left: 7px;
   }
-  .bus-hand .bottom-rank,
-  .bus-road .bottom-rank {
-    bottom: 8px;
-    right: 8px;
+  .bus-hand .bottom-rank {
+    bottom: 7px;
+    right: 7px;
   }
   .bus-hand .big-suit {
-    font-size: 34px;
+    font-size: 30px;
   }
-  .bus-road .big-suit {
-    font-size: 27px;
+  .bus-hand .card-back {
+    border-width: 4px;
   }
   .bus-hand .card-back > span {
-    width: 33px;
-    height: 33px;
-    font-size: 22px;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
   }
-  .bus-road .card-back > span {
-    width: 25px;
-    height: 25px;
-    font-size: 16px;
-    border-width: 1px;
+  .bus-card-caption {
+    font-size: 10px;
+    min-height: 40px;
   }
   .bus-pyramid {
-    --bus-mini: clamp(34px, 9vw, 52px);
+    --pyramid-card: clamp(44px, 10vw, 58px);
     gap: 6px;
   }
   .bus-pyramid-row {
+    grid-template-columns: minmax(0, 1fr) 38px;
     gap: 6px;
+    padding: 4px 2px;
   }
-  .bus-road {
+  .bus-pyramid-cards {
+    gap: 4px;
+  }
+  .bus-h {
     gap: 8px;
-    margin-block: 28px;
   }
-  .bus-road .rank {
+}
+@media (max-width: 350px) {
+  .bus-phases li {
+    flex-direction: column;
+    text-align: center;
+  }
+  .bus-hand .bottom-rank {
+    display: none;
+  }
+  .bus-hand .rank {
+    font-size: 16px;
+  }
+  .bus-hand .big-suit {
+    font-size: 24px;
+  }
+}
+
+/* Keep the rank and suit legible on the small board cards. */
+.bus-h .bottom-rank,
+.bus-pyramid .bottom-rank,
+.bus-h .rank small,
+.bus-pyramid .rank small {
+  display: none;
+}
+.bus-riders {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.bus-riders summary {
+  min-height: 44px;
+  padding-block: 12px;
+  cursor: pointer;
+}
+.bus-riders p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * The private hand drawer. Closed, the handle and the top half of the
+ * face-down cards peek up from the bottom edge; open, the whole hand slides up
+ * and the cards flip face up one after another.
+ */
+:root {
+  /* handle + a little over half a card, for the hand's width at this size */
+  --bus-peek: calc(
+    52px + (min(100vw, 560px) - 59px) * 0.2 + env(safe-area-inset-bottom, 0px)
+  );
+}
+.bus-drawer {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 40;
+  box-sizing: border-box;
+  width: min(100%, 560px);
+  padding: 0 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 -18px 40px -22px rgb(0 0 0 / 0.65);
+  color: var(--ink);
+  cursor: pointer;
+  touch-action: none;
+  transform: translate(-50%, calc(100% - var(--bus-peek)));
+  transition: transform 0.48s cubic-bezier(0.2, 0.9, 0.25, 1.06);
+  animation: bus-drawer-in 0.55s cubic-bezier(0.2, 0.9, 0.25, 1) backwards;
+}
+.bus-drawer-open {
+  transform: translate(-50%, 0);
+  cursor: default;
+}
+@keyframes bus-drawer-in {
+  from {
+    transform: translate(-50%, 100%);
+  }
+}
+.bus-drawer-handle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 0 12px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.bus-drawer-open .bus-drawer-handle {
+  color: var(--muted);
+}
+.bus-drawer-grip {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 32%, transparent);
+}
+.bus-drawer .bus-hand {
+  margin: 0 auto;
+}
+.bus-drawer-spacer {
+  height: calc(var(--bus-peek) + 12px);
+}
+/* closed: a small hop now and then says "tap me" */
+.bus-drawer:not(.bus-drawer-open) .bus-hand {
+  animation: bus-peek-hint 2.6s ease-in-out 1.4s infinite;
+}
+@keyframes bus-peek-hint {
+  0%,
+  78%,
+  100% {
+    transform: translateY(0);
+  }
+  86% {
+    transform: translateY(-7px);
+  }
+  92% {
+    transform: translateY(0);
+  }
+}
+/* nothing about the cards shows while they are face down */
+.bus-drawer:not(.bus-drawer-open) .bus-card-choice {
+  outline: none;
+  opacity: 1;
+}
+.bus-drawer:not(.bus-drawer-open) .bus-card-choice > span,
+.bus-drawer:not(.bus-drawer-open) .bus-card-caption {
+  visibility: hidden;
+}
+.bus-flip {
+  display: block;
+  perspective: 900px;
+}
+.bus-flip-inner {
+  display: block;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.3, 0.9, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 70ms + 120ms);
+}
+.bus-flip-down {
+  transform: rotateY(180deg);
+  transition-delay: calc(var(--i, 0) * 40ms);
+}
+.bus-flip-face {
+  display: block;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.bus-flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-drawer,
+  .bus-flip-inner {
+    transition: none;
+    animation: none;
+  }
+  .bus-drawer:not(.bus-drawer-open) .bus-hand {
+    animation: none;
+  }
+}
+
+/* Live: who laid what on the open H card, and the drawer's own little forms. */
+.bus-plays {
+  display: grid;
+  gap: 6px;
+  margin: 18px auto 0;
+  padding: 0;
+  width: min(100%, 520px);
+  list-style: none;
+}
+.bus-plays li {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  animation: bus-play-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+}
+@keyframes bus-play-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+.bus-drawer-give {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+.bus-drawer-give p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+}
+.bus-drawer-give .bus-player-grid {
+  margin: 12px 0 8px;
+}
+.bus-drawer-empty {
+  margin: 4px 0 8px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+/* Each card rests at the bottom; only matching cards rise in the minimized dock. */
+.bus-hand-dock,
+.bus-hand-dock-spacer {
+  --dock-card-width: clamp(50px, calc((100vw - 62px) / 4), 88px);
+  --dock-card-height: calc(var(--dock-card-width) * 17 / 12);
+  --dock-peek: 48px;
+  --dock-visible-height: var(--dock-peek);
+}
+.bus-hand-dock.has-raised-cards,
+.bus-hand-dock-spacer.has-raised-cards {
+  --dock-visible-height: var(--dock-card-height);
+}
+.bus-hand-dock {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(100%, 480px);
+  box-sizing: border-box;
+  padding: 0 12px env(safe-area-inset-bottom, 0px);
+  pointer-events: none;
+}
+.bus-hand-dock .bus-hand {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: var(--dock-visible-height);
+  gap: 10px;
+  margin: 0;
+  overflow: hidden;
+  transition: height 240ms ease;
+}
+.bus-hand-dock-card {
+  pointer-events: auto;
+  flex: 0 0 var(--dock-card-width);
+  height: var(--dock-card-height);
+  padding: 0;
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  transform: translateY(calc(var(--dock-visible-height) - var(--dock-peek)));
+  transition: transform 240ms ease;
+}
+.bus-hand-dock-card.is-raised {
+  transform: translateY(0);
+}
+.bus-hand-dock-card.is-playable .playing-card {
+  box-shadow: inset 0 0 0 3px var(--accent);
+}
+.bus-hand-dock-card:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.bus-hand-dock-card:focus-visible {
+  outline-offset: -4px;
+}
+.bus-hand-dock-spacer {
+  height: calc(
+    var(--dock-visible-height) + 16px + env(safe-area-inset-bottom, 0px)
+  );
+  transition: height 240ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-hand-dock .bus-hand,
+  .bus-hand-dock-card,
+  .bus-hand-dock-spacer {
+    transition: none;
+  }
+}
+.dialog .bus-h-card:enabled {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Personal messages stay on the player's phone until acknowledged. */
+.bus-personal-feedback {
+  position: fixed;
+  top: calc(94px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  display: grid;
+  gap: 12px;
+  width: min(calc(100% - 24px), 500px);
+  max-height: calc(100dvh - 250px);
+  overflow-y: auto;
+}
+.bus-personal-notice {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  padding: 20px;
+  border: 2px solid var(--pine);
+  border-radius: 16px;
+  background: var(--accent);
+  color: var(--pine);
+  box-shadow: 0 12px 36px #0005;
+  overflow-wrap: anywhere;
+}
+.bus-personal-notice.is-given {
+  background: var(--yellow);
+}
+.bus-personal-notice h2 {
+  margin: 0;
+  font-size: 19px;
+}
+.bus-personal-amount {
+  display: block;
+  margin: 4px 0;
+  font-size: clamp(28px, 7vw, 38px);
+  line-height: 1.15;
+}
+.bus-personal-notice p {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+.bus-personal-notice > .button {
+  grid-column: 1 / -1;
+  width: 100%;
+  background: var(--pine);
+  color: var(--paper);
+  border-color: var(--pine);
+}
+.bus-personal-action {
+  width: min(100%, 520px);
+  margin: 18px auto;
+  padding: 18px;
+  border: 2px solid var(--yellow);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--yellow) 12%, var(--surface));
+  text-align: center;
+}
+.bus-personal-action h3 {
+  margin: 6px 0;
+  font-size: clamp(22px, 5vw, 28px);
+}
+.bus-personal-action p:last-child {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+
+/* Turns, reveals and notifications animate independently from the next player's controls. */
+.bus-personal-notice {
+  position: relative;
+  overflow: hidden;
+  animation:
+    bus-notice-arrive 360ms cubic-bezier(0.18, 0.9, 0.22, 1.2),
+    bus-notice-leave 180ms ease 9820ms forwards;
+}
+.bus-notice-countdown {
+  position: absolute;
+  inset: auto 0 0;
+  height: 4px;
+  background: var(--pine);
+  transform-origin: left;
+  animation: bus-notice-countdown 10s linear forwards;
+}
+.bus-deal-turn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 14px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  animation: bus-turn-arrive 420ms ease;
+}
+.bus-deal-turn > strong {
+  font-size: 16px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.bus-deal-turn > .live-avatar {
+  flex-shrink: 0;
+  color: var(--paper);
+}
+.bus-deal-turn.is-your-turn {
+  background: var(--yellow);
+  color: var(--pine);
+  border-color: var(--yellow);
+}
+.bus-deal-question {
+  animation: bus-question-arrive 360ms ease both;
+}
+.bus-board:has(.bus-deal-turn) .game-actions .button {
+  animation: bus-choice-arrive 360ms ease backwards;
+}
+.bus-board:has(.bus-deal-turn) .game-actions .button:nth-child(2) {
+  animation-delay: 60ms;
+}
+.bus-board:has(.bus-deal-turn) .game-actions .button:nth-child(3) {
+  animation-delay: 120ms;
+}
+.bus-board:has(.bus-deal-turn) .game-actions .button:nth-child(4) {
+  animation-delay: 180ms;
+}
+.bus-recipient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 104px));
+  justify-content: center;
+  gap: 12px;
+  margin: 18px 0 8px;
+}
+.bus-recipient {
+  min-width: 0;
+  padding: 16px 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
+  animation: bus-choice-arrive 320ms ease backwards;
+}
+.bus-recipient:nth-child(2) {
+  animation-delay: 50ms;
+}
+.bus-recipient:nth-child(3) {
+  animation-delay: 100ms;
+}
+.bus-recipient:nth-child(4) {
+  animation-delay: 150ms;
+}
+.bus-recipient:nth-child(n + 5) {
+  animation-delay: 200ms;
+}
+.bus-recipient .live-chip {
+  width: 100%;
+  gap: 10px;
+}
+.bus-recipient .live-chip-name {
+  font-size: 13px;
+  font-weight: 650;
+}
+.bus-recipient:hover:enabled,
+.bus-recipient:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+}
+.bus-recipient:active:enabled {
+  transform: scale(0.95);
+}
+.bus-recipient:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.dialog:has(.bus-recipient-grid) {
+  animation: bus-popup-arrive 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.bus-award-intro {
+  text-align: center;
+}
+.bus-award-intro > span {
+  display: inline-block;
+  color: var(--accent);
+  font-size: 48px;
+  animation: bus-success-star 700ms cubic-bezier(0.18, 0.9, 0.22, 1.3) both;
+}
+@keyframes bus-notice-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes bus-notice-leave {
+  to {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+}
+@keyframes bus-notice-countdown {
+  to {
+    transform: scaleX(0);
+  }
+}
+@keyframes bus-turn-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes bus-turn-glow {
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--yellow) 18%, transparent);
+  }
+}
+@keyframes bus-question-arrive {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes bus-choice-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes bus-result-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes bus-card-reveal {
+  from {
+    opacity: 0;
+    transform: perspective(600px) rotateY(100deg) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(600px) rotateY(0) translateY(0);
+  }
+}
+@keyframes bus-popup-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes bus-success-star {
+  from {
+    opacity: 0;
+    transform: rotate(-120deg) scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-personal-notice,
+  .bus-notice-countdown,
+  .bus-deal-turn,
+  .bus-deal-question,
+  .bus-recipient,
+  .bus-award-intro > span,
+  .dialog:has(.bus-recipient-grid),
+  .bus-board:has(.bus-deal-turn) .game-actions .button {
+    animation: none;
+    transition: none;
+  }
+}
+
+.bus-notice-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--pine);
+  cursor: pointer;
+}
+.bus-notice-close:hover {
+  background: #153a3014;
+}
+.bus-personal-notice {
+  padding-right: 42px;
+}
+.bus-h-card .playing-card:not(.card-back),
+.bus-pyramid-choice .playing-card:not(.card-back) {
+  animation: bus-card-reveal 480ms cubic-bezier(0.18, 0.8, 0.25, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-h-card .playing-card:not(.card-back),
+  .bus-pyramid-choice .playing-card:not(.card-back) {
+    animation: none;
+  }
+}
+.bus-award-wait {
+  color: var(--yellow);
+  text-align: center;
+  font-size: 28px;
+  font-weight: 750;
+  animation: bus-result-arrive 360ms ease;
+}
+.bus-award-wait > span {
+  display: inline-block;
+  animation: bus-success-star 700ms cubic-bezier(0.18, 0.9, 0.22, 1.3) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-award-wait,
+  .bus-award-wait > span {
+    animation: none;
+  }
+}
+.bus-drink-wait {
+  padding: 16px 20px;
+  margin: 14px 0 22px;
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  font-weight: 650;
+  text-align: center;
+  animation: bus-result-arrive 360ms ease;
+}
+.bus-drink-confirmation {
+  text-align: center;
+}
+.bus-drink-hit {
+  margin: 20px auto 16px;
+}
+.bus-drink-hit > .playing-card {
+  width: 88px;
+  height: 125px;
+  margin: auto;
+}
+.bus-drink-hit > p {
+  color: var(--muted);
+  font-size: 14px;
+}
+.bus-pyramid-hit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin: 22px auto;
+  text-align: left;
+  animation: bus-popup-arrive 500ms ease both;
+}
+.bus-pyramid-hit > .playing-card {
+  width: 74px;
+  height: 105px;
+  flex-shrink: 0;
+  animation: bus-card-reveal 650ms ease both;
+}
+.bus-pyramid-hit h2 {
+  margin: 6px 0;
+  font-size: clamp(23px, 5vw, 32px);
+}
+.bus-pyramid-hit p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+.bus-pyramid-hit .eyebrow {
+  color: var(--accent);
+  font-size: 11px;
+}
+.bus-pyramid-reset .bus-pyramid-row {
+  animation: bus-pyramid-reset 700ms ease both;
+}
+.bus-pyramid-reset .bus-pyramid-row:nth-child(2) {
+  animation-delay: 70ms;
+}
+.bus-pyramid-reset .bus-pyramid-row:nth-child(3) {
+  animation-delay: 140ms;
+}
+.bus-pyramid-reset .bus-pyramid-row:nth-child(4) {
+  animation-delay: 210ms;
+}
+.bus-pyramid-reset .bus-pyramid-row:nth-child(5) {
+  animation-delay: 280ms;
+}
+@keyframes bus-pyramid-reset {
+  from {
+    opacity: 0;
+    transform: perspective(600px) rotateX(55deg) translateY(-18px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(600px) rotateX(0) translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-pyramid-hit,
+  .bus-pyramid-hit > .playing-card,
+  .bus-pyramid-reset .bus-pyramid-row {
+    animation: none;
+  }
+}
+.bus-drink-confirmation > .button {
+  width: 100%;
+  margin-top: 12px;
+}
+.bus-personal-feedback {
+  pointer-events: none;
+}
+.bus-notice-close {
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-drink-wait {
+    animation: none;
+  }
+}
+
+/* Phase intros and the transition into play. */
+.bus-phase-intro {
+  max-width: 570px;
+  margin: 0 auto;
+  text-align: center;
+  animation: bus-popup-arrive 600ms cubic-bezier(0.18, 0.8, 0.25, 1) both;
+}
+.bus-board {
+  scroll-margin-top: 90px;
+}
+.bus-phase-intro h2 {
+  margin: 8px 0 12px;
+  font-size: clamp(36px, 8vw, 58px);
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+  scroll-margin-top: 100px;
+}
+.bus-phase-intro h2:focus {
+  outline: none;
+}
+.bus-intro-lead {
+  color: var(--muted);
+  margin: 0 auto 26px;
+  max-width: 370px;
+}
+.bus-intro-art {
+  display: grid;
+  position: relative;
+  width: 190px;
+  height: 125px;
+  margin: 24px auto 20px;
+}
+.bus-intro-art > span {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  width: 49px;
+  height: 67px;
+  border: 1px solid #fff5;
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--pine);
+  box-shadow: 0 5px 16px #0002;
+  font-size: 25px;
+}
+.bus-intro-art.is-deal > span {
+  top: 28px;
+  left: 70px;
+  transform-origin: 50% 120%;
+}
+.bus-intro-art.is-deal > span:nth-child(1) {
+  transform: rotate(-30deg);
+  color: #c94432;
+}
+.bus-intro-art.is-deal > span:nth-child(2) {
+  transform: rotate(-10deg);
+}
+.bus-intro-art.is-deal > span:nth-child(3) {
+  transform: rotate(10deg);
+  color: #c94432;
+}
+.bus-intro-art.is-deal > span:nth-child(4) {
+  transform: rotate(30deg);
+}
+.bus-intro-art.is-h > span,
+.bus-intro-art.is-bus > span {
+  width: 34px;
+  height: 44px;
+  background: var(--yellow);
+  font-size: 18px;
+}
+.bus-intro-art.is-h > span:nth-child(1) {
+  top: 0;
+  left: 36px;
+}
+.bus-intro-art.is-h > span:nth-child(2) {
+  top: 0;
+  right: 36px;
+}
+.bus-intro-art.is-h > span:nth-child(3) {
+  top: 40px;
+  left: 36px;
+}
+.bus-intro-art.is-h > span:nth-child(4) {
+  top: 40px;
+  left: 78px;
+  background: var(--accent);
+}
+.bus-intro-art.is-h > span:nth-child(5) {
+  top: 40px;
+  right: 36px;
+}
+.bus-intro-art.is-h > span:nth-child(6) {
+  top: 80px;
+  left: 36px;
+}
+.bus-intro-art.is-h > span:nth-child(7) {
+  top: 80px;
+  right: 36px;
+}
+.bus-intro-art.is-bus > span:nth-child(1) {
+  top: 0;
+  left: 78px;
+  background: var(--accent);
+}
+.bus-intro-art.is-bus > span:nth-child(2) {
+  top: 39px;
+  left: 58px;
+}
+.bus-intro-art.is-bus > span:nth-child(3) {
+  top: 39px;
+  left: 98px;
+}
+.bus-intro-art.is-bus > span:nth-child(4) {
+  top: 78px;
+  left: 38px;
+}
+.bus-intro-art.is-bus > span:nth-child(5) {
+  top: 78px;
+  left: 78px;
+}
+.bus-intro-art.is-bus > span:nth-child(6) {
+  top: 78px;
+  left: 118px;
+}
+.bus-intro-rules {
+  counter-reset: rule;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+.bus-intro-rules li {
+  counter-increment: rule;
+  position: relative;
+  padding: 16px 0 16px 43px;
+  border-top: 1px solid var(--line);
+  animation: bus-question-arrive 500ms ease both;
+}
+.bus-intro-rules li:nth-child(2) {
+  animation-delay: 100ms;
+}
+.bus-intro-rules li:nth-child(3) {
+  animation-delay: 200ms;
+}
+.bus-intro-rules li::before {
+  content: counter(rule, decimal-leading-zero);
+  position: absolute;
+  top: 18px;
+  left: 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 750;
+}
+.bus-intro-rules strong {
+  font-size: 16px;
+}
+.bus-intro-rules p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.bus-intro-riders {
+  padding: 12px;
+  border-radius: 12px;
+  background: #ffffff0a;
+}
+.bus-intro-ready {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.bus-intro-ready h3 {
+  margin: 0 0 20px;
+  font-size: 25px;
+}
+.bus-intro-ready ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.bus-intro-ready li {
+  width: 82px;
+  min-width: 0;
+}
+.bus-intro-ready .live-avatar {
+  transition:
+    box-shadow 250ms,
+    transform 250ms;
+}
+.bus-intro-ready .is-ready .live-avatar {
+  box-shadow: 0 0 0 3px var(--yellow);
+  transform: translateY(-3px);
+}
+.bus-ready-mark {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.is-ready > .bus-ready-mark {
+  color: var(--yellow);
+}
+.bus-intro-ready > p {
+  margin: 20px 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.bus-intro-ready .error {
+  color: var(--accent);
+}
+.bus-ready-button {
+  width: 100%;
+  max-width: 360px;
+  min-height: 54px;
+  transition:
+    background 250ms,
+    transform 250ms;
+}
+.bus-ready-button.is-ready:disabled {
+  opacity: 1;
+  background: #ffffff12;
+  color: var(--yellow);
+  border-color: #ffffff26;
+}
+/* Opacity preserves the viewport positioning of the fixed hand dock. */
+.bus-phase-play {
+  animation: bus-phase-enter 650ms ease both;
+}
+@keyframes bus-phase-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-phase-intro,
+  .bus-intro-rules li,
+  .bus-phase-play,
+  .bus-current-row {
+    animation: none;
+  }
+  .bus-intro-ready .live-avatar,
+  .bus-ready-button {
+    transition: none;
+  }
+}
+
+.bus-end-scene {
+  max-width: 570px;
+  margin: auto;
+  text-align: center;
+  animation: bus-popup-arrive 650ms ease both;
+}
+.bus-end-art {
+  width: 240px;
+  height: 150px;
+  margin: 22px auto;
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--yellow);
+}
+.bus-end-art > svg {
+  animation: bus-end-park 850ms cubic-bezier(0.16, 0.8, 0.3, 1) both;
+}
+.bus-end-art::after {
+  content: "";
+  position: absolute;
+  bottom: 25px;
+  width: 160px;
+  height: 1px;
+  background: var(--line);
+}
+.bus-end-art > span {
+  position: absolute;
+  font-size: 17px;
+  color: var(--accent);
+  opacity: 0.65;
+}
+.bus-end-art > span:nth-child(1) {
+  top: 20px;
+  left: 20px;
+}
+.bus-end-art > span:nth-child(2) {
+  top: 55px;
+  right: 15px;
+}
+.bus-end-art > span:nth-child(3) {
+  bottom: 25px;
+  left: 12px;
+}
+.bus-end-art > span:nth-child(4) {
+  top: 5px;
+  right: 60px;
+}
+.bus-end-art.is-celebrating > span {
+  animation: bus-end-sparkle 2.2s ease-in-out 3;
+}
+.bus-end-art.is-celebrating > span:nth-child(even) {
+  animation-delay: 300ms;
+}
+.bus-end-scene h2 {
+  margin: 10px 0 16px;
+  font-size: clamp(34px, 7vw, 54px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+.bus-end-scene h2:focus {
+  outline: none;
+}
+.bus-end-lead {
+  color: var(--muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.bus-end-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 20px 0;
+  margin: 26px 0;
+  border-block: 1px solid var(--line);
+}
+.bus-end-stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 7px;
+}
+.bus-end-stats dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.bus-end-stats dd {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 750;
+}
+.bus-end-next {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px 20px 18px;
+  margin: 26px 0;
+}
+.bus-end-next h3 {
+  font-size: 27px;
+  margin: 0 0 10px;
+}
+.bus-end-next > p {
+  font-size: 14px;
+  color: var(--muted);
+}
+.bus-end-next ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 10px;
+  list-style: none;
+  padding: 10px 0;
+  margin: 20px 0;
+}
+.bus-end-next li {
+  width: 80px;
+  min-width: 0;
+}
+.bus-end-next .button {
+  width: 100%;
+  gap: 10px;
+}
+.bus-end-next > .small {
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+@keyframes bus-end-park {
+  from {
+    transform: translateX(-90px) rotate(-7deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) rotate(0);
+    opacity: 1;
+  }
+}
+@keyframes bus-end-sparkle {
+  50% {
+    transform: translateY(-9px) rotate(25deg);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-end-scene,
+  .bus-end-art > svg,
+  .bus-end-art.is-celebrating > span {
+    animation: none;
+  }
+}
+
+/* One decision at a time during the guessing rounds. */
+.bus-board.bus-deal-board {
+  max-width: 480px;
+  min-height: 0;
+}
+.bus-deal-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+.bus-deal-progress > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.bus-deal-progress > div {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+.bus-deal-progress i {
+  height: 3px;
+  border-radius: 2px;
+  flex: 1;
+  background: var(--line);
+}
+.bus-deal-progress i.is-complete {
+  background: var(--accent);
+}
+.bus-deal-board .bus-deal-question {
+  margin: 8px 0 18px;
+}
+.bus-deal-board .bus-deal-question h2 {
+  margin: 0;
+  font-size: clamp(24px, 6vw, 30px);
+}
+.bus-deal-board .bus-deal-question p {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+.bus-deal-board .bus-hand {
+  gap: 10px;
+  max-width: 440px;
+  margin: 20px auto 14px;
+}
+.bus-deal-board .bus-card-caption {
+  padding-top: 8px;
+  min-height: 0;
+  font-size: 11px;
+}
+.bus-deal-board .bus-active-card {
+  outline: none;
+}
+.bus-deal-board .bus-active-card .playing-card {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.bus-deal-board .bus-active-card .playing-card:not(.card-back) {
+  animation: bus-card-reveal 600ms ease both;
+}
+.bus-deal-board .game-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  border: 0;
+  margin: 12px 0 0;
+  padding: 0;
+  background: transparent;
+}
+.bus-deal-board .game-actions > .button {
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+  padding: 12px 8px;
+}
+.bus-deal-status {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 20px 0;
+}
+.bus-deal-rules {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.bus-deal-rules summary {
+  width: fit-content;
+  margin: auto;
+  min-height: 44px;
+  padding: 12px 0;
+  cursor: pointer;
+}
+.bus-deal-rules p {
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+.bus-room-code,
+.bus-room-share {
+  display: none;
+}
+@media (max-width: 760px) {
+  .live-bus-deal .room-heading {
+    display: none;
+  }
+  .live-bus-deal .play-top {
+    margin-bottom: 0;
+  }
+  .live-bus-deal .room-roster {
+    margin: 0 0 14px;
+  }
+  .live-bus-deal .room-roster > summary {
+    min-height: 36px;
+    padding-block: 8px;
     font-size: 12px;
   }
-  .bus-road .rank small {
-    font-size: 10px;
+  .live-bus-deal .room-roster > summary .bus-room-code {
+    display: inline;
+    margin: 0;
   }
-  .bus-road .top-rank {
-    top: 5px;
-    left: 5px;
+  .live-bus-deal .bus-room-share {
+    display: inline-flex;
+    margin-block: 14px;
   }
-  .bus-road .bottom-rank {
-    bottom: 5px;
-    right: 5px;
+  .bus-deal-board .bus-hand {
+    max-width: none;
+    gap: 6px;
   }
-  .bus-road > li > span {
-    font-size: 10px;
+  .bus-deal-board .bus-hand .bottom-rank {
+    display: none;
   }
-  .bus-card-choice > span {
-    font-size: 10px;
-    min-height: 28px;
+  .bus-deal-board .bus-deal-turn {
+    padding: 8px 12px;
+    margin-block: 12px 16px;
   }
-  .bus-player-grid {
-    gap: 9px;
+  .bus-deal-board .bus-hand {
+    margin-block: 16px 12px;
   }
-  .bus-player-grid > button {
-    min-height: 58px;
+}
+@media (max-width: 380px) {
+  .bus-deal-board .bus-hand {
+    max-width: none;
+  }
+  .bus-deal-board .bus-deal-question {
+    margin-block: 8px 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-deal-board .bus-active-card .playing-card:not(.card-back) {
+    animation: none;
+  }
+}
+
+.bus-deal-wrong {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 750;
+  margin: 20px 0 8px;
+  animation: bus-result-arrive 350ms ease both;
+}
+.bus-deal-wrong > span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  font-size: 18px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-deal-wrong {
+    animation: none;
+  }
+}
+
+.dialog:has(.bus-drink-confirmation) {
+  width: min(420px, calc(100% - 32px));
+  padding: 28px 24px 24px;
+  border: 1px solid var(--line);
+  outline: none;
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      ellipse at top,
+      color-mix(in srgb, var(--yellow) 9%, transparent),
+      transparent 70%
+    ),
+    var(--bg);
+  animation: bus-popup-arrive 450ms ease both;
+}
+.dialog:has(.bus-drink-confirmation) .dialog-top {
+  justify-content: center;
+  text-align: center;
+}
+.dialog:has(.bus-drink-confirmation) .dialog-top h2 {
+  font-size: clamp(26px, 6vw, 32px);
+  letter-spacing: -0.03em;
+}
+.bus-drink-sender {
+  margin: 22px 0 26px;
+}
+.bus-drink-sender .live-avatar {
+  background: var(--surface);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--yellow) 8%, transparent);
+  border-color: var(--line);
+}
+.bus-drink-sender .live-chip {
+  gap: 12px;
+}
+.bus-drink-sender .live-chip-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 19px;
+  font-weight: 750;
+}
+.bus-drink-sender > p {
+  color: var(--muted);
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dialog:has(.bus-drink-confirmation) {
+    animation: none;
+  }
+}
+
+.bus-deal-hand-owner {
+  margin: 16px 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.bus-deal-hand:has(.bus-deal-hand-owner) .bus-hand {
+  margin-top: 10px;
+}
+
+.bus-drink-hit.is-wrong {
+  margin-block: 24px;
+}
+.bus-drink-hit.is-wrong > .playing-card {
+  width: 98px;
+  height: 139px;
+  animation: bus-card-reveal 600ms cubic-bezier(0.18, 0.8, 0.25, 1) both;
+}
+.bus-drink-hit.is-wrong > p {
+  display: inline-block;
+  padding: 7px 14px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 750;
+  margin: 18px 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bus-drink-hit.is-wrong > .playing-card {
+    animation: none;
   }
 }

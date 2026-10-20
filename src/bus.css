@@ -702,6 +702,9 @@
   width: min(100%, 480px);
   box-sizing: border-box;
   padding: 0 12px env(safe-area-inset-bottom, 0px);
+  /* The inset padding is transparent otherwise: page content shows under and
+     between the cards, so the hand looks like it floats above the bottom. */
+  background: var(--bg);
   pointer-events: none;
 }
 .bus-hand-dock .bus-hand {

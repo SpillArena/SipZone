@@ -1,4 +1,10 @@
 import { useState } from "react";
+import { Dialog } from "../../ui/Dialog";
+import { BusHandDock } from "./BusHandDock";
+import { BusAwardPopup } from "./BusAwardPopup";
+import { BusPyramidFailure } from "./BusPyramidFailure";
+import { BusEndScene } from "./BusEndScene";
+import { Avatar, PlayerChip } from "./PlayerChip";
 import { cardLabel, type Card } from "../../../shared/engine";
 import { H_CARD_COUNT, hEffect, pyramidPenalty } from "../../../shared/bus";
 import type { LiveBusView } from "../../../shared/live-bus";
@@ -7,7 +13,6 @@ import {
   Actions,
   BusFrame,
   Hand,
-  HandDrawer,
   HCards,
   PyramidCards,
 } from "../../games/BusRoute";
@@ -17,11 +22,10 @@ import {
   effectLabels,
   guessHints,
   guesses,
-  questions,
   sips,
 } from "../../games/bus-copy";
 
-type Send = (input: Record<string, unknown>) => void;
+type Send = (input: Record<string, unknown>) => Promise<boolean>;
 const show = (card: Card) => `${cardLabel(card.rank)} ${card.suit}`;
 /** "Ada, Emil og Siri" */
 const list = (names: string[]) =>
@@ -32,7 +36,7 @@ const list = (names: string[]) =>
 /**
  * H-en + Bussruta with every player on their own phone.
  *
- * Your four cards wait in the drawer at the bottom of your own screen; the
+ * Cards rest at the bottom with their tops showing; matches rise automatically. The
  * table — the H, the guesses and the pyramid — is the same on every phone.
  * The host turns the H; whoever is up guesses and picks from their own phone.
  */
@@ -49,23 +53,27 @@ export function LiveBus({
 }) {
   const host = room.you === room.host;
   const me = view.you;
-  const [giving, setGiving] = useState<{ card: Card; at: number } | null>(null);
+  const [playError, setPlayError] = useState("");
+  const [laying, setLaying] = useState<{
+    card: Card;
+    target: number;
+  } | null>(null);
   const name = (index: number) =>
     `${view.players[index]?.name ?? "?"}${index === me ? " (deg)" : ""}`;
   const move = (type: string, extra: Record<string, unknown> = {}) =>
     send({ action: "bus", move: type, ...extra });
   const others = (actor: number, onChoose: (id: string) => void) => (
-    <div className="bus-player-grid">
+    <div className="bus-recipient-grid" role="group" aria-label="Velg spiller">
       {view.players.map(
         (player, index) =>
           index !== actor && (
             <button
-              className="button secondary"
+              className="bus-recipient"
               key={player.id}
               disabled={disabled}
               onClick={() => onChoose(player.id)}
             >
-              {player.name}
+              <PlayerChip name={player.name} size={64} />
             </button>
           ),
       )}
@@ -87,60 +95,106 @@ export function LiveBus({
     const open = view.hStage === "open";
     const effect = view.hIndex < 0 ? null : hEffect(view.hIndex);
     const current = open ? view.h[view.hIndex] : null;
-    const matches = current
-      ? view.hand.filter((card) => card.rank === current.rank).length
-      : 0;
-    const pending = giving?.at === view.hIndex ? giving.card : null;
-    const play = (card: Card) => {
-      if (effect === "give") setGiving({ card, at: view.hIndex });
-      else move("play-card", { rank: card.rank, suit: card.suit });
+    const canMatch = (card: Card) =>
+      view.h.some((target) => target?.rank === card.rank);
+    const matches = view.hand.filter(canMatch).length;
+    const giveCards = view.hand.filter((card) => {
+      const target = view.h.findLastIndex((hCard) => hCard?.rank === card.rank);
+      return target >= 0 && hEffect(target) === "give";
+    }).length;
+    const target = laying
+      ? Number.isInteger(laying.target) &&
+        view.h[laying.target]?.rank === laying.card.rank
+        ? laying.target
+        : view.h.findLastIndex((card) => card?.rank === laying.card.rank)
+      : -1;
+    const pending =
+      laying &&
+      target >= 0 &&
+      view.hand.some(
+        (card) =>
+          card.rank === laying.card.rank && card.suit === laying.card.suit,
+      )
+        ? { card: laying.card, target }
+        : null;
+    const play = async (card: Card, target: number, recipient?: string) => {
+      if (disabled) return;
+      if (view.h[target]?.rank !== card.rank) {
+        setPlayError(
+          "Kortet matcher ikke lenger. Lukk vinduet og velg kortet på nytt.",
+        );
+        return;
+      }
+      setPlayError("");
+      const accepted = await move("play-card", {
+        rank: card.rank,
+        suit: card.suit,
+        hIndex: target,
+        ...(recipient ? { recipient } : {}),
+      });
+      if (accepted) setLaying(null);
+      else setPlayError("Kortet ble ikke lagt. Prøv igjen.");
+    };
+    const choose = (card: Card) => {
+      const target = view.h.findLastIndex((hCard) => hCard?.rank === card.rank);
+      if (disabled || target < 0) return;
+      setPlayError("");
+      if (hEffect(target) === "give") setLaying({ card, target });
+      else play(card, target);
     };
     return (
       <BusFrame
         active={active}
         counter={
           view.hIndex < 0
-            ? "Fire kort til hver · målet er null igjen"
+            ? "Behold de fire kortene fra gjetterunden · målet er null igjen"
             : `H-kort ${view.hIndex + 1} av ${H_CARD_COUNT} · ${effectLabels[effect!]}`
         }
       >
         <div className="bus-message">
           <h2>
             {view.hStage === "intro"
-              ? "H-en først. Bussruta etterpå."
+              ? "Fire gjetninger er ferdig. Nå spiller vi H-en."
               : current
                 ? `${show(current)} · ${effectLabels[effect!]}`
                 : `H-kort ${view.hIndex + 1} ligger klart`}
           </h2>
           <p>
             {view.hStage === "intro"
-              ? "Kortene dine ligger nederst på skjermen. Trykk på dem for å se dem. Gi bort til venstre, ta selv til høyre, shots i midten."
+              ? "Kortene fra Fire gjetninger hviler nederst med toppen synlig. Trykk på dem for å vise hele hånden. Kort som kan spilles, løftes automatisk. Gi bort til venstre, ta selv til høyre, shots i midten."
               : !open
                 ? host
                   ? "Trykk på det markerte kortet for å snu det."
                   : "Verten snur kortet."
                 : matches
-                  ? `Du har ${matches === 1 ? "en match" : `${matches} matcher`}! Åpne kortene dine og legg ${matches === 1 ? "den" : "dem"}.`
+                  ? `Du har ${matches === 1 ? "en match" : `${matches} matcher`}! Trykk på kortet ditt for å legge det automatisk.`
                   : me >= 0 && view.hand.length
                     ? "Ingen match denne gangen."
                     : "Følg med på hvem som drikker."}
           </p>
         </div>
+        {giveCards > 0 && (
+          <div className="bus-personal-action" role="status">
+            <p className="eyebrow">Du har kort som gir bort</p>
+            <h3>Du kan dele ut {sips(giveCards)}</h3>
+            <p>Trykk på et løftet kort og velg hvem som skal drikke.</p>
+          </div>
+        )}
         <HCards
           h={view.h}
           index={view.hIndex}
           canReveal={view.hStage === "covered" && !disabled}
           onReveal={host ? () => move("reveal-h") : undefined}
         />
-        {open && view.plays.length > 0 && (
+        {view.plays.length > 0 && (
           <ul className="bus-plays" role="status">
             {view.plays.map((entry, index) => (
               <li key={index}>
                 <strong>{name(entry.player)}</strong> legger {show(entry.card)}{" "}
-                ·{" "}
-                {effect === "give"
+                på H-kort {(entry.hIndex ?? view.hIndex) + 1} ·{" "}
+                {hEffect(entry.hIndex ?? view.hIndex) === "give"
                   ? `${name(entry.recipient)} drikker 1 slurk 🍺`
-                  : effect === "shot"
+                  : hEffect(entry.hIndex ?? view.hIndex) === "shot"
                     ? "tar en shot 🥃"
                     : "tar 1 slurk 🍺"}
               </li>
@@ -168,60 +222,44 @@ export function LiveBus({
                   ? "Snu det markerte H-kortet"
                   : view.hIndex === H_CARD_COUNT - 1
                     ? "H-en er ferdig · hvem tar bussen?"
-                    : "Alle ferdige · neste H-kort →"}
+                    : "Neste H-kort →"}
             </button>
           </Actions>
         ) : (
           <p className="action-hint">Verten snur H-en.</p>
         )}
         {roster}
+        {playError && !pending && (
+          <p className="error" role="alert">
+            {playError}
+          </p>
+        )}
         {me >= 0 && (
-          <>
-            <HandDrawer key={me} count={view.hand.length}>
-              {(drawerOpen) =>
-                view.hand.length ? (
-                  <>
-                    <Hand
-                      cards={view.hand}
-                      faceDown={!drawerOpen}
-                      match={current?.rank}
-                      onPlay={
-                        current && !disabled
-                          ? (slot) => play(view.hand[slot])
-                          : undefined
-                      }
-                    />
-                    {pending && (
-                      <div className="bus-drawer-give">
-                        <p>
-                          Du legger {show(pending)}. Hvem skal drikke 1 slurk?
-                        </p>
-                        {others(me, (recipient) => {
-                          setGiving(null);
-                          move("play-card", {
-                            rank: pending.rank,
-                            suit: pending.suit,
-                            recipient,
-                          });
-                        })}
-                        <button
-                          className="text-button"
-                          onClick={() => setGiving(null)}
-                        >
-                          Avbryt
-                        </button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <p className="bus-drawer-empty">
-                    Tom hånd. Du slipper bussen 🎉
-                  </p>
-                )
-              }
-            </HandDrawer>
-            <div className="bus-drawer-spacer" aria-hidden="true" />
-          </>
+          <BusHandDock
+            cards={view.hand}
+            canPlay={canMatch}
+            disabled={disabled}
+            onChoose={choose}
+          />
+        )}
+        {pending && (
+          <Dialog
+            title="Du skal dele ut 1 slurk"
+            onClose={() => setLaying(null)}
+          >
+            {others(me, (recipient) =>
+              play(pending.card, pending.target, recipient),
+            )}
+            {disabled && <p role="status">Legger kortet …</p>}
+            {playError && (
+              <p className="error" role="alert">
+                {playError}
+              </p>
+            )}
+            <button className="text-button" onClick={() => setLaying(null)}>
+              Avbryt
+            </button>
+          </Dialog>
         )}
       </BusFrame>
     );
@@ -280,27 +318,101 @@ export function LiveBus({
   }
 
   if (view.phase === "deal") {
-    const { deal, drivers } = view;
+    const { deal } = view;
     const up = deal.player === me;
     const amount = deal.question + 1;
-    const next = drivers[(drivers.indexOf(deal.player) + 1) % drivers.length];
-    const last = deal.question === 3 && deal.player === drivers.at(-1);
+    const waiting = view.pendingDrinks?.[0];
+    const highlighted = waiting ? waiting.player : deal.player;
     return (
-      <BusFrame
-        active={active}
-        counter={`Bussruta · del 1 · kort ${amount} av 4 · spiller ${drivers.indexOf(deal.player) + 1} av ${drivers.length}`}
-        player={view.players[deal.player]?.name}
-        label={up ? "Din tur" : "Gjetter nå"}
-      >
-        <div className="bus-message">
-          <h2>{questions[deal.question]}</h2>
-          <p className="muted small">{guessHints[deal.question]}</p>
+      <div className="round-board bus-board bus-deal-board">
+        <div className="bus-deal-progress">
+          <strong>Fire gjetninger</strong>
+          <span>Kort {amount} av 4</span>
+          <div
+            role="progressbar"
+            aria-label="Gjetterunde"
+            aria-valuemin={1}
+            aria-valuemax={4}
+            aria-valuenow={amount}
+          >
+            {[0, 1, 2, 3].map((index) => (
+              <i
+                key={index}
+                className={index <= deal.question ? "is-complete" : ""}
+              />
+            ))}
+          </div>
         </div>
-        <Hand
-          cards={deal.cards.map((card) => card ?? HIDDEN_CARD)}
-          active={deal.question}
-          revealed={deal.cards.filter(Boolean).length}
-        />
+        <div
+          className={`bus-deal-turn ${highlighted === me ? "is-your-turn" : ""}`}
+          key={`turn-${deal.player}-${deal.question}-${waiting ? "drink" : deal.stage}`}
+          role="status"
+          aria-live="polite"
+        >
+          <Avatar name={view.players[highlighted]?.name ?? "?"} size={32} />
+          <strong>
+            {waiting
+              ? highlighted === me
+                ? "Din drikkebekreftelse"
+                : `Venter på ${view.players[highlighted]?.name}`
+              : deal.stage === "feedback"
+                ? `${view.players[deal.player]?.name} deler ut`
+                : up
+                  ? "Din tur"
+                  : `Ser på ${view.players[deal.player]?.name}`}
+          </strong>
+        </div>
+        <div
+          className="bus-message bus-deal-question"
+          key={`question-${deal.player}-${deal.question}`}
+        >
+          <h2>
+            {
+              [
+                "Rød eller svart?",
+                "Høyere eller lavere?",
+                "Innenfor eller utenfor?",
+                "Hvilken sort?",
+              ][deal.question]
+            }
+          </h2>
+          {(deal.question === 1 || deal.question === 2) && (
+            <p className="muted small">
+              {deal.question === 1
+                ? "Sammenlign med kort 1"
+                : "Mellom kort 1 og 2"}
+            </p>
+          )}
+        </div>
+        <div
+          className="bus-deal-hand"
+          role="group"
+          aria-label={
+            up ? "Dine kort" : `${view.players[deal.player]?.name} sine kort`
+          }
+        >
+          {!up && (
+            <p className="bus-deal-hand-owner">
+              {view.players[deal.player]?.name} sine kort
+            </p>
+          )}
+          <Hand
+            key={`hand-${deal.player}-${deal.question}`}
+            cards={deal.cards.map((card) => card ?? HIDDEN_CARD)}
+            active={deal.question}
+            revealed={deal.cards.filter(Boolean).length}
+            compact
+          />
+        </div>
+        {deal.stage === "feedback" && deal.correct === false && (
+          <p
+            className="bus-deal-wrong"
+            role="status"
+            key={`wrong-${deal.player}-${deal.question}`}
+          >
+            <span aria-hidden="true">✕</span> Feil svar
+          </p>
+        )}
         {deal.stage === "guess" ? (
           up ? (
             <Actions>
@@ -316,97 +428,59 @@ export function LiveBus({
               ))}
             </Actions>
           ) : (
-            <p className="action-hint">
-              Venter på at {name(deal.player)} gjetter. Riktig gir bort{" "}
-              {sips(amount)}, feil tar {sips(amount)}.
+            <p className="bus-deal-status">Du venter på tur.</p>
+          )
+        ) : deal.correct && deal.recipient === null ? (
+          up ? (
+            <BusAwardPopup
+              key={`award-${deal.player}-${deal.question}`}
+              amount={amount}
+            >
+              {others(me, async (recipient) => {
+                setPlayError("");
+                const accepted = await move("deal-award", { recipient });
+                if (!accepted)
+                  setPlayError(
+                    "Slurkene ble ikke delt ut. Velg spilleren på nytt.",
+                  );
+              })}
+              {disabled && <p role="status">Sender slurkene …</p>}
+              {playError && (
+                <p className="error" role="alert">
+                  {playError}
+                </p>
+              )}
+            </BusAwardPopup>
+          ) : (
+            <p className="bus-deal-status">
+              Riktig! Velger hvem som får {sips(amount)}.
             </p>
           )
-        ) : (
-          <>
-            <p
-              className={`bus-feedback ${deal.correct ? "bus-correct" : "bus-wrong"}`}
-              role="status"
-            >
-              {deal.correct
-                ? deal.recipient === null
-                  ? `Riktig! ${name(deal.player)} gir bort ${sips(amount)} 🍺`
-                  : `${name(deal.recipient)} tar ${sips(amount)} 🍺`
-                : `Feil! ${name(deal.player)} tar ${sips(amount)} 🍺`}
-            </p>
-            {deal.correct && deal.recipient === null ? (
-              up ? (
-                <>
-                  <p className="bus-hand-hint">Hvem gir du slurkene til?</p>
-                  {others(me, (recipient) => move("deal-award", { recipient }))}
-                </>
-              ) : (
-                <p className="action-hint">
-                  {name(deal.player)} velger hvem som drikker.
-                </p>
-              )
-            ) : up || host ? (
-              <Actions>
-                <button
-                  className="button primary"
-                  disabled={disabled}
-                  onClick={() => move("next-player")}
-                >
-                  {last
-                    ? "Til Bussruta del 2 · pyramiden →"
-                    : `Videre · ${view.players[next]?.name} sin tur →`}
-                </button>
-              </Actions>
-            ) : (
-              <p className="action-hint">
-                {name(deal.player)} tar dere videre.
-              </p>
-            )}
-          </>
-        )}
-      </BusFrame>
+        ) : null}
+        <details className="bus-deal-rules" key={`rules-${deal.question}`}>
+          <summary>Regler for dette kortet</summary>
+          <p>{guessHints[deal.question]}</p>
+          <p>
+            Riktig svar: del ut {sips(amount)}. Feil svar: ta {sips(amount)}.
+          </p>
+        </details>
+      </div>
     );
   }
 
   const names = list(view.drivers.map(name));
   const { bus } = view;
   if (view.phase === "done")
-    return (
-      <BusFrame active={active} counter="H-en + Bussruta · endestasjon">
-        <div className="bus-message">
-          <span className="bus-finish-symbol" aria-hidden="true">
-            {view.endReason === "cleared" ? "🎉" : "🚌"}
-          </span>
-          <h2>
-            {view.endReason === "no-driver"
-              ? "Alle tømte hånden!"
-              : view.endReason === "cleared"
-                ? "Dere kom til toppen!"
-                : "Bussturen er avsluttet"}
-          </h2>
-          <p>
-            {view.endReason === "no-driver"
-              ? "Null kort igjen til noen. Alle slipper Bussruta."
-              : `${names} · ${bus.attempt} forsøk · ${bus.failures} bildekort.`}
-          </p>
-        </div>
-        {view.endReason === "cleared" && (
-          <PyramidCards pyramid={bus.pyramid} row={bus.row} active={false} />
-        )}
-        <p className="action-hint">
-          {host
-            ? "Ta gjengen tilbake til lobbyen for en ny runde."
-            : "Verten tar dere tilbake til lobbyen."}
-        </p>
-      </BusFrame>
-    );
+    return <BusEndScene view={view} disabled={disabled} send={send} />;
 
   const riding = view.drivers.includes(me);
   const canAct = riding || host;
   const penalty = pyramidPenalty(bus.row);
+  const failed = bus.stage === "feedback" && bus.failed;
   return (
     <BusFrame
       active={active}
-      counter={`Bussruta · del 2 · forsøk ${bus.attempt} · rad ${bus.row} av 5`}
+      counter={`Pyramiden · forsøk ${bus.attempt} · rad ${bus.row} av 5`}
       player={view.drivers.length > 1 ? "Busslaget" : names}
       label={
         view.drivers.length > 1
@@ -422,36 +496,47 @@ export function LiveBus({
           <p>{names}</p>
         </details>
       )}
-      <div className="bus-message">
-        <h2>
-          {bus.stage === "ready"
-            ? "Unngå bildekortene"
-            : bus.stage === "pick"
-              ? `Velg ett kort på rad ${bus.row}`
-              : bus.failed
-                ? "Bildekort! Hele pyramiden starter på nytt"
-                : "Trygt kort! Videre oppover"}
-        </h2>
-        <p>
-          {bus.stage === "ready"
-            ? "Ett kort per rad, fra bunnen til toppen. Knekt, dame og konge sender bussen tilbake til start. Ess er trygt."
-            : bus.stage === "pick"
-              ? canAct
-                ? "Den markerte raden er aktiv. Velg selv hvilket kort dere vil snu."
-                : `${names} velger kort. Hold pusten.`
-              : bus.failed
-                ? penalty.shot
-                  ? "Ta en shot 🥃"
-                  : `Ta ${sips(penalty.sips)} 🍺`
-                : "Ingen bildekort. Neste rad venter."}
-        </p>
-      </div>
-      <PyramidCards
-        pyramid={bus.pyramid}
-        row={bus.row}
-        active={bus.stage === "pick" && !disabled}
-        onPick={canAct ? (index) => move("pick-pyramid", { index }) : undefined}
-      />
+      {!failed && (
+        <div className="bus-message">
+          <h2>
+            {bus.stage === "ready"
+              ? "Unngå bildekortene"
+              : bus.stage === "pick"
+                ? bus.row > 1
+                  ? `Trygt kort! Velg på rad ${bus.row}`
+                  : `Velg ett kort på rad ${bus.row}`
+                : bus.failed
+                  ? "Bildekort! Hele pyramiden starter på nytt"
+                  : "Trygt kort! Videre oppover"}
+          </h2>
+          <p>
+            {bus.stage === "ready"
+              ? "Ett kort per rad, fra bunnen til toppen. Knekt, dame og konge sender bussen tilbake til start. Ess er trygt."
+              : bus.stage === "pick"
+                ? canAct
+                  ? "Den markerte raden er aktiv. Velg selv hvilket kort dere vil snu."
+                  : `${names} velger kort. Hold pusten.`
+                : bus.failed
+                  ? penalty.shot
+                    ? "Ta en shot 🥃"
+                    : `Ta ${sips(penalty.sips)} 🍺`
+                  : "Ingen bildekort. Neste rad venter."}
+          </p>
+        </div>
+      )}
+      {failed ? (
+        <BusPyramidFailure key={`${bus.attempt}-${bus.row}`} view={view} />
+      ) : (
+        <PyramidCards
+          pyramid={bus.pyramid}
+          row={bus.row}
+          active={bus.stage === "pick" && !disabled}
+          onPick={
+            canAct ? (index) => move("pick-pyramid", { index }) : undefined
+          }
+          autoFocus
+        />
+      )}
       {canAct ? (
         <Actions>
           {bus.stage === "ready" ? (
@@ -462,21 +547,15 @@ export function LiveBus({
             >
               Start pyramiden 🚌
             </button>
-          ) : bus.stage === "feedback" ? (
-            <button
-              className="button primary"
-              disabled={disabled}
-              onClick={() => move(bus.failed ? "retry-bus" : "next-row")}
-            >
-              {bus.failed
-                ? "Stokk hele pyramiden · prøv igjen ↻"
-                : "Neste rad ↑"}
-            </button>
-          ) : (
+          ) : !failed ? (
             <p className="action-hint">
               {penalty.shot
                 ? "Bildekort på toppen = en shot 🥃"
                 : `Bildekort på denne raden = ${sips(penalty.sips)} 🍺`}
+            </p>
+          ) : (
+            <p className="action-hint">
+              Bussen fortsetter når alle har bekreftet.
             </p>
           )}
           <button

@@ -1,4 +1,5 @@
 import { cardDeck, compareCards, potatoDuration, shuffle } from "./engine.ts";
+import { availableGames } from "./catalog.ts";
 import type { Card } from "./engine.ts";
 import { promptDeck } from "./engine.ts";
 import { rouletteOutcomes } from "./content.ts";
@@ -64,8 +65,8 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
     id: "bus",
     name: "H-en + Bussruta",
     symbol: "↗",
-    no: "Fire kort på hver mobil. Tøm hånden i H-en, ellers tar du Bussruta. 2–8 spillere.",
-    en: "Four cards on every phone. Empty your hand in the H, or you ride the bus. 2–8 players.",
+    no: "Fire gjetninger gir deg hånden til H-en. De med flest kort igjen tar pyramiden. 2–8 spillere.",
+    en: "Guess four cards, then use the same hand in the H. Most cards left means the pyramid. 2–8 players.",
     answers: false,
     turns: false,
     categories: false,
@@ -273,6 +274,9 @@ export const LIVE_GAMES: readonly LiveGameInfo[] = [
 ];
 export const liveGame = (id: string) =>
   LIVE_GAMES.find((game) => game.id === id);
+export const availableLiveGames = LIVE_GAMES.filter((game) =>
+  availableGames.some((available) => available.id === game.id),
+);
 export const isLiveGame = (id: unknown): id is LiveGame =>
   LIVE_GAMES.some((game) => game.id === id);
 const isPrompt = (game: LiveGame) =>

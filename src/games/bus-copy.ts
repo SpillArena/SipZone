@@ -40,6 +40,8 @@ export const effectLabels = {
   shot: "Ta en shot 🥃",
 };
 export const sips = (n: number) => `${n} ${n === 1 ? "slurk" : "slurker"}`;
+export const PYRAMID_RESET_DELAY_MS = 1600;
+export const PYRAMID_DRINK_DELAY_MS = 3000;
 /** Stands in for a card the phone has not been told yet; only its back is drawn. */
 export const HIDDEN_CARD: Card = { rank: 1, suit: "♠" };
 export const busPhase = (
@@ -47,7 +49,7 @@ export const busPhase = (
   endReason: BusState["endReason"],
 ) =>
   phase === "h" || phase === "driver" || endReason === "no-driver"
-    ? 0
+    ? 1
     : phase === "deal"
-      ? 1
+      ? 0
       : 2;

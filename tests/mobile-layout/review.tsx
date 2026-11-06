@@ -8,6 +8,7 @@ import "../../src/live.css";
 import "../../src/party-games.css";
 import "../../src/bus.css";
 import "../../src/mobile-games.css";
+import "../../src/motion.css";
 import { LIVE_GAMES } from "../../shared/live-games";
 import { ConnectedRoom } from "../../src/features/live/ConnectedRoom";
 import { games } from "../../shared/catalog";
@@ -77,6 +78,14 @@ const cases = [
   "setup",
   ...games.filter((game) => game.id !== "bus").map((game) => game.id),
   ...busCases,
+  "live-bus-pyramid-fail",
+  "live-bus-pyramid-shot",
+  "live-bus-pyramid-safe",
+  "live-bus-finished",
+  "live-bus-guess-1",
+  "live-bus-guess-2",
+  "live-bus-guess-3",
+  "live-bus-guess-4",
   ...["higher-lower", "emoji", "quickfire", "roulette", "hot-potato"].map(
     (id) => `live-${id}`,
   ),
@@ -85,6 +94,8 @@ const params = new URLSearchParams(location.search);
 const selected = params.get("case");
 function busFixture(name: string): BusState {
   const state = createBusGame(players, () => 0.4);
+  state.phase = "h";
+  state.hands = state.guessHands.map((hand) => [...hand]);
   if (name === "h-intro") return state;
   state.table.index = 0;
   state.table.stage = "covered";
@@ -155,7 +166,7 @@ function ReviewLive({ name }: { name: string }) {
     players.slice(1).forEach((player) => joinRoom(current, player.name, ""));
     applyRoomAction(current, current.members[0], {
       action: "settings",
-      game: name,
+      game: name.startsWith("bus-") ? "bus" : name,
       category: "all",
       version: current.version,
     });
@@ -163,6 +174,37 @@ function ReviewLive({ name }: { name: string }) {
       action: "start",
       version: current.version,
     });
+    if (name.startsWith("bus-pyramid-") && current.bus) {
+      current.bus.phase = "bus";
+      current.bus.phaseIntro = null;
+      current.bus.drivers = [0];
+      const row = name.endsWith("safe") ? 1 : name.endsWith("shot") ? 5 : 3;
+      current.bus.bus = {
+        ...current.bus.bus,
+        row,
+        stage: "pick",
+        picks: row === 5 ? [0, 5, 9, 12] : row === 1 ? [] : [0, 5],
+      };
+      current.bus.pyramid[row === 5 ? 14 : 9] = { rank: 12, suit: "♥" };
+      if (name.endsWith("safe"))
+        current.bus.pyramid = current.bus.pyramid.map(() => ({
+          rank: 1,
+          suit: "♣",
+        }));
+    }
+    if (name === "bus-finished" && current.bus) {
+      current.bus.phase = "done";
+      current.bus.phaseIntro = null;
+      current.bus.endReason = "cleared";
+      current.bus.drivers = [0];
+      current.bus.bus = { ...current.bus.bus, attempt: 3, failures: 2 };
+    }
+    if (name.startsWith("bus-guess-") && current.bus) {
+      current.bus.phaseIntro = null;
+      current.bus.deal.question = Number(name.at(-1)) - 1;
+      const question = current.bus.deal.question;
+      current.bus.hands[0] = current.bus.guessHands[0].slice(0, question);
+    }
     return current;
   });
   return (
@@ -170,7 +212,7 @@ function ReviewLive({ name }: { name: string }) {
       <LiveBoard
         room={publicRoom(room, room.members[0].id)}
         disabled={false}
-        send={(input) => {
+        send={async (input) => {
           const next = structuredClone(room);
           applyRoomAction(next, next.members[0], {
             ...input,
@@ -178,6 +220,7 @@ function ReviewLive({ name }: { name: string }) {
             version: room.version,
           });
           setRoom(next);
+          return true;
         }}
       />
     </section>

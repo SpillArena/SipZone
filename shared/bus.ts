@@ -72,11 +72,33 @@ export function busCandidates(hands: readonly (readonly Card[])[]) {
     ? []
     : hands.flatMap((hand, index) => (hand.length === max ? [index] : []));
 }
+export interface BusDealResult {
+  player: number;
+  question: number;
+  card: Card;
+  correct: boolean;
+  recipient: number | null;
+}
+export interface BusDrink {
+  id: string;
+  player: number;
+  sips: number;
+  shots: number;
+  from: number | null;
+}
+export interface BusPhaseIntro {
+  id: string;
+  phase: "deal" | "h" | "bus";
+  ready: number[];
+}
 export interface BusState {
   players: Player[];
   hands: Card[][];
   h: Card[];
   guessHands: Card[][];
+  dealResults: BusDealResult[];
+  pendingDrinks: BusDrink[];
+  phaseIntro: BusPhaseIntro | null;
   pyramid: Card[];
   phase: "deal" | "h" | "driver" | "bus" | "done";
   deal: {
@@ -121,16 +143,16 @@ export function createBusGame(
   )
     throw new Error(invalid ?? "Spillerne må ha unike ID-er.");
   const deck = cardDeck(random);
-  const guesses = cardDeck(random);
   return {
     players: players.map((player) => ({ ...player })),
-    hands: players.map((_, index) => deck.slice(index * 4, index * 4 + 4)),
-    guessHands: players.map((_, index) =>
-      guesses.slice(index * 4, index * 4 + 4),
-    ),
+    hands: players.map(() => []),
+    guessHands: players.map((_, index) => deck.slice(index * 4, index * 4 + 4)),
+    dealResults: [],
+    pendingDrinks: [],
+    phaseIntro: null,
     h: deck.slice(players.length * 4, players.length * 4 + H_CARD_COUNT),
     pyramid: cardDeck(random).slice(0, PYRAMID_CARD_COUNT),
-    phase: "h",
+    phase: "deal",
     deal: {
       player: 0,
       question: 0,
@@ -186,12 +208,11 @@ function finishH(state: BusState): BusState {
     phase: !candidates.length
       ? "done"
       : candidates.length === 1
-        ? "deal"
+        ? "bus"
         : "driver",
     endReason: !candidates.length ? "no-driver" : null,
     driverCandidates: candidates,
     drivers: candidates.length === 1 ? candidates : [],
-    deal: { ...state.deal, player: candidates[0] ?? 0 },
   };
 }
 /** Gate every action by phase and reveal state; repeated taps cannot consume cards. */
@@ -215,16 +236,33 @@ export function playBus(
         ["♠", "♥", "♣", "♦"],
       ];
       if (!allowed[deal.question].includes(action.guess)) return state;
+      const correct = busGuessCorrect(
+        state.guessHands[deal.player],
+        deal.question,
+        action.guess,
+      );
       return {
         ...state,
+        dealResults: [
+          ...(state.dealResults ?? []),
+          {
+            player: deal.player,
+            question: deal.question,
+            card: state.guessHands[deal.player][deal.question],
+            correct,
+            recipient: null,
+          },
+        ],
+        // A revealed guess card becomes part of this player's H hand.
+        hands: state.hands.map((hand, index) =>
+          index === deal.player
+            ? [...hand, state.guessHands[deal.player][deal.question]]
+            : hand,
+        ),
         deal: {
           ...deal,
           stage: "feedback",
-          correct: busGuessCorrect(
-            state.guessHands[deal.player],
-            deal.question,
-            action.guess,
-          ),
+          correct,
         },
       };
     }
@@ -235,17 +273,24 @@ export function playBus(
       deal.recipient === null &&
       validRecipient(action.recipient, deal.player)
     )
-      return { ...state, deal: { ...deal, recipient: action.recipient } };
+      return {
+        ...state,
+        deal: { ...deal, recipient: action.recipient },
+        dealResults: (state.dealResults ?? []).map((result) =>
+          result.player === deal.player && result.question === deal.question
+            ? { ...result, recipient: action.recipient }
+            : result,
+        ),
+      };
     if (
       action.type === "next-player" &&
       deal.stage === "feedback" &&
       (!deal.correct || deal.recipient !== null)
     ) {
-      const next =
-        (state.drivers.indexOf(deal.player) + 1) % state.drivers.length;
-      const player = state.drivers[next];
+      const next = (deal.player + 1) % state.players.length;
+      const player = next;
       const question = deal.question + (next === 0 ? 1 : 0);
-      if (question === 4) return { ...state, phase: "bus" };
+      if (question === 4) return { ...state, phase: "h" };
       return {
         ...state,
         deal: {
@@ -351,9 +396,8 @@ export function playBus(
     if (action.type === "ride-together")
       return {
         ...state,
-        phase: "deal",
+        phase: "bus",
         drivers: [...state.driverCandidates],
-        deal: { ...deal, player: state.driverCandidates[0] },
       };
     if (
       action.type === "choose-driver" &&
@@ -361,9 +405,8 @@ export function playBus(
     )
       return {
         ...state,
-        phase: "deal",
+        phase: "bus",
         drivers: [action.player],
-        deal: { ...deal, player: action.player },
       };
     return state;
   }

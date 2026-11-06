@@ -52,7 +52,7 @@ export function BusFrame({
   return (
     <div className="round-board bus-board" tabIndex={-1}>
       <ol className="bus-phases" aria-label="Spillets faser">
-        {["H-en", "Fire gjetninger", "Pyramiden"].map((name, index) => (
+        {["Fire gjetninger", "H-en", "Pyramiden"].map((name, index) => (
           <li
             key={name}
             aria-current={index === active ? "step" : undefined}
@@ -82,6 +82,8 @@ export function Hand({
   onPlay,
   match,
   faceDown,
+  canPlay,
+  compact = false,
 }: {
   cards: Card[];
   revealed?: number;
@@ -90,6 +92,8 @@ export function Hand({
   match?: number;
   /** Set inside the hand drawer: the cards flip over as it opens and closes. */
   faceDown?: boolean;
+  canPlay?: (slot: number) => boolean;
+  compact?: boolean;
 }) {
   const face = (card: Card, index: number) =>
     faceDown === undefined ? (
@@ -121,8 +125,8 @@ export function Hand({
           <>
             {face(card, index)}
             <span className="bus-card-caption">
-              Kort {index + 1}
-              {active === index
+              {compact ? index + 1 : `Kort ${index + 1}`}
+              {!compact && active === index
                 ? index < revealed
                   ? " · snudd nå"
                   : " · neste kort"
@@ -134,15 +138,23 @@ export function Hand({
           <button
             key={key}
             className="bus-card-choice"
-            disabled={card.rank !== match}
+            disabled={canPlay ? !canPlay(index) : card.rank !== match}
             aria-label={`Legg ${cardLabel(card.rank)} ${card.suit}`}
             onClick={() => onPlay(index)}
           >
             {face(card, index)}
-            <span>{card.rank === match ? "Legg kortet" : "Ingen match"}</span>
+            <span>
+              {(canPlay ? canPlay(index) : card.rank === match)
+                ? "Legg kortet"
+                : "Ingen match"}
+            </span>
           </button>
         ) : (
-          <div key={key} className={active === index ? "bus-active-card" : ""}>
+          <div
+            key={key}
+            className={`bus-hand-slot${active === index ? " bus-active-card" : ""}`}
+            style={{ "--i": index } as CSSProperties}
+          >
             {content}
           </div>
         );
@@ -258,11 +270,15 @@ export function HCards({
   index: current,
   canReveal,
   onReveal,
+  onSelect,
+  selectable,
 }: {
   h: (Card | null)[];
   index: number;
   canReveal: boolean;
   onReveal?: () => void;
+  onSelect?: (index: number) => void;
+  selectable?: number[];
 }) {
   return (
     <>
@@ -279,16 +295,20 @@ export function HCards({
         {h.map((card, index) => (
           <button
             key={index}
-            className={`bus-h-card ${index === current ? "bus-active-card" : ""}`}
+            className={`bus-h-card ${!onSelect && index === current ? "bus-active-card" : ""}`}
             style={{
               gridColumn: index < 10 ? (index % 2 === 0 ? 4 : 1) : index - 8,
               gridRow: index < 10 ? Math.floor(index / 2) + 1 : 3,
             }}
-            disabled={!onReveal || index !== current || !canReveal}
-            onClick={onReveal}
+            disabled={
+              onSelect
+                ? !selectable?.includes(index)
+                : !onReveal || index !== current || !canReveal
+            }
+            onClick={onSelect ? () => onSelect(index) : onReveal}
             aria-label={
               card
-                ? `H-kort ${index + 1}: ${cardLabel(card.rank)} ${card.suit}`
+                ? `H-kort ${index + 1}: ${cardLabel(card.rank)} ${card.suit}${onSelect ? ` · ${effectLabels[hEffect(index)]}` : ""}`
                 : `Snu H-kort ${index + 1}: ${effectLabels[hEffect(index)]}`
             }
           >
@@ -323,14 +343,34 @@ export function PyramidCards({
   row: current,
   active,
   onPick,
+  autoFocus = false,
 }: {
   pyramid: (Card | null)[];
   row: number;
   active: boolean;
   onPick?: (index: number) => void;
+  autoFocus?: boolean;
 }) {
+  const pyramidRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!autoFocus) return;
+    const timer = setTimeout(() => {
+      const row =
+        pyramidRef.current?.querySelector<HTMLElement>(".bus-current-row");
+      if (!row) return;
+      row.focus({ preventScroll: true });
+      row.scrollIntoView({
+        block: "nearest",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
+    }, 450);
+    return () => clearTimeout(timer);
+  }, [autoFocus, current]);
   return (
     <div
+      ref={pyramidRef}
       className="bus-pyramid"
       role="group"
       aria-label="Velg ett kort per rad, fra bunnen til toppen"
@@ -342,6 +382,9 @@ export function PyramidCards({
             <div
               className={`bus-pyramid-row ${current === row ? "bus-current-row" : ""}`}
               key={row}
+              tabIndex={autoFocus && current === row ? -1 : undefined}
+              role="group"
+              aria-label={`Rad ${row}`}
             >
               <div className="bus-pyramid-cards">
                 {indices.map((index) => {
@@ -541,7 +584,7 @@ export function BusGame({
           <>
             {table.stage === "intro" && (
               <div className="bus-message">
-                <h2>H-en først. Bussruta etterpå.</h2>
+                <h2>Fire gjetninger er ferdig. Nå spiller vi H-en.</h2>
                 <p>
                   Alle har fått fire kort. Trykk på navnet ditt for å se hånden
                   privat. Gi bort til venstre, ta selv til høyre. Vi snur
@@ -655,15 +698,13 @@ export function BusGame({
     const { deal } = state;
     const amount = deal.question + 1;
     const hand = state.guessHands[deal.player];
-    const nextDriver =
-      state.drivers[
-        (state.drivers.indexOf(deal.player) + 1) % state.drivers.length
-      ];
-    const last = deal.question === 3 && deal.player === state.drivers.at(-1);
+    const nextDriver = (deal.player + 1) % state.players.length;
+    const last =
+      deal.question === 3 && deal.player === state.players.length - 1;
     return (
       <Frame
         state={state}
-        counter={`Bussruta · del 1 · kort ${amount} av 4 · spiller ${state.drivers.indexOf(deal.player) + 1} av ${state.drivers.length}`}
+        counter={`Fire gjetninger · kort ${amount} av 4 · spiller ${deal.player + 1} av ${state.players.length}`}
         player={players[deal.player].name}
         label={deal.stage === "handoff" ? "Gi mobilen til" : undefined}
       >
@@ -742,7 +783,7 @@ export function BusGame({
                       onClick={() => act({ type: "next-player" })}
                     >
                       {last
-                        ? "Til Bussruta del 2 · pyramiden →"
+                        ? "Til H-en · behold kortene →"
                         : `Skjul kortene · ${players[nextDriver].name} sin tur →`}
                     </button>
                   </Actions>
@@ -791,7 +832,7 @@ export function BusGame({
   return (
     <Frame
       state={state}
-      counter={`Bussruta · del 2 · forsøk ${bus.attempt} · rad ${bus.row} av 5`}
+      counter={`Pyramiden · forsøk ${bus.attempt} · rad ${bus.row} av 5`}
       player={state.drivers.length > 1 ? "Busslaget" : names}
       label={
         state.drivers.length > 1

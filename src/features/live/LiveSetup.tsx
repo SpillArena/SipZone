@@ -4,7 +4,7 @@ import { useAccount } from "../../account/useAccount";
 import { onSessionChange } from "../../account/session";
 import { useI18n } from "../../i18n";
 import { ROOM_CODE } from "../../../shared/rooms";
-import { LIVE_GAMES, type LiveGame } from "../../../shared/live-games";
+import { availableLiveGames, type LiveGame } from "../../../shared/live-games";
 import { LiveError, randomCode, roomRequest } from "./api";
 import type { Access } from "./api";
 import { ConnectedRoom } from "./ConnectedRoom";
@@ -131,12 +131,12 @@ export function LiveSetup({
   return (
     <section className="live-page live-onboarding arena-container page-narrow">
       <a className="back-link" href="#/">
-        ← {t("Alle leker", "All games")}
+        ← {t("Til forsiden", "Back to home")}
       </a>
       <div className="live-intro">
         <p className="eyebrow">
           <span className="live-dot" />
-          SipZone Live
+          Bussruta
         </p>
         <h1>
           {t("Hver sin mobil.", "Your own phone.")}
@@ -290,8 +290,8 @@ export function LiveSetup({
                 <h3>{t("Én er vert", "One person hosts")}</h3>
                 <p>
                   {t(
-                    "Opprett rommet og velg en lek.",
-                    "Create the room and pick a game.",
+                    "Opprett et rom for Bussruta.",
+                    "Create a room for Bussruta.",
                   )}
                 </p>
               </div>
@@ -318,16 +318,16 @@ export function LiveSetup({
                 <h3>{t("Hver deres skjerm", "Your own screens")}</h3>
                 <p>
                   {t(
-                    "Alle ser samme runde. Svar og stemmer er private frem til resultatet vises.",
-                    "Everyone sees the same round. Answers and votes stay private until the result is revealed.",
+                    "Alle ser bordet, men bare du ser kortene på hånden din.",
+                    "Everyone sees the table, but only you can see your own hand.",
                   )}
                 </p>
               </div>
             </li>
           </ol>
           <div className="live-included">
-            <span>2–16 {t("spillere", "players")}</span>
-            {LIVE_GAMES.map((game) => (
+            <span>2–8 {t("spillere", "players")}</span>
+            {availableLiveGames.map((game) => (
               <span key={game.id}>{game.name}</span>
             ))}
           </div>

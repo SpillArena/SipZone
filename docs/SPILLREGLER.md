@@ -49,29 +49,37 @@ betydning, og fjerde konge avslutter fortsatt spillet med husregler.
 
 ### Bussruta
 
-Bussruta er nå implementert som SipZones variant for én enhet og 2–8 spillere.
-Regelvalg som skilte seg mellom kildene er fastlagt slik:
+Gjeldende SipZone-variant er for 2–8 spillere med hver sin mobil:
 
-- Én kortstokk gir fire kort per spiller og 15 pyramidekort. Med åtte spillere
-  brukes 47 unike kort. Ingen nye stokker blandes inn i utdeling eller pyramide.
-- Hver spiller får fire private gjetninger: farge, høyere/lavere, innenfor/utenfor
-  og sort. Ess er høyest. Lik verdi er feil; også likt med en av grensene i
-  innenfor/utenfor. Riktig gir ett poeng, feil én valgfri slurk.
-- Hånden vises først etter bekreftet overlevering. De andre ser bort. Spilleren
-  skjuler hånden før neste person får mobilen. Ved senere innsyn gjelder samme
-  overlevering; appen viser ikke hvem som har matchende kort på felles skjerm.
-- Pyramiden snus fra nederste rad, fem/fire/tre/to/ett kort. Et matchende
-  håndkort legges én gang og gir radens poeng (1–5). Spilleren kan velge én
-  annen deltaker til én valgfri slurk eller hoppe over utdelingen. Flere kort
-  kan legges før gruppen avslutter samme pyramidekort. Dette er en poengvariant;
-  radnummeret øker ikke antall slurker.
-- Den med flest restkort kjører, uavhengig av poeng. Ved delt tap trekker appen
-  én av kandidatene tilfeldig. Er alle tomhendte, avsluttes spillet uten busstur.
-- Bussturen har fem kort og fire høyere/lavere-gjetninger. Ved feil begynner
-  et nytt forsøk fra første kort, med fem kort fra en ny stokket kortstokk.
-  Kort kan derfor komme igjen mellom forsøk, men ikke innenfor ett forsøk.
-  Ess er høyest og like verdier er feil. Etter tre mislykkede forsøk er turen
-  slutt. Sjåføren kan også avslutte underveis uten en ny feilregistrering.
+Før hver av de tre fasene får alle en animert intro med enkle regler.
+Hver spiller trykker «Jeg er klar» på sin egen enhet. Fasen begynner først når
+alle er klare; etter pyramideintroen kan de på bussen velge første kort direkte.
+
+1. **Fire gjetninger:** alle gjetter ett kort hver på rundgang. Rød/svart,
+   høyere/lavere, innenfor/utenfor og sort. Riktig svar gir bort 1–4 slurker;
+   feil svar gir samme antall til spilleren selv. Ess er høyest, likt er feil,
+   og innenfor/utenfor bruker strenge grenser. Kortet beholdes uansett svar.
+   Ved feil svar bekrefter spilleren å ha drukket. Ved riktig svar vises
+   mottakervalg etter to sekunder. Turen går først videre når den som skal
+   drikke har trykket «Jeg har drukket». Varsler varer høyst ti sekunder, kan lukkes og forsvinner når
+   drikkingen bekreftes; selve bekreftelsen har ingen tidsfrist og kan ikke hoppes over.
+2. **H-en:** de samme fire kortene blir hånden. H-ens 12 kort kommer fra resten
+   av samme stokk, slik at ingen kort finnes både på hånden og på bordet.
+   Verten snur høyre/venstre annenhver gang. Match til venstre gir bort en
+   slurk, match til høyre tar en slurk, og de to kortene i midten gir en shot.
+   Et trykk på et spillbart håndkort velger sist snudde match automatisk.
+3. **Pyramiden:** den med flest kort igjen tar bussen. Ved likt avgjør dere med
+   stein, saks, papir, eller tar bussen sammen. Ingen kort igjen betyr ingen
+   busstur. Det er ingen ny gjetterunde etter H-en. Velg ett kort per rad i
+   pyramiden og unngå knekt, dame og konge; ess er trygt. Bildekort gir 2, 4,
+   6 eller 8 slurker på rad 1–4 og en shot på toppen. Et bildekort stokker hele
+   pyramiden og starter fra bunnen igjen, uten en fast grense på antall forsøk.
+   Trygge kort aktiverer neste rad automatisk. Ved bildekort vises kortet og
+   resettingen før drikkevinduet åpnes etter tre sekunder. Vinduet viser kortet
+   som ble truffet. Når alle på bussen har bekreftet, starter neste forsøk automatisk.
+
+Dette er SipZones avtalte variant. Historiske kildehenvisninger nedenfor er
+inspirasjon; den gjeldende digitale flyten er beskrevet her og i spillet.
 
 ## Overlapp og nye leker
 

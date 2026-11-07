@@ -23,7 +23,9 @@ import {
   type BusPlay,
 } from "./live-bus.ts";
 import { dropTablePlayer, tableMove, type TableState } from "./live-table.ts";
-export const ROOM_CODE = /^\d{3}[A-Z]$/;
+/** A party code from the SpillArena lobby: four letters, and the room code of whatever game the party opens. */
+export const PARTY_CODE = /^[ABCDEFGHJKMNPQRSTVWXYZ]{4}$/;
+export const ROOM_CODE = /^(?:\d{3}[A-Z]|[ABCDEFGHJKMNPQRSTVWXYZ]{4})$/;
 export const ROOM_TTL = 24 * 60 * 60 * 1000;
 export interface Member extends Player {
   account: string;

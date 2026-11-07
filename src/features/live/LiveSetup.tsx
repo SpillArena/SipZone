@@ -5,7 +5,7 @@ import { onSessionChange } from "../../account/session";
 import { useI18n } from "../../i18n";
 import { ROOM_CODE } from "../../../shared/rooms";
 import { availableLiveGames, type LiveGame } from "../../../shared/live-games";
-import { LiveError, randomCode, roomRequest } from "./api";
+import { LiveError, partyFromUrl, partyRoom, randomCode, roomRequest } from "./api";
 import type { Access } from "./api";
 import { ConnectedRoom } from "./ConnectedRoom";
 
@@ -40,7 +40,12 @@ export function LiveSetup({
   );
 
   const enter = useCallback(
-    async (create: boolean, account: string, roomCodeInput: string) => {
+    async (
+      create: boolean,
+      account: string,
+      roomCodeInput: string,
+      party = false,
+    ) => {
       if (lock.current) return;
       const normalized = roomCodeInput.trim().toUpperCase();
       if (!create && !ROOM_CODE.test(normalized)) {
@@ -52,6 +57,19 @@ export function LiveSetup({
       setBusy(true);
       setError("");
       try {
+        if (party) {
+          // Party mode: the party code is the room code, so the room opens or is joined without anyone typing a code.
+          const result = await partyRoom(
+            normalized,
+            create,
+            () => operation.current !== current,
+          );
+          if (!result.token) throw new Error("Mangler romtilgang. Prøv igjen.");
+          if (operation.current !== current) return;
+          history.replaceState(null, "", `#/live/${normalized}`);
+          setAccess({ code: normalized, token: result.token, account });
+          return;
+        }
         for (let attempt = 0; attempt < (create ? 10 : 1); attempt++) {
           const roomCode = create ? randomCode() : normalized;
           try {
@@ -90,6 +108,19 @@ export function LiveSetup({
     [],
   );
 
+  // The lobby's party mode: the host creates the room, everyone else joins it, as soon as the account is known.
+  const party = useRef(partyFromUrl());
+  useEffect(() => {
+    if (!party.current || !username) return;
+    // Deferred so StrictMode's throwaway first mount (whose cleanup cancels a running entry) never starts one.
+    const timer = window.setTimeout(() => {
+      const intent = party.current;
+      if (!intent) return;
+      party.current = null;
+      void enter(intent.host, username, intent.code, true);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [username, enter]);
   useEffect(
     () =>
       onSessionChange((session) => {

@@ -6,6 +6,7 @@ import {
   joinRoom,
   normalizeRoom,
   publicRoom,
+  ROOM_CODE,
   ROOM_TTL,
 } from "../shared/rooms.ts";
 import { LIVE_GAMES, nextWake, tick } from "../shared/live-games.ts";
@@ -18,6 +19,11 @@ const setup = () => {
   applyRoomAction(room, host, { action: "start", version: room.version });
   return { room, host, friend };
 };
+test("a four-letter party code from the lobby is a room code, and look-alike letters are not", () => {
+  for (const code of ["123A", "ABCD", "WXYZ"]) assert.match(code, ROOM_CODE);
+  for (const code of ["ABIL", "ABC", "ABCDE", "abcd"]) assert.doesNotMatch(code, ROOM_CODE);
+});
+
 test("room start and host-only actions enforce permissions and revisions", () => {
   const room = createRoom("123A", "Ada", 1000);
   assert.equal(room.expires, 1000 + ROOM_TTL);

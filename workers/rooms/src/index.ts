@@ -225,7 +225,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const match = url.pathname.match(
-      /^(?:\/sipzone)?\/api\/rooms\/(\d{3}[A-Z])(\/socket)?$/,
+      /^(?:\/sipzone)?\/api\/rooms\/(\d{3}[A-Z]|[A-Z]{4})(\/socket)?$/,
     );
     if (!match || !ROOM_CODE.test(match[1]))
       return Response.json({ error: "Ugyldig romadresse." }, { status: 404 });

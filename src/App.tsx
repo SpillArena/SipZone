@@ -13,7 +13,11 @@ import { Setup } from "./features/Setup";
 import type { GameSettings } from "./features/Setup";
 import { LocalGame } from "./features/LocalGame";
 import { Live } from "./features/live/Live";
+import { partyFromUrl } from "./features/live/api";
 const routeFromHash = () => location.hash.replace(/^#\/?/, "").split("/");
+// Opened by the lobby's party mode (?party=ABCD): go straight to the room screen, which opens or joins the room.
+const firstRoute = () =>
+  !location.hash && partyFromUrl() ? ["live"] : routeFromHash();
 interface Session {
   id: string;
   game: string;
@@ -22,7 +26,7 @@ interface Session {
 }
 export default function App() {
   const { language, t } = useI18n();
-  const [route, setRoute] = useState(routeFromHash);
+  const [route, setRoute] = useState(firstRoute);
   const [party, setParty] = useState<Player[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const [exit, setExit] = useState(false);

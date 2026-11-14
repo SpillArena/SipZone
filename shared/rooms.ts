@@ -26,6 +26,7 @@ import { dropTablePlayer, tableMove, type TableState } from "./live-table.ts";
 /** A party code from the SpillArena lobby: four letters, and the room code of whatever game the party opens. */
 export const PARTY_CODE = /^[ABCDEFGHJKMNPQRSTVWXYZ]{4}$/;
 export const ROOM_CODE = /^(?:\d{3}[A-Z]|[ABCDEFGHJKMNPQRSTVWXYZ]{4})$/;
+export const IDLE_MS = 10 * 60 * 1000;
 export const ROOM_TTL = 24 * 60 * 60 * 1000;
 export interface Member extends Player {
   account: string;
@@ -40,6 +41,8 @@ export interface Room {
   members: Member[];
   version: number;
   expires: number;
+  /** Last time anyone used the room over HTTP; with no socket open, a room idle for IDLE_MS is deleted. */
+  activeAt?: number;
   game: LiveGame;
   category: Category;
   phase: "lobby" | "playing";
@@ -109,6 +112,7 @@ export function createRoom(
     members: [member],
     version: 0,
     expires: now + ROOM_TTL,
+    activeAt: now,
     game: "most-likely",
     category: "all",
     phase: "lobby",

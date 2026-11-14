@@ -5,6 +5,7 @@ import {
   joinRoom,
   normalizeRoom,
   publicRoom,
+  IDLE_MS,
   ROOM_CODE,
   RoomError,
 } from "../../../shared/rooms.ts";
@@ -56,9 +57,13 @@ export class SipZoneRoom extends DurableObject<Env> {
       }
     }
   }
+  /** The next timed event, or the point where an unused room is checked for deletion. */
+  private wake(room: Room) {
+    return Math.max(Math.min(nextWake(room), (room.activeAt ?? Date.now()) + IDLE_MS), Date.now() + 1000);
+  }
   /** Wakes the room for its next timed event, such as a potato going off. */
   private schedule(room: Room) {
-    this.ctx.waitUntil(this.ctx.storage.setAlarm(nextWake(room)));
+    this.ctx.waitUntil(this.ctx.storage.setAlarm(this.wake(room)));
   }
   handle(
     code: string,
@@ -98,8 +103,14 @@ export class SipZoneRoom extends DurableObject<Env> {
             (player) => player.account === account && player.token === token,
           );
           if (!member) return fail("Bli med i rommet igjen.", 401);
-          if (method === "GET")
+          if (method === "GET") {
+            // Polling keeps the room alive, but is persisted at most once a minute.
+            if (Date.now() - (room.activeAt ?? 0) > 60_000) {
+              room.activeAt = Date.now();
+              this.save(room);
+            }
             return { status: 200, data: publicRoom(room, member.id) };
+          }
           if (input.action === "ticket") {
             member.ticket = crypto.randomUUID();
             member.ticketExpires = Date.now() + 30_000;
@@ -110,6 +121,7 @@ export class SipZoneRoom extends DurableObject<Env> {
           applyRoomAction(room, member, input);
         }
       }
+      room.activeAt = Date.now();
       this.save(room);
       this.broadcast(room);
       if (room.members.length === 0)
@@ -170,13 +182,14 @@ export class SipZoneRoom extends DurableObject<Env> {
   }
   async alarm() {
     const room = this.read();
-    if (room && room.members.length && room.expires > Date.now()) {
+    const inUse = !!room && (this.ctx.getWebSockets().some((s) => s.readyState === 1) || Date.now() - (room.activeAt ?? 0) < IDLE_MS);
+    if (room && room.members.length && room.expires > Date.now() && inUse) {
       if (tick(room)) {
         room.version++;
         this.save(room);
         this.broadcast(room);
       }
-      await this.ctx.storage.setAlarm(nextWake(room));
+      await this.ctx.storage.setAlarm(this.wake(room));
       return;
     }
     for (const socket of this.ctx.getWebSockets())

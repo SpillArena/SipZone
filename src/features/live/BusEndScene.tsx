@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { BusFront, RotateCcw } from "lucide-react";
 import type { LiveBusView } from "../../../shared/live-bus";
 import { BusFrame } from "../../games/BusRoute";
+import { recordGame } from "../../lib/storage";
 import { PlayerChip } from "./PlayerChip";
 
 export function BusEndScene({
@@ -19,6 +20,16 @@ export function BusEndScene({
     heading.current?.focus({ preventScroll: true });
     heading.current?.closest(".bus-board")?.scrollIntoView({ block: "start" });
   }, []);
+  // The round is over: it counts once for the signed-in player, who must have been dealt in.
+  useEffect(() => {
+    if (view.you < 0) return;
+    recordGame({
+      id: `${view.players.map((player) => player.id).join(",")}:${view.drivers.join(",")}:${view.endReason}`,
+      game: "bus",
+      mode: "live",
+      players: view.players.length,
+    });
+  }, [view]);
   const cleared = view.endReason === "cleared";
   const noDriver = view.endReason === "no-driver";
   const riders = view.drivers

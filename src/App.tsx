@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { AccountBadge, ConsentDialog } from "./account";
+import { AccountBadge, ConsentDialog, onSessionChange } from "./account";
 import { useI18n } from "./i18n";
+import { progress, pullProgress, recordGame } from "./lib/storage";
 import { availableGames } from "../shared/catalog";
 import { isLiveGame } from "../shared/live-games";
 import type { Player } from "../shared/engine";
@@ -44,6 +45,14 @@ export default function App() {
       window.scrollTo(0, 0);
     } else location.hash = "/";
   };
+  // Fetch the account's profile on start and on every sign-in, and forget the previous player's on sign-out.
+  useEffect(() => {
+    void pullProgress();
+    return onSessionChange((next) => {
+      progress.forget();
+      if (next) void pullProgress();
+    });
+  }, []);
   useEffect(() => {
     const change = () => {
       if (
@@ -141,7 +150,16 @@ export default function App() {
                 finished: false,
               })
             }
-            onComplete={() => setSession({ ...session, finished: true })}
+            onComplete={() => {
+              // A finished local game counts once for XP and plays on the account.
+              recordGame({
+                id: session.id,
+                game: session.game,
+                mode: "local",
+                players: party.length,
+              });
+              setSession({ ...session, finished: true });
+            }}
           />
         ) : (
           <Setup
@@ -174,6 +192,16 @@ export default function App() {
             en: {
               title: "Language and appearance",
               body: "Remembers your language and light or dark appearance. Local players and rounds stay in this tab only.",
+            },
+          },
+          {
+            no: {
+              title: "Fremgangen din",
+              body: "XP, nivå og hvor mange leker du har fullført, slik at du kan fortsette neste gang. Lagres på kontoen din når du er logget inn.",
+            },
+            en: {
+              title: "Your progress",
+              body: "XP, level and how many games you have finished, so you can pick up where you left off. Saved to your account when you are signed in.",
             },
           },
         ]}
